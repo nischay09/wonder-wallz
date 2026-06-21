@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
@@ -16,209 +16,252 @@ const navLinks = [
 
 export function Navbar() {
   const [scrolled,   setScrolled]   = useState(false);
+  const [hidden,     setHidden]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
   const { scrollY } = useScroll();
+  const lastY = useRef(0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 100);
+    setScrolled(latest > 60);
+
+    // Auto-hide on the way down, reveal on the way up — keeps the pill
+    // out of the hero's headline while scrolling, and brings it right
+    // back the moment the visitor wants it.
+    const delta = latest - lastY.current;
+    if (latest < 120) {
+      setHidden(false);
+    } else if (delta > 6 && !mobileOpen) {
+      setHidden(true);
+    } else if (delta < -6) {
+      setHidden(false);
+    }
+    lastY.current = latest;
   });
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
+    if (mobileOpen) setHidden(false);
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
   return (
     <>
-      {/* ── Floating Navbar Wrapper ── */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 z-50 flex justify-center"
-        animate={{
-          paddingLeft:  scrolled ? "1.25rem" : "0.5rem",
-          paddingRight: scrolled ? "1.25rem" : "0.5rem",
-          paddingTop:   scrolled ? "0.75rem" : "0.5rem",
-        }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+      {/* ── Floating Navbar Wrapper ──
+          Outer layer is a plain (non-animated) fixed container that just
+          reserves the device's notch/Dynamic-Island inset. All motion
+          lives on the inner layer so the safe-area padding never fights
+          the scroll animation. */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
       >
-        <motion.header
-          className="w-full"
+        <motion.div
+          className="flex justify-center px-2"
           animate={{
-            maxWidth: scrolled ? "860px" : "1600px",
-            scale:    scrolled ? 1 : 1.02,
-            y:        scrolled ? 0 : 4,
-            filter: scrolled
-              ? "drop-shadow(0 8px 32px rgba(0,0,0,0.18))"
-              : "drop-shadow(0 4px 16px rgba(0,0,0,0.10))",
+            paddingLeft:  scrolled ? "0.75rem" : "0.5rem",
+            paddingRight: scrolled ? "0.75rem" : "0.5rem",
+            paddingTop:   scrolled ? "0.625rem" : "0.5rem",
+            paddingBottom:"0.5rem",
+            y: hidden ? "-130%" : "0%",
           }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
         >
-          {/* ── Nav Shell — always pill, always frosted ── */}
-          <motion.nav
-            className="flex items-center justify-between px-3 py-2.5"
+          <motion.header
+            className="w-full"
             animate={{
-              borderRadius: "9999px",
-              // Warm frosted glass — matches the beige/cream in the screenshot
-              background: scrolled
-                ? "rgba(240,236,228,0.82)"
-                : "rgba(240,236,228,0.70)",
-              backdropFilter: "blur(24px)",
-              WebkitBackdropFilter: "blur(24px)",
-              borderColor: scrolled
-                ? "rgba(200,190,175,0.55)"
-                : "rgba(200,190,175,0.40)",
+              maxWidth: scrolled ? "860px" : "1600px",
+              y:        scrolled ? 0 : 4,
+              filter: scrolled
+                ? "drop-shadow(0 8px 32px rgba(0,0,0,0.18))"
+                : "drop-shadow(0 4px 16px rgba(0,0,0,0.10))",
             }}
-            style={{
-              border: "1px solid transparent",
-            }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            aria-label="Main navigation"
+            transition={{ duration: 0.35, ease: "easeOut" }}
           >
-
-            {/* ── Logo Badge — always visible with gradient border ── */}
-            <Link
-              href="/"
-              aria-label="Wonder Wallz home"
-              className="flex items-center gap-2.5 shrink-0 relative rounded-2xl px-3.5 py-2"
-              style={{
-                background: "linear-gradient(135deg, #fdfaff 0%, #fff9f5 100%)",
-                boxShadow: "0 1px 8px rgba(139,63,200,0.12)",
+            {/* ── Nav Shell — always pill, always frosted ── */}
+            <motion.nav
+              className="flex items-center justify-between px-2.5 py-2"
+              animate={{
+                borderRadius: "9999px",
+                background: scrolled
+                  ? "rgba(240,236,228,0.86)"
+                  : "rgba(240,236,228,0.70)",
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                borderColor: scrolled
+                  ? "rgba(200,190,175,0.55)"
+                  : "rgba(200,190,175,0.40)",
               }}
+              style={{ border: "1px solid transparent" }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              aria-label="Main navigation"
             >
-              {/* Gradient border ring */}
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  borderRadius: "inherit",
-                  padding: "1.5px",
-                  background: "linear-gradient(135deg, #00BDB0, #7C3AED 40%, #F97316)",
-                  WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                  WebkitMaskComposite: "xor",
-                  maskComposite: "exclude",
-                  pointerEvents: "none",
-                }}
-              />
 
-              {/* Logo image */}
-              <div
-                className="relative w-9 h-9 shrink-0"
-                style={{ filter: "drop-shadow(0 1px 2px rgba(139,63,200,0.20))" }}
+              {/* ── Logo Badge — settles into a smaller, tidier mark on
+                   scroll instead of getting squeezed by shrinking padding.
+                   A deliberate, proportional scale-down reads as "elegant"
+                   rather than "cramped". ── */}
+              <motion.div
+                animate={{ scale: scrolled ? 0.88 : 1 }}
+                style={{ transformOrigin: "left center" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
               >
-                <Image
-                  src="/logo.png"
-                  alt="Wonder Wallz Logo"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-
-              {/* Wordmark */}
-              <span
-                className="font-extrabold text-sm uppercase whitespace-nowrap"
-                style={{ letterSpacing: "0.10em" }}
-              >
-                <span style={{ color: "#7C3AED" }}>Wonder</span>
-                <span style={{ color: "#d1c4e0", fontWeight: 300, margin: "0 2px" }}>·</span>
-                <span style={{ color: "#F97316" }}>Wallz</span>
-              </span>
-            </Link>
-
-            {/* ── Desktop Nav Links ── */}
-            <ul className="hidden lg:flex items-center gap-0 mx-2" role="list">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="relative px-4 py-2 text-sm font-medium tracking-wide block"
-                    style={{
-                      color: activeLink === link.href ? "#1a1a1a" : "#4a4a4a",
-                      transition: "color 0.15s",
-                    }}
-                    onMouseEnter={() => setActiveLink(link.href)}
-                    onMouseLeave={() => setActiveLink(null)}
-                  >
-                    {/* Subtle hover bg pill */}
-                    <AnimatePresence>
-                      {activeLink === link.href && (
-                        <motion.span
-                          className="absolute inset-0 rounded-xl"
-                          style={{ background: "rgba(139,63,200,0.06)" }}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                        />
-                      )}
-                    </AnimatePresence>
-
-                    <span className="relative z-10">{link.label}</span>
-
-                    {/* Animated underline */}
-                    <AnimatePresence>
-                      {activeLink === link.href && (
-                        <motion.span
-                          className="absolute left-4 right-4 rounded-full"
-                          style={{
-                            bottom: "4px",
-                            height: "2px",
-                            background: "linear-gradient(90deg, #00BDB0, #7C3AED, #F97316)",
-                          }}
-                          initial={{ scaleX: 0, originX: 0 }}
-                          animate={{ scaleX: 1 }}
-                          exit={{ scaleX: 0, originX: 1 }}
-                          transition={{ duration: 0.2, ease: "easeOut" }}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            {/* ── Right Icon Group ── */}
-            <div className="flex items-center gap-1 pr-1">
-              <CircleIconBtn aria-label="Search">
-                <Search size={16} />
-              </CircleIconBtn>
-
-              <CircleIconBtn aria-label="Account" className="hidden md:flex">
-                <User size={16} />
-              </CircleIconBtn>
-
-              <CircleIconBtn aria-label="Cart (0 items)" className="relative">
-                <ShoppingBag size={16} />
-                <span
-                  className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-                  style={{ backgroundColor: "#F97316" }}
+                <Link
+                  href="/"
+                  aria-label="Wonder Wallz home"
+                  className="flex items-center gap-2 shrink-0 relative rounded-2xl px-3 py-1.5"
+                  style={{
+                    background: "linear-gradient(135deg, #fdfaff 0%, #fff9f5 100%)",
+                    boxShadow: "0 1px 8px rgba(139,63,200,0.12)",
+                  }}
                 >
-                  0
-                </span>
-              </CircleIconBtn>
+                  {/* Gradient border ring */}
+                  <span
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: "inherit",
+                      padding: "1.5px",
+                      background: "linear-gradient(135deg, #00BDB0, #7C3AED 40%, #F97316)",
+                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+                      WebkitMaskComposite: "xor",
+                      maskComposite: "exclude",
+                      pointerEvents: "none",
+                    }}
+                  />
 
-              {/* Mobile hamburger */}
-              <motion.button
-                className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full ml-0.5"
-                style={{
-                  background: "rgba(255,255,255,0.7)",
-                  border: "1px solid rgba(200,190,175,0.5)",
-                  color: "#555",
-                }}
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-                aria-expanded={mobileOpen}
-                whileHover={{ backgroundColor: "#fff", color: "#7C3AED" }}
-                whileTap={{ scale: 0.92 }}
-                transition={{ duration: 0.15 }}
-              >
-                <Menu size={18} />
-              </motion.button>
-            </div>
-          </motion.nav>
-        </motion.header>
-      </motion.div>
+                  {/* Logo image */}
+                  <div
+                    className="relative w-8 h-8 shrink-0"
+                    style={{ filter: "drop-shadow(0 1px 2px rgba(139,63,200,0.20))" }}
+                  >
+                    <Image
+                      src="/logo.png"
+                      alt="Wonder Wallz Logo"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
+                  </div>
+
+                  {/* Wordmark — slightly tighter tracking so it sits
+                      comfortably even at the compact scroll size */}
+                  <span
+                    className="font-extrabold text-[13px] uppercase whitespace-nowrap"
+                    style={{ letterSpacing: "0.08em" }}
+                  >
+                    <span style={{ color: "#7C3AED" }}>Wonder</span>
+                    <span style={{ color: "#d1c4e0", fontWeight: 300, margin: "0 2px" }}>·</span>
+                    <span style={{ color: "#F97316" }}>Wallz</span>
+                  </span>
+                </Link>
+              </motion.div>
+
+              {/* ── Desktop Nav Links ── */}
+              <ul className="hidden lg:flex items-center gap-0 mx-2" role="list">
+                {navLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="relative px-4 py-2 text-sm font-medium tracking-wide block"
+                      style={{
+                        color: activeLink === link.href ? "#1a1a1a" : "#4a4a4a",
+                        transition: "color 0.15s",
+                      }}
+                      onMouseEnter={() => setActiveLink(link.href)}
+                      onMouseLeave={() => setActiveLink(null)}
+                    >
+                      <AnimatePresence>
+                        {activeLink === link.href && (
+                          <motion.span
+                            className="absolute inset-0 rounded-xl"
+                            style={{ background: "rgba(139,63,200,0.06)" }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                          />
+                        )}
+                      </AnimatePresence>
+
+                      <span className="relative z-10">{link.label}</span>
+
+                      <AnimatePresence>
+                        {activeLink === link.href && (
+                          <motion.span
+                            className="absolute left-4 right-4 rounded-full"
+                            style={{
+                              bottom: "4px",
+                              height: "2px",
+                              background: "linear-gradient(90deg, #00BDB0, #7C3AED, #F97316)",
+                            }}
+                            initial={{ scaleX: 0, originX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            exit={{ scaleX: 0, originX: 1 }}
+                            transition={{ duration: 0.2, ease: "easeOut" }}
+                          />
+                        )}
+                      </AnimatePresence>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              {/* ── Right Icon Group ── */}
+              <div className="flex items-center gap-1 pr-0.5">
+                <CircleIconBtn aria-label="Search">
+                  <Search size={16} />
+                </CircleIconBtn>
+
+                <CircleIconBtn aria-label="Account" className="hidden md:flex">
+                  <User size={16} />
+                </CircleIconBtn>
+
+                <CircleIconBtn aria-label="Cart (0 items)" className="relative">
+                  <ShoppingBag size={16} />
+                  <span
+                    className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
+                    style={{ backgroundColor: "#F97316" }}
+                  >
+                    0
+                  </span>
+                </CircleIconBtn>
+
+                {/* Mobile hamburger — morphs into a close icon when the
+                    drawer is open, and now toggles both ways */}
+                <motion.button
+                  className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full ml-0.5 overflow-hidden"
+                  style={{
+                    background: "rgba(255,255,255,0.7)",
+                    border: "1px solid rgba(200,190,175,0.5)",
+                    color: "#555",
+                  }}
+                  onClick={() => setMobileOpen((v) => !v)}
+                  aria-label={mobileOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={mobileOpen}
+                  whileHover={{ backgroundColor: "#fff", color: "#7C3AED" }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={mobileOpen ? "close" : "open"}
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.18 }}
+                      className="flex items-center justify-center"
+                    >
+                      {mobileOpen ? <X size={18} /> : <Menu size={18} />}
+                    </motion.span>
+                  </AnimatePresence>
+                </motion.button>
+              </div>
+            </motion.nav>
+          </motion.header>
+        </motion.div>
+      </div>
 
       {/* ── Mobile Menu Overlay ── */}
       <AnimatePresence>
@@ -241,6 +284,7 @@ export function Navbar() {
                 backdropFilter: "blur(20px)",
                 boxShadow: "-4px 0 40px rgba(139,63,200,0.12)",
                 borderLeft: "1px solid rgba(200,190,175,0.40)",
+                paddingTop: "env(safe-area-inset-top, 0px)",
               }}
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -283,7 +327,7 @@ export function Navbar() {
                   <div className="relative w-7 h-7">
                     <Image src="/logo.png" alt="Wonder Wallz" fill className="object-contain" />
                   </div>
-                  <span className="font-extrabold text-xs uppercase whitespace-nowrap" style={{ letterSpacing: "0.10em" }}>
+                  <span className="font-extrabold text-xs uppercase whitespace-nowrap" style={{ letterSpacing: "0.08em" }}>
                     <span style={{ color: "#7C3AED" }}>Wonder</span>
                     <span style={{ color: "#d1c4e0", fontWeight: 300, margin: "0 1px" }}>·</span>
                     <span style={{ color: "#F97316" }}>Wallz</span>
