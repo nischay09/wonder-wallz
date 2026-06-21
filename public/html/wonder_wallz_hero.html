@@ -973,6 +973,38 @@ if(rc){
     rc.style.transition = 'transform 0.7s cubic-bezier(.22,.9,.32,1)';
   });
 }
+
+// ── Report real content height to the parent page (IframeSection.tsx) ──
+// Without this, the parent has no way to know how tall this page actually
+// is, and falls back to a guessed fixed height — cropping content on
+// screens (like mobile) where the real layout is taller.
+(function () {
+  function reportHeight() {
+    const h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    );
+    window.parent.postMessage({ type: 'wonderwallz:resize', height: h }, '*');
+  }
+
+  // Report on load, after fonts settle, and whenever layout changes size
+  window.addEventListener('load', reportHeight);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(reportHeight);
+  }
+
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(reportHeight);
+    ro.observe(document.body);
+  } else {
+    // Fallback for older browsers
+    window.addEventListener('resize', reportHeight);
+    setInterval(reportHeight, 1000);
+  }
+
+  // Initial attempt in case load already fired
+  reportHeight();
+})();
 </script>
 </body>
 </html>
