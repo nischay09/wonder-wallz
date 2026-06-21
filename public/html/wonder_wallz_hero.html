@@ -978,46 +978,53 @@ if(rc){
 // Without this, the parent has no way to know how tall this page actually
 // is, and falls back to a guessed fixed height — cropping content on
 // screens (like mobile) where the real layout is taller.
+//
+// IMPORTANT: we measure the .hero section itself, NOT document/body height.
+// document.scrollHeight is unreliable on iOS Safari because the dynamic
+// address bar collapsing/expanding shifts viewport-relative calculations,
+// which was causing this iframe to report a height taller than the real
+// content (visible as blank space below the section on phones).
 (function () {
+  const heroEl = document.querySelector('.hero') || document.body;
   let lastReported = 0;
-  let rafPending = false;
+  let debounceTimer = null;
 
   function measureAndReport() {
-    rafPending = false;
-    const h = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight
-    );
-    // Only postMessage when height actually changed (ignore sub-pixel noise)
+    const h = Math.ceil(heroEl.getBoundingClientRect().height);
     if (Math.abs(h - lastReported) < 2) return;
     lastReported = h;
     window.parent.postMessage({ type: 'wonderwallz:resize', height: h }, '*');
   }
 
   function reportHeight() {
-    // Coalesce bursts of calls (animations, ResizeObserver) into one
-    // measurement per animation frame instead of many per frame.
-    if (rafPending) return;
-    rafPending = true;
-    requestAnimationFrame(measureAndReport);
+    // Debounce: wait for things to settle (animations/font swap/layout)
+    // before measuring, instead of measuring on every single trigger.
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(measureAndReport, 120);
   }
 
   window.addEventListener('load', reportHeight);
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(reportHeight);
   }
+  window.addEventListener('orientationchange', reportHeight);
 
   if ('ResizeObserver' in window) {
     const ro = new ResizeObserver(reportHeight);
-    ro.observe(document.body);
+    ro.observe(heroEl);
   } else {
-    // Fallback for older browsers only — a single periodic check, not tight
     window.addEventListener('resize', reportHeight);
-    setInterval(reportHeight, 2000);
   }
+
+  // A couple of delayed re-checks to catch late layout settling
+  // (e.g. webfont swap, mobile browser chrome collapsing) without
+  // polling indefinitely.
+  setTimeout(reportHeight, 400);
+  setTimeout(reportHeight, 1200);
 
   reportHeight();
 })();
+
 
 </script>
 </body>
