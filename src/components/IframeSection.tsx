@@ -26,8 +26,9 @@ export default function IframeSection({
       }
       const data = e.data;
       if (data && data.type === "wonderwallz:resize" && typeof data.height === "number") {
-        // Small buffer so nothing is clipped due to sub-pixel rounding
-        setHeight(Math.ceil(data.height) + 2);
+        const next = Math.ceil(data.height) + 2;
+        // Avoid redundant re-renders for sub-pixel/no-op changes
+        setHeight((prev) => (Math.abs(prev - next) < 2 ? prev : next));
       }
     }
     window.addEventListener("message", handleMessage);
@@ -46,7 +47,6 @@ export default function IframeSection({
           height: `${height}px`,
           border: "none",
           display: "block",
-          transition: "height 0.15s ease",
         }}
         loading="lazy"
       />

@@ -979,15 +979,29 @@ if(rc){
 // is, and falls back to a guessed fixed height — cropping content on
 // screens (like mobile) where the real layout is taller.
 (function () {
-  function reportHeight() {
+  let lastReported = 0;
+  let rafPending = false;
+
+  function measureAndReport() {
+    rafPending = false;
     const h = Math.max(
       document.documentElement.scrollHeight,
       document.body.scrollHeight
     );
+    // Only postMessage when height actually changed (ignore sub-pixel noise)
+    if (Math.abs(h - lastReported) < 2) return;
+    lastReported = h;
     window.parent.postMessage({ type: 'wonderwallz:resize', height: h }, '*');
   }
 
-  // Report on load, after fonts settle, and whenever layout changes size
+  function reportHeight() {
+    // Coalesce bursts of calls (animations, ResizeObserver) into one
+    // measurement per animation frame instead of many per frame.
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(measureAndReport);
+  }
+
   window.addEventListener('load', reportHeight);
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(reportHeight);
@@ -997,14 +1011,14 @@ if(rc){
     const ro = new ResizeObserver(reportHeight);
     ro.observe(document.body);
   } else {
-    // Fallback for older browsers
+    // Fallback for older browsers only — a single periodic check, not tight
     window.addEventListener('resize', reportHeight);
-    setInterval(reportHeight, 1000);
+    setInterval(reportHeight, 2000);
   }
 
-  // Initial attempt in case load already fired
   reportHeight();
 })();
+
 </script>
 </body>
 </html>
