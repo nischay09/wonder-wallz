@@ -422,7 +422,20 @@ body{
 }
 @media(max-width:540px){
   .headline{font-size:2.05rem}
-  .gb-2,.gb-3{display:none} /* keep the two edge-most badges off very narrow screens to avoid clipping */
+  /* Keep all 5 badges visible on narrow screens — shrink the two edge
+     badges and drop their bleed so they sit fully inside the canvas
+     instead of disappearing. */
+  .gb-2,.gb-3{
+    padding:5px 9px 5px 5px;
+    gap:5px;
+    max-width:128px;
+    white-space:normal;
+  }
+  .gb-2 .gb-icon,.gb-3 .gb-icon{width:18px;height:18px;font-size:9px}
+  .gb-2 .gb-title,.gb-3 .gb-title{font-size:8.5px;line-height:1.15}
+  .gb-2 .gb-sub,.gb-3 .gb-sub{display:none}
+  .gb-2{top:34%;right:2px}
+  .gb-3{top:64%;left:2px}
 }
 @media(prefers-reduced-motion:reduce){
   .hero-florals svg,.light-sweep,.orb,.mockup-stage,.gb,.pp,.eyebrow-dot,.hero-content > *{
