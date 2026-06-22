@@ -54,7 +54,13 @@ export function Navbar() {
           the scroll animation. */}
       <div
         className="fixed top-0 left-0 right-0 z-50"
-        style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+        style={{
+          paddingTop: "env(safe-area-inset-top, 0px)",
+          contain: "layout style paint",
+          transform: "translateZ(0)",
+          backfaceVisibility: "hidden",
+          willChange: "transform",
+        }}
       >
         <motion.div
           className="flex justify-center px-2"

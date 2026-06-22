@@ -17,6 +17,8 @@ export default function IframeSection({
 }: IframeSectionProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState(defaultHeight);
+  const rafRef = useRef<number | null>(null);
+  const pendingHeightRef = useRef<number | null>(null);
 
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
@@ -27,12 +29,25 @@ export default function IframeSection({
       const data = e.data;
       if (data && data.type === "wonderwallz:resize" && typeof data.height === "number") {
         const next = Math.ceil(data.height) + 2;
-        // Avoid redundant re-renders for sub-pixel/no-op changes
-        setHeight((prev) => (Math.abs(prev - next) < 2 ? prev : next));
+        pendingHeightRef.current = next;
+
+        // Coalesce bursts of resize messages (load, font-ready, timers, etc.)
+        // into a single layout pass per animation frame instead of one
+        // reflow per message — this is what was causing the navbar repaint.
+        if (rafRef.current !== null) return;
+        rafRef.current = requestAnimationFrame(() => {
+          rafRef.current = null;
+          const value = pendingHeightRef.current;
+          if (value === null) return;
+          setHeight((prev) => (Math.abs(prev - value) < 2 ? prev : value));
+        });
       }
     }
     window.addEventListener("message", handleMessage);
-    return () => window.removeEventListener("message", handleMessage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
   return (
