@@ -3,1029 +3,702 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Wonder Wallz – Transform Your Space with Designer Wallpapers</title>
-<meta name="description" content="Wonder Wallz offers premium designer wallpapers for homes & offices across India. Browse 500+ patterns and order instantly on WhatsApp. Free consultation available."/>
-<meta name="keywords" content="wallpaper, designer wallpaper, home decor, wall decor India, wallpaper online, Wonder Wallz"/>
-<meta property="og:title" content="Wonder Wallz – Transform Your Space"/>
-<meta property="og:description" content="Premium designer wallpapers for every wall. Order on WhatsApp."/>
+<title>Wonder Wallz – Premium Custom Wallpapers & Wall Murals India</title>
+<meta name="description" content="Transform your walls with Wonder Wallz premium custom wallpapers, wall murals, posters and glass films. 500+ curated designs. HP Latex printed. Pan India delivery. Get a free quote today."/>
+<meta name="keywords" content="custom wallpaper India, wall murals India, premium wallpaper, wallpaper printing, custom wall murals, wallpaper online India"/>
+<meta property="og:title" content="Wonder Wallz – Premium Custom Wallpapers & Wall Murals India"/>
+<meta property="og:description" content="500+ premium wallpaper designs. Custom size printing. HP Latex technology. Pan India delivery. Get your free quote."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
+/* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+/* ── TOKENS ── */
 :root{
-  --teal:#00C9B1;
-  --teal-dark:#009E8C;
-  --purple:#8B2FC9;
-  --purple-light:#B06EE0;
-  --orange:#FF6B35;
-  --orange-light:#FF9260;
-  --dark:#EFE4D2;        /* wallpaper base — warm cream */
-  --dark2:#E1CEAC;       /* deeper tan for gradients */
-  --paper:#FBF6EC;       /* lightest paper highlight */
-  --line-tan:#AD9272;    /* botanical line-art ink */
-  --cream:#332619;       /* primary ink (was bright cream text, now dark warm brown) */
-  --cream-muted:#6E5C47; /* secondary muted ink */
-  --wa-green:#25D366;
-  --wa-dark:#1DA851;
-  /* Height of the floating mobile navbar pill, measured from the real
-     Navbar.tsx: ~8-12px outer offset + ~62px pill (logo badge is the
-     tallest child) + a small buffer. env() accounts for notch/Dynamic
-     Island devices, since the navbar reserves that inset too. */
-  --mobile-nav-clear:calc(env(safe-area-inset-top, 0px) + 84px);
+  --ivory:       #F8F4EE;
+  --ivory-deep:  #EDE6D8;
+  --ink:         #1C1410;
+  --ink-muted:   #6B5B4E;
+  --ink-faint:   #A8977F;
+  --gold:        #C9A84C;
+  --gold-light:  #E8C97A;
+  --gold-pale:   rgba(201,168,76,0.12);
+  --blue:        #2D7FF9;
+  --purple:      #7A3DF0;
+  --orange:      #FF8A00;
+  --wa-green:    #25D366;
+  --wa-dark:     #1DA851;
+  --glass-bg:    rgba(252,248,241,0.92);
+  --glass-border:rgba(201,168,76,0.3);
+  --shadow-warm: rgba(28,20,16,0.18);
 }
+
 body{
   font-family:'Inter',sans-serif;
-  background:linear-gradient(165deg, var(--paper) 0%, var(--dark) 45%, var(--dark2) 100%);
-  color:var(--cream);
+  background:var(--ivory);
+  color:var(--ink);
   min-height:100vh;
   overflow-x:hidden;
 }
 
-/* ─── HERO WRAPPER ─── */
+/* ── HERO LAYOUT ── */
 .hero{
   position:relative;
   min-height:100vh;
   display:grid;
   grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:0;
+  align-items:stretch;
   overflow:hidden;
-  /* Pull the section to the very top so the dark bg fills behind the transparent navbar */
-  margin-top:-80px;
-  padding-top:80px;
 }
 
-/* ─── BG GRADIENTS — soft sunlit wallpaper wall ─── */
-.hero::before{
-  content:'';
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 50% 45% at 14% 10%, rgba(255,253,247,0.75) 0%, transparent 60%),
-    radial-gradient(circle 420px at 6% 96%, rgba(255,255,255,0.4) 0%, transparent 70%),
-    radial-gradient(ellipse 65% 60% at 90% 85%, rgba(173,146,114,0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 45% 40% at 60% 8%, rgba(255,255,255,0.35) 0%, transparent 50%),
-    linear-gradient(155deg, var(--paper) 0%, var(--dark) 45%, var(--dark2) 100%);
-  z-index:0;
-}
-/* faint wall-panel seam + paper grain, like the photographed wallpaper wall */
-.hero::after{
-  content:'';
-  position:absolute;inset:0;
-  background:
-    linear-gradient(90deg, transparent 34.6%, rgba(109,90,63,0.10) 35%, rgba(255,255,255,0.3) 35.4%, transparent 36%),
-    repeating-linear-gradient(180deg, rgba(109,90,63,0.025) 0px, rgba(109,90,63,0.025) 1px, transparent 1px, transparent 3px);
-  z-index:0;
-  pointer-events:none;
-}
-/* ─── FLORAL PATTERN OVERLAY — sepia botanical line art ─── */
-.hero-florals{
-  position:absolute;inset:0;
-  z-index:1;
-  pointer-events:none;
-  overflow:hidden;
-  opacity:0.55;
-  -webkit-mask-image:linear-gradient(100deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 30%, black 60%);
-  mask-image:linear-gradient(100deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 30%, black 60%);
-}
-.hero-florals svg{
-  position:absolute;
-  width:106%;height:106%;
-  top:-3%;left:-3%;
-  animation:floralDrift 26s ease-in-out infinite;
-}
-@keyframes floralDrift{
-  0%,100%{transform:translate(0,0) scale(1)}
-  50%{transform:translate(-10px,8px) scale(1.012)}
-}
-
-/* floating orbs — soft pastel light blooms instead of saturated color blobs */
-.orb{position:absolute;border-radius:50%;filter:blur(85px);opacity:0.55;z-index:2;pointer-events:none;mix-blend-mode:multiply}
-.orb-1{width:340px;height:340px;background:#E3CFF0;top:-90px;left:-90px;animation:float1 11s ease-in-out infinite}
-.orb-2{width:300px;height:300px;background:#BCEAE0;bottom:-70px;right:55%;animation:float2 13s ease-in-out infinite}
-.orb-3{width:240px;height:240px;background:#F6D9B8;top:30%;right:-50px;animation:float3 9s ease-in-out infinite}
-
-@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,20px)}}
-@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-30px)}}
-@keyframes float3{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,25px)}}
-
-/* slow diagonal light sweep, like sunlight drifting across a papered wall */
-.light-sweep{
-  position:absolute;inset:-20% -20%;
-  z-index:1;
-  pointer-events:none;
-  background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.5) 48%, rgba(255,255,255,0.05) 56%, transparent 64%);
-  mix-blend-mode:soft-light;
-  animation:sweep 14s ease-in-out infinite;
-}
-@keyframes sweep{
-  0%{transform:translateX(-30%)}
-  50%{transform:translateX(15%)}
-  100%{transform:translateX(-30%)}
-}
-
-/* drifting petals — tiny botanical motes rising through the light */
-.petal{
-  position:absolute;
-  border-radius:60% 0 60% 0;
-  pointer-events:none;
-  z-index:2;
-  opacity:0;
-  animation:petalRise linear infinite;
-}
-@keyframes petalRise{
-  0%{transform:translate(0,0) rotate(0deg);opacity:0}
-  8%{opacity:0.55}
-  50%{transform:translate(18px,-46vh) rotate(170deg);opacity:0.4}
-  92%{opacity:0.18}
-  100%{transform:translate(28px,-92vh) rotate(320deg);opacity:0}
-}
-
-/* ─── LEFT CONTENT ─── */
+/* ── LEFT COLUMN ── */
 .hero-content{
-  position:relative;z-index:2;
-  padding:3rem 3rem 3rem 5rem;
-  max-width:640px;
+  position:relative;
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:5rem 4rem 4rem 5.5rem;
+  background:var(--ivory);
 }
+
+/* Subtle vertical rule separating columns */
+.hero-content::after{
+  content:'';
+  position:absolute;
+  top:10%;right:0;
+  width:1px;height:80%;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,0.25) 30%,rgba(201,168,76,0.25) 70%,transparent);
+}
+
+/* Load-in animations */
 .hero-content > *{
   opacity:0;
-  animation:contentRise 0.8s cubic-bezier(.22,.9,.32,1) forwards;
+  animation:rise 0.9s cubic-bezier(.22,.9,.32,1) forwards;
 }
-.hero-content > .eyebrow{animation-delay:0.05s}
-.hero-content > .headline{animation-delay:0.16s}
-.hero-content > .subheadline{animation-delay:0.30s}
-.hero-content > .trust-row{animation-delay:0.42s}
-.hero-content > .cta-group{animation-delay:0.54s}
-@keyframes contentRise{
-  from{opacity:0;transform:translateY(16px)}
+.eyebrow        {animation-delay:0.05s}
+.headline       {animation-delay:0.18s}
+.subheadline    {animation-delay:0.32s}
+.trust-grid     {animation-delay:0.46s}
+.social-proof   {animation-delay:0.58s}
+.cta-group      {animation-delay:0.70s}
+
+@keyframes rise{
+  from{opacity:0;transform:translateY(20px)}
   to{opacity:1;transform:translateY(0)}
 }
 
-/* eyebrow */
+/* Eyebrow */
 .eyebrow{
   display:inline-flex;align-items:center;gap:8px;
-  font-family:'Inter',sans-serif;
-  font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--teal-dark);
-  background:rgba(0,201,177,0.12);
-  border:1px solid rgba(0,201,177,0.3);
-  border-radius:50px;
-  padding:6px 16px;
+  font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--gold);
   margin-bottom:1.5rem;
 }
-.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.eyebrow-line{
+  width:28px;height:1px;
+  background:var(--gold);
+  flex-shrink:0;
+}
 
-/* headline */
+/* H1 Headline — Cormorant for luxury serif weight */
 .headline{
-  font-family:'Playfair Display',serif;
-  font-size:clamp(2.6rem,4.5vw,4rem);
-  font-weight:900;
-  line-height:1.08;
-  color:var(--cream);
-  margin-bottom:1.25rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.8rem,4vw,4.2rem);
+  font-weight:700;
+  line-height:1.06;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  margin-bottom:1.5rem;
 }
 .headline em{
   font-style:italic;
-  background:linear-gradient(90deg,var(--orange) 0%,var(--purple-light) 60%,var(--teal) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  font-weight:400;
+  color:var(--ink);
+  /* No garish gradient — let the typeface do the work */
 }
-.headline .underline-accent{
-  position:relative;display:inline-block;
+/* Gold underline beneath "Masterpieces" */
+.headline .accent-word{
+  position:relative;
+  display:inline-block;
 }
-.headline .underline-accent::after{
+.headline .accent-word::after{
   content:'';
-  position:absolute;left:0;bottom:-4px;width:100%;height:3px;
-  background:linear-gradient(90deg,var(--teal),var(--purple));
-  border-radius:2px;
+  position:absolute;
+  left:0;bottom:-3px;
+  width:100%;height:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  border-radius:1px;
 }
 
-/* subheadline */
+/* Subheadline */
 .subheadline{
-  font-size:1.05rem;
-  line-height:1.72;
-  color:var(--cream-muted);
-  max-width:440px;
-  margin-bottom:2.25rem;
+  font-size:1rem;
+  line-height:1.78;
+  color:var(--ink-muted);
+  max-width:430px;
+  margin-bottom:2.5rem;
 }
-.subheadline strong{color:var(--cream);}
 
-/* trust badges */
-.trust-row{
+/* Trust grid — four ticks in a 2×2 grid */
+.trust-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 24px;
+  margin-bottom:2rem;
+  max-width:360px;
+}
+.trust-item{
+  display:flex;align-items:center;gap:8px;
+  font-size:12.5px;font-weight:600;
+  color:var(--ink-muted);
+  letter-spacing:0.01em;
+}
+.trust-check{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold-pale);
+  border:1px solid rgba(201,168,76,0.35);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.trust-check svg{width:9px;height:9px}
+
+/* Social proof row */
+.social-proof{
   display:flex;align-items:center;gap:20px;
-  margin-bottom:2.25rem;
-  flex-wrap:wrap;
+  margin-bottom:2.5rem;
+  padding:16px 20px;
+  background:rgba(255,255,255,0.6);
+  border:1px solid rgba(201,168,76,0.2);
+  border-radius:12px;
+  backdrop-filter:blur(6px);
+  max-width:420px;
 }
-.trust-badge{
-  display:flex;align-items:center;gap:7px;
-  font-size:12.5px;color:var(--cream-muted);
+.sp-stat{text-align:center;flex:1}
+.sp-stat + .sp-stat{
+  border-left:1px solid rgba(201,168,76,0.2);
+  padding-left:20px;
 }
-.trust-badge svg{flex-shrink:0}
-.trust-divider{width:1px;height:20px;background:rgba(51,38,24,0.15)}
+.sp-number{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.65rem;font-weight:700;
+  color:var(--ink);
+  line-height:1;
+  display:block;
+}
+.sp-label{
+  font-size:10.5px;color:var(--ink-faint);
+  letter-spacing:0.06em;text-transform:uppercase;
+  margin-top:3px;
+  display:block;
+}
+.sp-stars{
+  display:flex;align-items:center;gap:2px;
+  justify-content:center;
+  margin-bottom:2px;
+}
+.sp-stars svg{width:11px;height:11px;fill:var(--gold)}
 
 /* CTA group */
-.cta-group{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cta-group{
+  display:flex;align-items:center;gap:12px;
+  flex-wrap:wrap;
+}
+
+/* Primary CTA — dark rich button */
+.cta-primary{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--ink);
+  color:var(--ivory);
+  font-family:'Inter',sans-serif;
+  font-size:14px;font-weight:600;letter-spacing:0.02em;
+  padding:15px 28px;
+  border-radius:4px;
+  text-decoration:none;
+  border:none;cursor:pointer;
+  transition:background 0.2s,transform 0.18s,box-shadow 0.2s;
+  box-shadow:0 4px 20px var(--shadow-warm);
+  white-space:nowrap;
+}
+.cta-primary:hover{background:#2D1F18;transform:translateY(-2px);box-shadow:0 8px 28px rgba(28,20,16,0.3)}
+.cta-primary:active{transform:translateY(0)}
+.cta-primary svg{flex-shrink:0}
 
 /* WhatsApp CTA */
 .cta-whatsapp{
-  display:inline-flex;align-items:center;gap:10px;
+  display:inline-flex;align-items:center;gap:9px;
   background:var(--wa-green);
   color:#fff;
-  font-family:'Inter',sans-serif;
-  font-size:15px;font-weight:600;
-  padding:15px 28px;
-  border-radius:50px;
+  font-size:14px;font-weight:600;
+  padding:15px 24px;
+  border-radius:4px;
   text-decoration:none;
-  transition:background 0.2s,transform 0.18s,box-shadow 0.2s;
-  box-shadow:0 4px 24px rgba(37,211,102,0.35);
+  transition:background 0.2s,transform 0.18s;
+  box-shadow:0 4px 18px rgba(37,211,102,0.3);
   white-space:nowrap;
 }
-.cta-whatsapp:hover{background:var(--wa-dark);transform:translateY(-2px);box-shadow:0 8px 32px rgba(37,211,102,0.5)}
-.cta-whatsapp:active{transform:translateY(0)}
+.cta-whatsapp:hover{background:var(--wa-dark);transform:translateY(-2px)}
 .cta-whatsapp svg{flex-shrink:0}
 
+/* Secondary ghost CTA */
 .cta-secondary{
   display:inline-flex;align-items:center;gap:8px;
-  color:var(--cream);
-  font-size:14px;font-weight:500;
-  padding:14px 24px;
-  border-radius:50px;
-  border:1.5px solid rgba(51,38,24,0.16);
+  color:var(--ink-muted);
+  font-size:13.5px;font-weight:500;
   text-decoration:none;
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(8px);
-  transition:border-color 0.2s,background 0.2s,transform 0.18s;
+  padding:15px 4px;
+  border-bottom:1px solid var(--ink-faint);
+  transition:color 0.2s,border-color 0.2s;
   white-space:nowrap;
+  background:none;border:none;border-bottom:1px solid var(--ink-faint);
   cursor:pointer;
 }
-.cta-secondary:hover{border-color:rgba(51,38,24,0.32);background:rgba(255,255,255,0.85);transform:translateY(-2px)}
+.cta-secondary:hover{color:var(--ink);border-color:var(--ink)}
+.cta-secondary svg{flex-shrink:0;transition:transform 0.2s}
+.cta-secondary:hover svg{transform:translateX(3px)}
 
-/* ─── RIGHT SHOWCASE ─── */
-.hero-mockup{
-  position:relative;z-index:2;
-  display:flex;align-items:center;justify-content:center;
-  padding:4rem 3.5rem 3rem 1rem;
-  height:100vh;
-}
-.mockup-stage{
+/* ── RIGHT COLUMN — PHOTO ── */
+.hero-visual{
   position:relative;
-  width:460px;
-  display:flex;
-  flex-direction:column;
-  gap:11px;
-  animation:levitate 7s ease-in-out infinite;
-}
-@keyframes levitate{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-
-/* ── Room canvas wrapper ── */
-.room-canvas{
-  position:relative;
-  width:100%;
-  border-radius:20px;
-  overflow:visible; /* badges bleed outside */
-  /* subtle frame */
-  filter:drop-shadow(0 32px 64px rgba(51,38,24,0.32)) drop-shadow(0 4px 12px rgba(51,38,24,0.18));
-}
-.room-canvas svg.room-svg{
-  display:block;
-  width:100%;
-  height:auto;
-  border-radius:20px;
   overflow:hidden;
 }
 
-/* ── Glassmorphism badges — absolutely placed relative to room-canvas ── */
+/* The luxury interior photograph */
+.room-photo{
+  width:100%;height:100%;
+  object-fit:cover;
+  object-position:center center;
+  display:block;
+  /* Warm tone overlay blended in */
+}
+
+/* Vignette: left-side fade to ivory so it blends with left column */
+.hero-visual::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    100deg,
+    rgba(248,244,238,0.6) 0%,
+    rgba(248,244,238,0.12) 20%,
+    transparent 40%
+  );
+  z-index:2;
+  pointer-events:none;
+}
+/* Warm amber tint layer for premium look */
+.hero-visual::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(
+    180deg,
+    rgba(28,20,16,0.04) 0%,
+    transparent 40%,
+    rgba(28,20,16,0.15) 100%
+  );
+  z-index:2;
+  pointer-events:none;
+}
+
+/* ── GLASSMORPHISM BADGE CARDS ── */
 .gb{
   position:absolute;
-  background:rgba(253,249,240,0.97);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  border:1px solid rgba(201,176,110,0.38);
-  border-radius:40px;
-  padding:8px 14px 8px 10px;
-  display:flex;align-items:center;gap:8px;
-  box-shadow:0 10px 24px rgba(51,38,24,0.16), 0 1px 0 rgba(255,255,255,0.9) inset;
   z-index:10;
+  background:var(--glass-bg);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid var(--glass-border);
+  border-radius:10px;
+  box-shadow:0 12px 32px rgba(28,20,16,0.16), 0 1px 0 rgba(255,255,255,0.8) inset;
+  padding:10px 14px;
   white-space:nowrap;
   animation:gbFloat 8s ease-in-out infinite;
 }
-.gb-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.gb-title{font-size:10.5px;font-weight:700;color:#332619;line-height:1.2}
-.gb-sub{font-size:9px;color:#6E5C47;margin-top:1px;line-height:1.2}
-@keyframes gbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-
-/* Rating card — taller pill */
-.gb-rating{
-  flex-direction:column;
-  align-items:flex-start;
-  border-radius:16px;
-  padding:11px 14px;
-  gap:2px;
+@keyframes gbFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
 }
-.gb-rating .stars{display:flex;gap:2px;margin-top:3px}
-.gb-rating .star{font-size:10px;color:#E0A526}
-.gb-rating .rval{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#332619;line-height:1}
-
-/* Badge positions — symmetric, non-overlapping placement */
-.gb-1{ top:-16px; left:24px; animation-delay:0s }        /* 500+ Designs — top-left corner */
-.gb-5{ top:-16px; right:24px; animation-delay:0.5s }     /* Rating — top-right corner */
-.gb-2{ top:40%; right:-22px; animation-delay:1.4s }      /* Custom Printing — mid right */
-.gb-3{ top:58%; left:-22px; animation-delay:2.4s }       /* Free Consultation — mid left */
-.gb-4{ bottom:-16px; left:50%; transform:translateX(-50%); animation-delay:0.9s }  /* Pan India — bottom centre */
-
-/* Accent dot */
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.dot-teal{background:#00C9B1;box-shadow:0 0 8px rgba(0,201,177,0.5)}
-.dot-orange{background:#FF6B35;box-shadow:0 0 8px rgba(255,107,53,0.45)}
-.dot-purple{background:#B06EE0;box-shadow:0 0 8px rgba(176,110,224,0.45)}
-
-/* ── Product category grid ── */
-.prod-label{
-  font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
-  color:#8A7256;
-  margin-bottom:8px;
-  padding-left:2px;
+.gb-label{
+  font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--ink-faint);
+  display:block;margin-bottom:2px;
 }
-.prod-strip{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
+.gb-value{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.25rem;font-weight:700;
+  color:var(--ink);
+  line-height:1;
+  display:block;
+}
+.gb-sub{
+  font-size:10px;color:var(--ink-muted);
+  margin-top:1px;display:block;
 }
 
-.pp{
-  display:flex;align-items:center;gap:7px;
-  background:rgba(253,249,240,0.92);
-  border:1.5px solid rgba(201,176,110,0.3);
+/* Badge position classes */
+.gb-1{top:14%;left:5%;  animation-delay:0s}      /* Rating top-left */
+.gb-2{top:14%;right:6%; animation-delay:0.6s}     /* Designs top-right */
+.gb-3{top:48%;right:6%; animation-delay:1.2s}     /* Custom Size */
+.gb-4{bottom:18%;left:5%;animation-delay:1.8s}    /* Pan India */
+.gb-5{bottom:18%;right:6%;animation-delay:0.9s}   /* HP Latex */
+
+/* Rating badge special */
+.gb-rating .gb-stars{
+  display:flex;gap:2px;margin-top:4px;
+}
+.gb-rating .gb-stars svg{width:10px;height:10px;fill:var(--gold)}
+.gb-rating .gb-value{font-size:1.5rem}
+
+/* HP badge accent line */
+.gb-hp::before{
+  content:'';
+  display:block;
+  width:20px;height:2px;
+  background:var(--gold);
+  border-radius:1px;
+  margin-bottom:6px;
+}
+
+/* ── BRAND MARK on photo ── */
+.brand-mark{
+  position:absolute;
+  bottom:24px;left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  background:rgba(28,20,16,0.72);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(201,168,76,0.3);
   border-radius:40px;
-  padding:8px 14px 8px 9px;
+  padding:7px 18px;
+  display:flex;align-items:center;gap:8px;
   white-space:nowrap;
-  cursor:pointer;
-  font-family:inherit;
-  text-align:left;
-  width:100%;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:manipulation;
-  user-select:none;
-  box-shadow:0 3px 12px rgba(51,38,24,0.08), 0 1px 0 rgba(255,255,255,0.85) inset;
-  transition:background 0.2s,border-color 0.2s,transform 0.12s,box-shadow 0.2s;
-  opacity:0;
-  animation:ppIn 0.5s cubic-bezier(.22,.9,.32,1) forwards;
 }
-.pp:hover{background:rgba(255,255,255,0.98);border-color:rgba(0,201,177,0.45);transform:translateY(-2px);box-shadow:0 7px 20px rgba(51,38,24,0.14)}
-.pp:active{transform:translateY(0) scale(0.95);box-shadow:0 2px 8px rgba(51,38,24,0.1);transition:transform 0.08s ease,box-shadow 0.08s ease}
-.pp.on{background:rgba(0,201,177,0.12);border-color:rgba(0,201,177,0.42)}
-.pp .pp-ico{transition:transform 0.18s ease}
-.pp:active .pp-ico{transform:scale(0.88) rotate(-4deg)}
-.pp-ico{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.pp-lbl{font-size:11px;font-weight:600;color:#332619;letter-spacing:.01em}
-@keyframes ppIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.pp:nth-child(1){animation-delay:.72s}.pp:nth-child(2){animation-delay:.84s}
-.pp:nth-child(3){animation-delay:.96s}.pp:nth-child(4){animation-delay:1.08s}
+.brand-mark-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.brand-mark-text{
+  font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(232,201,122,0.9);
+}
 
-/* ── Responsive ── */
+/* ── MOBILE ── */
 @media(max-width:900px){
   .hero{
     grid-template-columns:1fr;
+    grid-template-rows:auto auto;
     min-height:auto;
-    /* cancel the desktop pull-up; mobile nav is handled via hero-content's own top padding */
-    margin-top:0;
-    padding-top:0;
   }
-  /* Clear the floating mobile navbar, then keep everything else compact
-     so the showcase image isn't pushed too far below the fold. */
   .hero-content{
-    padding:calc(var(--mobile-nav-clear) + 0.75rem) 1.5rem 1.5rem;
-    max-width:100%;
+    padding:4.5rem 1.5rem 2.5rem;
+    order:1;
   }
-  .eyebrow{margin-bottom:1rem;padding:5px 14px;font-size:11px}
-  .headline{margin-bottom:0.85rem;font-size:2.35rem;line-height:1.12}
-  .headline-break{display:none} /* let the headline wrap naturally instead of forcing 3 lines */
-  .subheadline{margin-bottom:1.25rem;max-width:100%;font-size:0.98rem;line-height:1.6}
-  .trust-row{margin-bottom:1.4rem;gap:12px;row-gap:8px}
-  .trust-badge{font-size:11.5px}
+  .hero-content::after{display:none}
+  .hero-visual{
+    order:2;
+    height:70vw;
+    min-height:280px;
+    max-height:460px;
+  }
+  .gb{display:none} /* hide on mobile — space is precious */
+  .brand-mark{display:none}
+  .social-proof{max-width:100%}
+  .trust-grid{max-width:100%}
+}
+
+@media(max-width:600px){
+  .hero-content{padding:4.5rem 1.25rem 2rem}
+  .headline{font-size:2.4rem}
   .cta-group{gap:10px}
-  .cta-whatsapp,.cta-secondary{padding:13px 22px;font-size:14px}
-
-  .hero-mockup{height:auto;padding:0.5rem 1.25rem 2rem}
-  .mockup-stage{width:100%;max-width:420px;margin:0 auto}
-
-  /* Re-enable the icon badges instead of hiding them — just sized and
-     repositioned to fit a narrow viewport without overflowing it. */
-  .gb{
-    display:flex;
-    padding:6px 11px 6px 7px;
-    gap:6px;
-    border-radius:30px;
-  }
-  .gb-icon{width:22px;height:22px;font-size:11px}
-  .gb-title{font-size:9.5px}
-  .gb-sub{font-size:8px}
-  .gb-rating{padding:8px 11px;border-radius:14px}
-  .gb-rating .rval{font-size:16px}
-  .gb-rating .star{font-size:8px}
-  .gb-1{top:-12px;left:6px}
-  .gb-5{top:-12px;right:6px}
-  .gb-2{top:38%;right:-8px}
-  .gb-3{top:60%;left:-8px}
-  .gb-4{bottom:-12px}
-
-  .prod-strip{gap:10px}
-  .pp{padding:11px 14px 11px 10px;min-height:48px}
-  .pp-ico{width:30px;height:30px;font-size:14px}
-  .pp-lbl{font-size:12px}
+  .cta-primary,.cta-whatsapp{padding:13px 20px;font-size:13.5px}
 }
-@media(max-width:540px){
-  .headline{font-size:2.05rem}
-  /* Keep all 5 badges visible on narrow screens — shrink the two edge
-     badges and drop their bleed so they sit fully inside the canvas
-     instead of disappearing. */
-  .gb-2,.gb-3{
-    padding:5px 9px 5px 5px;
-    gap:5px;
-    max-width:128px;
-    white-space:normal;
-  }
-  .gb-2 .gb-icon,.gb-3 .gb-icon{width:18px;height:18px;font-size:9px}
-  .gb-2 .gb-title,.gb-3 .gb-title{font-size:8.5px;line-height:1.15}
-  .gb-2 .gb-sub,.gb-3 .gb-sub{display:none}
-  .gb-2{top:34%;right:2px}
-  .gb-3{top:64%;left:2px}
+
+@media(max-width:390px){
+  .headline{font-size:2rem}
 }
+
+/* Tablet landscape */
+@media(min-width:901px) and (max-width:1100px){
+  .hero-content{padding:4rem 2.5rem 3rem 3rem}
+  .headline{font-size:clamp(2.4rem,3.5vw,3.4rem)}
+}
+
+/* Reduced motion */
 @media(prefers-reduced-motion:reduce){
-  .hero-florals svg,.light-sweep,.orb,.mockup-stage,.gb,.pp,.eyebrow-dot,.hero-content > *{
-    animation:none!important;opacity:1!important;transform:none!important;
+  .hero-content > *,.gb,.brand-mark-dot{
+    animation:none!important;
+    opacity:1!important;
+    transform:none!important;
   }
-  .petal{display:none}
 }
 
+/* ── SKIP LINK (a11y) ── */
+.skip-link{
+  position:absolute;top:-40px;left:0;
+  background:var(--ink);color:var(--ivory);
+  padding:8px 16px;font-size:13px;
+  z-index:100;transition:top 0.2s;
+  text-decoration:none;
+}
+.skip-link:focus{top:0}
 </style>
 </head>
 <body>
-<main>
-  <section class="hero" aria-label="Wonder Wallz homepage hero">
-    <!-- Floral decorative pattern -->
-    <div class="hero-florals" aria-hidden="true">
-      <svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <!-- Large bloom top-left -->
-        <g transform="translate(60,80)">
-          <circle cx="0" cy="0" r="38" fill="none" stroke="#AD9272" stroke-width="1.2"/>
-          <circle cx="0" cy="0" r="18" fill="rgba(173,146,114,0.12)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(45)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(90)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(135)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(225)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(270)"/>
-          <ellipse cx="0" cy="-42" rx="10" ry="22" fill="rgba(173,146,114,0.18)" transform="rotate(315)"/>
-          <circle cx="0" cy="0" r="7" fill="#AD9272" opacity="0.5"/>
-        </g>
-        <!-- Stem + leaves top-left -->
-        <path d="M60,140 Q75,200 65,280" stroke="#AD9272" stroke-width="1.5" fill="none" opacity="0.4"/>
-        <ellipse cx="80" cy="195" rx="18" ry="9" fill="rgba(173,146,114,0.15)" transform="rotate(-30,80,195)"/>
-        <ellipse cx="50" cy="240" rx="18" ry="9" fill="rgba(173,146,114,0.15)" transform="rotate(20,50,240)"/>
 
-        <!-- Small bud top-left cluster -->
-        <g transform="translate(145,45)">
-          <circle cx="0" cy="0" r="14" fill="none" stroke="#C9B08A" stroke-width="1"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(60)"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(120)"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(240)"/>
-          <ellipse cx="0" cy="-18" rx="6" ry="12" fill="rgba(201,176,138,0.2)" transform="rotate(300)"/>
-          <circle cx="0" cy="0" r="4" fill="#C9B08A" opacity="0.55"/>
-        </g>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <!-- Tall bloom right side -->
-        <g transform="translate(1320,120)">
-          <circle cx="0" cy="0" r="44" fill="none" stroke="#8A7256" stroke-width="1.2"/>
-          <circle cx="0" cy="0" r="20" fill="rgba(138,114,86,0.12)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(45)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(90)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(135)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(225)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(270)"/>
-          <ellipse cx="0" cy="-48" rx="11" ry="24" fill="rgba(138,114,86,0.18)" transform="rotate(315)"/>
-          <circle cx="0" cy="0" r="8" fill="#8A7256" opacity="0.5"/>
-        </g>
-        <!-- Stem right -->
-        <path d="M1320,175 Q1305,260 1315,360" stroke="#8A7256" stroke-width="1.5" fill="none" opacity="0.35"/>
-        <ellipse cx="1300" cy="230" rx="20" ry="9" fill="rgba(138,114,86,0.15)" transform="rotate(25,1300,230)"/>
-        <ellipse cx="1328" cy="305" rx="20" ry="9" fill="rgba(138,114,86,0.15)" transform="rotate(-20,1328,305)"/>
+<main id="main-content">
+  <section
+    class="hero"
+    aria-label="Wonder Wallz – Premium Wallpapers and Wall Murals for Indian Homes"
+    itemscope itemtype="https://schema.org/Product"
+  >
 
-        <!-- Orange blossom bottom-left -->
-        <g transform="translate(120,760)">
-          <circle cx="0" cy="0" r="32" fill="none" stroke="#B89A6E" stroke-width="1"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(60)"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(120)"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(240)"/>
-          <ellipse cx="0" cy="-36" rx="9" ry="19" fill="rgba(184,154,110,0.16)" transform="rotate(300)"/>
-          <circle cx="0" cy="0" r="6" fill="#B89A6E" opacity="0.5"/>
-        </g>
-
-        <!-- Teal bud bottom-right -->
-        <g transform="translate(1380,800)">
-          <circle cx="0" cy="0" r="26" fill="none" stroke="#AD9272" stroke-width="1"/>
-          <ellipse cx="0" cy="-30" rx="8" ry="16" fill="rgba(173,146,114,0.16)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-30" rx="8" ry="16" fill="rgba(173,146,114,0.16)" transform="rotate(72)"/>
-          <ellipse cx="0" cy="-30" rx="8" ry="16" fill="rgba(173,146,114,0.16)" transform="rotate(144)"/>
-          <ellipse cx="0" cy="-30" rx="8" ry="16" fill="rgba(173,146,114,0.16)" transform="rotate(216)"/>
-          <ellipse cx="0" cy="-30" rx="8" ry="16" fill="rgba(173,146,114,0.16)" transform="rotate(288)"/>
-          <circle cx="0" cy="0" r="5" fill="#AD9272" opacity="0.5"/>
-        </g>
-
-        <!-- Scattered small buds and dots for texture -->
-        <circle cx="280" cy="30" r="4" fill="#C9B08A" opacity="0.35"/>
-        <circle cx="295" cy="50" r="2.5" fill="#AD9272" opacity="0.3"/>
-        <circle cx="265" cy="55" r="3" fill="#B89A6E" opacity="0.3"/>
-
-        <circle cx="1100" cy="60" r="3.5" fill="#AD9272" opacity="0.3"/>
-        <circle cx="1120" cy="40" r="2" fill="#C9B08A" opacity="0.3"/>
-        <circle cx="1140" cy="70" r="3" fill="#B89A6E" opacity="0.25"/>
-
-        <circle cx="30" cy="450" r="3" fill="#C9B08A" opacity="0.3"/>
-        <circle cx="50" cy="470" r="2" fill="#AD9272" opacity="0.25"/>
-
-        <circle cx="1410" cy="450" r="3.5" fill="#B89A6E" opacity="0.3"/>
-        <circle cx="1395" cy="470" r="2" fill="#C9B08A" opacity="0.25"/>
-
-        <!-- Mid-page tiny florets -->
-        <g transform="translate(340,880)" opacity="0.5">
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(173,146,114,0.25)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(173,146,114,0.25)" transform="rotate(90)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(173,146,114,0.25)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(173,146,114,0.25)" transform="rotate(270)"/>
-          <circle cx="0" cy="0" r="3" fill="#AD9272" opacity="0.4"/>
-        </g>
-        <g transform="translate(1180,870)" opacity="0.5">
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(201,176,138,0.25)" transform="rotate(0)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(201,176,138,0.25)" transform="rotate(90)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(201,176,138,0.25)" transform="rotate(180)"/>
-          <ellipse cx="0" cy="-12" rx="4" ry="8" fill="rgba(201,176,138,0.25)" transform="rotate(270)"/>
-          <circle cx="0" cy="0" r="3" fill="#C9B08A" opacity="0.4"/>
-        </g>
-
-        <!-- Vine-like connecting paths -->
-        <path d="M60,280 Q120,350 100,440 Q80,520 130,580" stroke="#AD9272" stroke-width="1" fill="none" opacity="0.18"/>
-        <path d="M1315,360 Q1340,440 1320,530 Q1300,610 1350,680" stroke="#8A7256" stroke-width="1" fill="none" opacity="0.18"/>
-      </svg>
-    </div>
-
-    <div class="orb orb-1" aria-hidden="true"></div>
-    <div class="orb orb-2" aria-hidden="true"></div>
-    <div class="orb orb-3" aria-hidden="true"></div>
-
-    <div class="light-sweep" aria-hidden="true"></div>
-
-    <!-- drifting botanical petals -->
-    <div class="petal" style="left:8%;bottom:-5%;width:9px;height:9px;background:rgba(173,146,114,0.55);animation-duration:13s;animation-delay:0s" aria-hidden="true"></div>
-    <div class="petal" style="left:22%;bottom:-5%;width:6px;height:6px;background:rgba(0,201,177,0.4);animation-duration:16s;animation-delay:3s" aria-hidden="true"></div>
-    <div class="petal" style="left:46%;bottom:-5%;width:8px;height:8px;background:rgba(201,176,138,0.5);animation-duration:14.5s;animation-delay:6s" aria-hidden="true"></div>
-    <div class="petal" style="left:64%;bottom:-5%;width:7px;height:7px;background:rgba(139,47,201,0.32);animation-duration:18s;animation-delay:1.5s" aria-hidden="true"></div>
-    <div class="petal" style="left:80%;bottom:-5%;width:10px;height:10px;background:rgba(255,107,53,0.3);animation-duration:15s;animation-delay:8s" aria-hidden="true"></div>
-    <div class="petal" style="left:91%;bottom:-5%;width:6px;height:6px;background:rgba(173,146,114,0.5);animation-duration:12s;animation-delay:4.5s" aria-hidden="true"></div>
-
-    <!-- LEFT: Copy -->
+    <!-- ══════════════════════════════════════
+         LEFT COLUMN — Headline, Trust, CTAs
+    ═══════════════════════════════════════ -->
     <div class="hero-content">
-      <div class="eyebrow">
-        <span class="eyebrow-dot" aria-hidden="true"></span>
-        Premium Wallpapers · India's Favourite
-      </div>
 
-      <h1 class="headline">
-        Your Walls<br class="headline-break">
-        Deserve to<br class="headline-break">
-        <span class="underline-accent"><em>Wonder</em></span>
-      </h1>
-
-      <p class="subheadline">
-        Transform any room into a masterpiece with our curated collection of <strong>500+ designer wallpapers</strong>. Crafted for Indian homes — rich textures, bold patterns, timeless elegance.
+      <!-- Eyebrow -->
+      <p class="eyebrow" aria-hidden="true">
+        <span class="eyebrow-line"></span>
+        Premium Wall Décor · India
       </p>
 
-      <div class="trust-row" aria-label="Trust indicators">
-        <div class="trust-badge">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.5" stroke="#00C9B1" stroke-width="1.2"/><path d="M4.5 7.5L6.5 9.5L10.5 5.5" stroke="#00C9B1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Free Installation Guidance
+      <!-- H1 — ONE per page -->
+      <h1 class="headline">
+        Transform Your Walls<br>
+        Into <em>Timeless</em><br>
+        <span class="accent-word">Masterpieces</span>
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="subheadline" itemprop="description">
+        Premium custom wallpapers, murals, posters and glass films crafted for Indian homes.
+        Choose from <strong>500+ curated designs</strong> or upload your own artwork — printed
+        on HP Latex technology for lasting colour.
+      </p>
+
+      <!-- Trust badges — 2×2 grid -->
+      <div class="trust-grid" aria-label="Quality guarantees">
+        <div class="trust-item">
+          <span class="trust-check" aria-hidden="true">
+            <svg viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          HP Latex Printed
         </div>
-        <div class="trust-divider" aria-hidden="true"></div>
-        <div class="trust-badge">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.5" stroke="#00C9B1" stroke-width="1.2"/><path d="M4.5 7.5L6.5 9.5L10.5 5.5" stroke="#00C9B1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Pan-India Delivery
+        <div class="trust-item">
+          <span class="trust-check" aria-hidden="true">
+            <svg viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Eco-Friendly Inks
         </div>
-        <div class="trust-divider" aria-hidden="true"></div>
-        <div class="trust-badge">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="6.5" stroke="#00C9B1" stroke-width="1.2"/><path d="M4.5 7.5L6.5 9.5L10.5 5.5" stroke="#00C9B1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          500+ Patterns
+        <div class="trust-item">
+          <span class="trust-check" aria-hidden="true">
+            <svg viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Any Custom Size
+        </div>
+        <div class="trust-item">
+          <span class="trust-check" aria-hidden="true">
+            <svg viewBox="0 0 9 9" fill="none"><path d="M1.5 4.5L3.5 6.5L7.5 2.5" stroke="#C9A84C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Pan India Delivery
         </div>
       </div>
 
+      <!-- Social proof row -->
+      <div class="social-proof" aria-label="Customer trust indicators">
+        <div class="sp-stat">
+          <div class="sp-stars" aria-label="4.8 out of 5 stars">
+            <svg viewBox="0 0 12 12"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+            <svg viewBox="0 0 12 12"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+            <svg viewBox="0 0 12 12"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+            <svg viewBox="0 0 12 12"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+            <svg viewBox="0 0 12 12"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+          </div>
+          <span class="sp-number">4.8</span>
+          <span class="sp-label">Avg. Rating</span>
+        </div>
+        <div class="sp-stat">
+          <span class="sp-number">500+</span>
+          <span class="sp-label">Premium Designs</span>
+        </div>
+        <div class="sp-stat">
+          <span class="sp-number">1000+</span>
+          <span class="sp-label">Walls Transformed</span>
+        </div>
+      </div>
+
+      <!-- CTAs -->
       <div class="cta-group">
-        <!-- Primary WhatsApp CTA -->
+        <!-- Primary: Get Free Quote -->
         <a
-          href="https://wa.me/919883100377?text=Hi%20Wonder%20Wallz!%20I%27d%20like%20to%20explore%20your%20wallpaper%20collection."
-          target="_blank" rel="noopener"
-          class="cta-whatsapp"
-          aria-label="Order on WhatsApp – Wonder Wallz"
+          href="/quote"
+          class="cta-primary"
+          aria-label="Get a free wallpaper quote from Wonder Wallz"
         >
-          <!-- WhatsApp SVG icon -->
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Order on WhatsApp
+          <!-- Pencil/spark icon -->
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M11.5 2.5L13.5 4.5L5.5 12.5L2.5 13.5L3.5 10.5L11.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+          Get Free Quote
         </a>
 
-        <!-- Secondary CTA -->
-        <button class="cta-secondary" onclick="sendPrompt('Show me Wonder Wallz collections and design styles available')" aria-label="Browse all wallpaper collections">
-          Browse Collections
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 7H11M7 3L11 7L7 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- RIGHT: Premium Interior Showcase -->
-    <div class="hero-mockup" aria-label="Wonder Wallz premium interior showcase">
-      <div class="mockup-stage">
-
-        <!-- Room canvas — single SVG does all rendering, no CSS positioning bugs -->
-        <div class="room-canvas">
-          <svg class="room-svg" viewBox="0 0 460 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-              <!-- Wallpaper gradient — deep botanical teal -->
-              <linearGradient id="wallGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#0d3830"/>
-                <stop offset="55%" stop-color="#0a2b24"/>
-                <stop offset="100%" stop-color="#071e19"/>
-              </linearGradient>
-              <!-- Ceiling gradient -->
-              <linearGradient id="ceilGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#f8f2e6"/>
-                <stop offset="100%" stop-color="#ede1cc"/>
-              </linearGradient>
-              <!-- Floor gradient -->
-              <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#c9ae80"/>
-                <stop offset="100%" stop-color="#a88660"/>
-              </linearGradient>
-              <!-- Vase gradient -->
-              <linearGradient id="vaseGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#5a9a88"/>
-                <stop offset="100%" stop-color="#2d6050"/>
-              </linearGradient>
-              <!-- Clip path for room border radius -->
-              <clipPath id="roomClip">
-                <rect x="0" y="0" width="460" height="340" rx="18" ry="18"/>
-              </clipPath>
-              <!-- Wallpaper clip -->
-              <clipPath id="wallClip">
-                <rect x="0" y="0" width="460" height="240"/>
-              </clipPath>
-            </defs>
-
-            <!-- ── ROOM SCENE (clipped to rounded rect) ── -->
-            <g clip-path="url(#roomClip)">
-
-              <!-- CEILING — warm linen -->
-              <rect x="0" y="0" width="460" height="50" fill="url(#ceilGrad)"/>
-              <!-- Ceiling shadow band -->
-              <rect x="0" y="46" width="460" height="8" fill="rgba(0,0,0,0.06)"/>
-
-              <!-- WALLPAPER WALL — full bleed, fills ceiling to skirting -->
-              <rect x="0" y="0" width="460" height="263" fill="url(#wallGrad)"/>
-
-              <!-- Wallpaper botanical pattern — SVG paths for realism -->
-              <!-- Left vine cluster -->
-              <path d="M-10,340 Q30,270 60,220 Q90,170 80,120 Q70,80 100,40" stroke="#00C9B1" stroke-width="1.6" fill="none" opacity="0.45"/>
-              <path d="M20,340 Q55,265 85,215" stroke="#00AA95" stroke-width="1" fill="none" opacity="0.25"/>
-              <!-- Left leaves -->
-              <ellipse cx="80" cy="215" rx="28" ry="9" fill="rgba(0,201,177,0.28)" transform="rotate(-38,80,215)"/>
-              <ellipse cx="68" cy="170" rx="24" ry="8" fill="rgba(0,180,150,0.22)" transform="rotate(15,68,170)"/>
-              <ellipse cx="95" cy="130" rx="30" ry="10" fill="rgba(0,201,177,0.26)" transform="rotate(-52,95,130)"/>
-              <ellipse cx="92" cy="88"  rx="22" ry="8" fill="rgba(0,180,150,0.2)" transform="rotate(-30,92,88)"/>
-
-              <!-- Right vine cluster -->
-              <path d="M470,340 Q420,265 390,210 Q360,160 375,100 Q385,55 360,10" stroke="#00B894" stroke-width="1.6" fill="none" opacity="0.42"/>
-              <path d="M450,340 Q405,260 380,205" stroke="#00AA95" stroke-width="1" fill="none" opacity="0.22"/>
-              <!-- Right leaves -->
-              <ellipse cx="390" cy="210" rx="27" ry="9" fill="rgba(0,201,177,0.26)" transform="rotate(35,390,210)"/>
-              <ellipse cx="378" cy="165" rx="25" ry="8" fill="rgba(0,180,150,0.2)" transform="rotate(-18,378,165)"/>
-              <ellipse cx="368" cy="120" rx="28" ry="9" fill="rgba(0,201,177,0.24)" transform="rotate(44,368,120)"/>
-              <ellipse cx="358" cy="78"  rx="20" ry="7" fill="rgba(0,180,150,0.18)" transform="rotate(-28,358,78)"/>
-
-              <!-- Centre vine (subtle) -->
-              <path d="M230,340 Q210,280 220,230 Q230,185 215,140" stroke="#009E8C" stroke-width="1.2" fill="none" opacity="0.18"/>
-
-              <!-- Gold botanical blooms -->
-              <!-- Centre bloom -->
-              <g transform="translate(228,95)">
-                <circle cx="0" cy="0" r="14" fill="none" stroke="rgba(224,165,38,0.65)" stroke-width="0.8"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(0)"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(60)"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(120)"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(180)"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(240)"/>
-                <ellipse cx="0" cy="-18" rx="5" ry="11" fill="rgba(224,165,38,0.28)" transform="rotate(300)"/>
-                <circle cx="0" cy="0" r="4" fill="rgba(224,165,38,0.55)"/>
-              </g>
-              <!-- Top-left bloom -->
-              <g transform="translate(105,55)">
-                <circle cx="0" cy="0" r="10" fill="none" stroke="rgba(201,176,110,0.55)" stroke-width="0.7"/>
-                <ellipse cx="0" cy="-13" rx="4" ry="8" fill="rgba(201,176,110,0.24)" transform="rotate(0)"/>
-                <ellipse cx="0" cy="-13" rx="4" ry="8" fill="rgba(201,176,110,0.24)" transform="rotate(72)"/>
-                <ellipse cx="0" cy="-13" rx="4" ry="8" fill="rgba(201,176,110,0.24)" transform="rotate(144)"/>
-                <ellipse cx="0" cy="-13" rx="4" ry="8" fill="rgba(201,176,110,0.24)" transform="rotate(216)"/>
-                <ellipse cx="0" cy="-13" rx="4" ry="8" fill="rgba(201,176,110,0.24)" transform="rotate(288)"/>
-                <circle cx="0" cy="0" r="3" fill="rgba(201,176,110,0.5)"/>
-              </g>
-              <!-- Top-right small bloom -->
-              <g transform="translate(358,52)">
-                <circle cx="0" cy="0" r="9" fill="none" stroke="rgba(224,165,38,0.5)" stroke-width="0.7"/>
-                <ellipse cx="0" cy="-12" rx="3.5" ry="7" fill="rgba(224,165,38,0.22)" transform="rotate(0)"/>
-                <ellipse cx="0" cy="-12" rx="3.5" ry="7" fill="rgba(224,165,38,0.22)" transform="rotate(72)"/>
-                <ellipse cx="0" cy="-12" rx="3.5" ry="7" fill="rgba(224,165,38,0.22)" transform="rotate(144)"/>
-                <ellipse cx="0" cy="-12" rx="3.5" ry="7" fill="rgba(224,165,38,0.22)" transform="rotate(216)"/>
-                <ellipse cx="0" cy="-12" rx="3.5" ry="7" fill="rgba(224,165,38,0.22)" transform="rotate(288)"/>
-                <circle cx="0" cy="0" r="3" fill="rgba(224,165,38,0.45)"/>
-              </g>
-
-              <!-- Scatter micro-dots -->
-              <circle cx="170" cy="38" r="2.2" fill="rgba(201,176,110,0.45)"/>
-              <circle cx="290" cy="52" r="1.8" fill="rgba(0,201,177,0.4)"/>
-              <circle cx="45"  cy="95" r="1.6" fill="rgba(224,165,38,0.4)"/>
-              <circle cx="415" cy="88" r="2"   fill="rgba(0,201,177,0.35)"/>
-              <circle cx="310" cy="170" r="1.5" fill="rgba(201,176,110,0.35)"/>
-              <circle cx="148" cy="185" r="1.8" fill="rgba(0,201,177,0.3)"/>
-
-              <!-- Subtle horizontal line shimmer across mid-wall -->
-              <rect x="0" y="130" width="460" height="1" fill="rgba(255,255,255,0.04)"/>
-
-              <!-- Gold border frame for wallpaper panel effect -->
-              <rect x="14" y="14" width="432" height="230" rx="4" fill="none" stroke="rgba(201,176,110,0.28)" stroke-width="1.2"/>
-
-              <!-- Ambient light sheen (top-left diagonal) -->
-              <polygon points="0,0 200,0 0,160" fill="rgba(255,255,255,0.05)"/>
-
-              <!-- ── SKIRTING BOARD ── -->
-              <rect x="0" y="258" width="460" height="8" fill="#e8dcc8"/>
-              <rect x="0" y="258" width="460" height="1" fill="rgba(255,255,255,0.6)"/>
-              <rect x="0" y="265" width="460" height="1" fill="rgba(0,0,0,0.06)"/>
-
-              <!-- ── FLOOR ── -->
-              <rect x="0" y="266" width="460" height="74" fill="url(#floorGrad)"/>
-              <!-- Floorboard planks -->
-              <line x1="0"   y1="280" x2="460" y2="280" stroke="rgba(0,0,0,0.06)" stroke-width="0.8"/>
-              <line x1="0"   y1="295" x2="460" y2="295" stroke="rgba(0,0,0,0.05)" stroke-width="0.8"/>
-              <line x1="0"   y1="310" x2="460" y2="310" stroke="rgba(0,0,0,0.04)" stroke-width="0.8"/>
-              <line x1="115" y1="266" x2="115" y2="340" stroke="rgba(0,0,0,0.04)" stroke-width="0.6"/>
-              <line x1="230" y1="266" x2="230" y2="340" stroke="rgba(0,0,0,0.04)" stroke-width="0.6"/>
-              <line x1="345" y1="266" x2="345" y2="340" stroke="rgba(0,0,0,0.04)" stroke-width="0.6"/>
-              <!-- Floor gloss highlight -->
-              <rect x="0" y="266" width="460" height="6" fill="rgba(255,255,255,0.12)"/>
-
-              <!-- ── CONSOLE TABLE ── -->
-              <!-- Table shadow -->
-              <ellipse cx="230" cy="339" rx="75" ry="5" fill="rgba(0,0,0,0.2)"/>
-              <!-- Table top -->
-              <rect x="148" y="266" width="164" height="10" rx="2" fill="#2e1508"/>
-              <rect x="148" y="266" width="164" height="3" rx="2" fill="rgba(255,255,255,0.12)"/>
-              <!-- Table legs — elegant tapered -->
-              <polygon points="162,276 168,276 165,334 159,334" fill="#261205"/>
-              <polygon points="292,276 298,276 301,334 295,334" fill="#261205"/>
-              <!-- Table apron front -->
-              <rect x="162" y="276" width="136" height="7" fill="#381a08" rx="0"/>
-
-              <!-- ── DECORATIVE VASE on table ── -->
-              <!-- Vase shadow -->
-              <ellipse cx="230" cy="269" rx="11" ry="3" fill="rgba(0,0,0,0.2)"/>
-              <!-- Vase body -->
-              <ellipse cx="230" cy="253" rx="13" ry="16" fill="url(#vaseGrad)"/>
-              <!-- Vase neck -->
-              <rect x="226" y="245" width="8" height="9" fill="#3a6a58" rx="2"/>
-              <!-- Vase mouth -->
-              <ellipse cx="230" cy="245" rx="7" ry="3" fill="#3a6a58"/>
-              <!-- Vase highlight -->
-              <ellipse cx="225" cy="252" rx="4" ry="7" fill="rgba(255,255,255,0.12)" transform="rotate(-15,225,252)"/>
-              <!-- Stem in vase -->
-              <line x1="230" y1="245" x2="228" y2="225" stroke="rgba(0,180,100,0.7)" stroke-width="1.5"/>
-              <line x1="230" y1="245" x2="232" y2="220" stroke="rgba(0,160,90,0.6)" stroke-width="1.2"/>
-              <!-- Leaves -->
-              <ellipse cx="222" cy="232" rx="8" ry="4" fill="rgba(0,180,100,0.55)" transform="rotate(-40,222,232)"/>
-              <ellipse cx="238" cy="225" rx="7" ry="3.5" fill="rgba(0,160,90,0.5)" transform="rotate(30,238,225)"/>
-
-              <!-- Decorative object on table right -->
-              <ellipse cx="274" cy="266" rx="9" ry="4" fill="rgba(0,0,0,0.15)"/>
-              <rect x="268" y="255" width="12" height="12" rx="2" fill="#8B6020"/>
-              <rect x="270" y="257" width="8" height="8" rx="1" fill="rgba(255,255,255,0.15)"/>
-
-              <!-- ── INSTALLER — applying the wallpaper, right of the table ── -->
-              <g transform="translate(388,332)">
-                <!-- contact shadow -->
-                <ellipse cx="0" cy="2" rx="34" ry="6" fill="rgba(0,0,0,0.16)"/>
-
-                <!-- fresh wallpaper strip he's currently smoothing — subtle sheen seam -->
-                <rect x="-46" y="-272" width="20" height="270" fill="rgba(255,255,255,0.07)"/>
-                <line x1="-46" y1="-272" x2="-46" y2="-2" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
-                <line x1="-26" y1="-272" x2="-26" y2="-2" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-
-                <!-- wallpaper roll leaning at his feet -->
-                <g transform="translate(30,-4)">
-                  <ellipse cx="0" cy="2" rx="9" ry="3" fill="rgba(0,0,0,0.14)"/>
-                  <rect x="-6" y="-46" width="12" height="46" rx="6" fill="#f3ead8"/>
-                  <rect x="-6" y="-46" width="12" height="46" rx="6" fill="none" stroke="rgba(150,120,80,0.3)" stroke-width="1"/>
-                  <ellipse cx="0" cy="-46" rx="6" ry="2.4" fill="#0d2e26"/>
-                  <line x1="-3" y1="-40" x2="3" y2="-40" stroke="rgba(0,150,130,0.4)" stroke-width="1"/>
-                  <line x1="-3" y1="-30" x2="3" y2="-30" stroke="rgba(0,150,130,0.4)" stroke-width="1"/>
-                  <line x1="-3" y1="-20" x2="3" y2="-20" stroke="rgba(0,150,130,0.4)" stroke-width="1"/>
-                  <line x1="-3" y1="-10" x2="3" y2="-10" stroke="rgba(0,150,130,0.4)" stroke-width="1"/>
-                </g>
-
-                <!-- back leg -->
-                <path d="M3,-58 L8,0 L17,0 L13,-58 Z" fill="#3a2c20"/>
-                <!-- front leg -->
-                <path d="M-3,-58 L-9,0 L0,0 L4,-58 Z" fill="#2e2317"/>
-                <!-- shoes -->
-                <ellipse cx="12" cy="1" rx="8" ry="3.5" fill="#1c140c"/>
-                <ellipse cx="-5" cy="1" rx="8" ry="3.5" fill="#241a10"/>
-
-                <!-- torso (shirt) -->
-                <path d="M-15,-58 Q-17,-95 -12,-110 L12,-110 Q17,-95 15,-58 Z" fill="#f3ead8"/>
-                <!-- apron, brand teal -->
-                <path d="M-11,-58 Q-13,-88 -9,-104 L9,-104 Q13,-88 11,-58 Z" fill="rgba(0,180,150,0.85)"/>
-                <line x1="0" y1="-104" x2="0" y2="-58" stroke="rgba(0,120,100,0.3)" stroke-width="1"/>
-                <!-- apron pocket -->
-                <rect x="-7" y="-70" width="14" height="9" rx="1.5" fill="rgba(0,130,110,0.9)"/>
-
-                <!-- back arm, relaxed, holding wallpaper edge -->
-                <path d="M13,-104 Q24,-95 23,-72 Q22,-62 17,-56" stroke="#f3ead8" stroke-width="9" fill="none" stroke-linecap="round"/>
-                <circle cx="17" cy="-56" r="4.5" fill="#c68a5e"/>
-
-                <!-- front arm, raised, smoothing the wall -->
-                <path d="M-12,-104 Q-25,-108 -27,-120" stroke="#f3ead8" stroke-width="9" fill="none" stroke-linecap="round"/>
-                <!-- rolled sleeve -->
-                <circle cx="-27" cy="-117" r="5.5" fill="#e3d5ba"/>
-                <!-- forearm skin -->
-                <path d="M-27,-117 Q-29,-125 -26,-132" stroke="#c68a5e" stroke-width="7" fill="none" stroke-linecap="round"/>
-                <!-- hand -->
-                <circle cx="-25" cy="-133" r="5" fill="#c68a5e"/>
-                <!-- smoothing brush tool -->
-                <g transform="translate(-28,-141) rotate(18)">
-                  <rect x="-9" y="0" width="18" height="7" rx="2" fill="#8B6020"/>
-                  <rect x="-9" y="0" width="18" height="2" rx="1" fill="rgba(255,255,255,0.25)"/>
-                  <rect x="-2.5" y="6" width="5" height="9" fill="#5c4012"/>
-                </g>
-
-                <!-- neck -->
-                <rect x="-4" y="-114" width="8" height="6" fill="#c68a5e"/>
-                <!-- head -->
-                <circle cx="0" cy="-122" r="11" fill="#c68a5e"/>
-                <!-- ear -->
-                <circle cx="-10" cy="-121" r="2.4" fill="#bb7e51"/>
-                <!-- hair -->
-                <path d="M-11,-126 Q-12,-136 0,-137 Q12,-136 11,-126 Q11,-131 0,-132 Q-11,-131 -11,-126 Z" fill="#2a1d12"/>
-                <!-- simple facial hint -->
-                <ellipse cx="3" cy="-120" rx="1.3" ry="1.6" fill="rgba(40,25,15,0.55)"/>
-              </g>
-
-              <!-- ── ROOM LABEL TAG ── -->
-              <g transform="translate(230,58)">
-                <rect x="-70" y="-12" width="140" height="24" rx="12" fill="rgba(8,40,32,0.82)"/>
-                <rect x="-70" y="-12" width="140" height="24" rx="12" fill="none" stroke="rgba(224,165,38,0.45)" stroke-width="1"/>
-                <text x="0" y="4" text-anchor="middle" font-family="Inter,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.1" fill="rgba(224,200,140,0.95)" text-transform="uppercase">Botanical Teal · Signature Mural</text>
-              </g>
-
-            </g><!-- end roomClip -->
-
-            <!-- Subtle outer frame — warm gold hairline for a boutique-frame feel -->
-            <rect x="0.75" y="0.75" width="458.5" height="338.5" rx="17.5" fill="none" stroke="rgba(232,201,106,0.55)" stroke-width="1.5"/>
-            <rect x="2.5" y="2.5" width="455" height="335" rx="16" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1"/>
+        <!-- WhatsApp -->
+        <a
+          href="https://wa.me/919XXXXXXXXX?text=Hi%2C%20I%27d%20like%20a%20wallpaper%20consultation"
+          class="cta-whatsapp"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat with Wonder Wallz on WhatsApp for a free consultation"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
           </svg>
+          WhatsApp Us
+        </a>
 
-          <!-- ── GLASSMORPHISM BADGES ── -->
-          <!-- 500+ Designs — top left -->
-          <div class="gb gb-1" aria-hidden="true">
-            <div class="gb-icon" style="background:rgba(0,201,177,0.15)"><div class="dot dot-teal"></div></div>
-            <div><div class="gb-title">500+ Designs</div><div class="gb-sub">Curated collection</div></div>
-          </div>
-          <!-- Rating — top right (card style) -->
-          <div class="gb gb-5 gb-rating" aria-hidden="true">
-            <div class="rval">4.8★</div>
-            <div class="gb-title">Customer Rating</div>
-            <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
-          </div>
-          <!-- Custom Printing — mid right -->
-          <div class="gb gb-2" aria-hidden="true">
-            <div class="gb-icon" style="background:rgba(255,107,53,0.12)"><div class="dot dot-orange"></div></div>
-            <div><div class="gb-title">Custom Printing</div><div class="gb-sub">Any size, any wall</div></div>
-          </div>
-          <!-- Free Consultation — mid left -->
-          <div class="gb gb-3" aria-hidden="true">
-            <div class="gb-icon" style="background:rgba(176,110,224,0.12)"><div class="dot dot-purple"></div></div>
-            <div><div class="gb-title">Free Consultation</div><div class="gb-sub">Design experts</div></div>
-          </div>
-          <!-- Pan India Delivery — bottom centre -->
-          <div class="gb gb-4" aria-hidden="true">
-            <div class="gb-icon" style="background:rgba(0,201,177,0.12);font-size:14px">🚚</div>
-            <div><div class="gb-title">Pan India Delivery</div><div class="gb-sub">Fast · Reliable</div></div>
-          </div>
-        </div>
-
-        <!-- ── PRODUCT CATEGORY GRID ── -->
-        <div class="prod-label">Shop By Category</div>
-        <nav class="prod-strip" aria-label="Product categories">
-          <button type="button" class="pp on" onclick="sendPrompt('Show me Custom Wallpaper from Wonder Wallz');this.closest('.prod-strip').querySelectorAll('.pp').forEach(p=>p.classList.remove('on'));this.classList.add('on')">
-            <div class="pp-ico" style="background:rgba(0,201,177,0.15)">🌿</div>
-            <span class="pp-lbl">Custom Wallpaper</span>
-          </button>
-          <button type="button" class="pp" onclick="sendPrompt('Show me Custom Posters from Wonder Wallz');this.closest('.prod-strip').querySelectorAll('.pp').forEach(p=>p.classList.remove('on'));this.classList.add('on')">
-            <div class="pp-ico" style="background:rgba(224,165,38,0.14)">🖼️</div>
-            <span class="pp-lbl">Custom Poster</span>
-          </button>
-          <button type="button" class="pp" onclick="sendPrompt('Show me Custom Glass Films from Wonder Wallz');this.closest('.prod-strip').querySelectorAll('.pp').forEach(p=>p.classList.remove('on'));this.classList.add('on')">
-            <div class="pp-ico" style="background:rgba(139,47,201,0.12)">✨</div>
-            <span class="pp-lbl">Custom Glass Films</span>
-          </button>
-          <button type="button" class="pp" onclick="sendPrompt('Show me other Home Decor from Wonder Wallz');this.closest('.prod-strip').querySelectorAll('.pp').forEach(p=>p.classList.remove('on'));this.classList.add('on')">
-            <div class="pp-ico" style="background:rgba(255,107,53,0.12)">🏠</div>
-            <span class="pp-lbl">Home Decor</span>
-          </button>
-        </nav>
-
+        <!-- Secondary: Browse -->
+        <a
+          href="/collections"
+          class="cta-secondary"
+          aria-label="Browse Wonder Wallz wallpaper collections"
+        >
+          Browse Collections
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2.5 7H11.5M8 3.5L11.5 7L8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </div>
-    </div>
+
+    </div><!-- /hero-content -->
+
+
+    <!-- ══════════════════════════════════════
+         RIGHT COLUMN — Luxury Interior Photo
+    ═══════════════════════════════════════ -->
+    <div class="hero-visual" role="img" aria-label="Luxury living room with a stunning botanical wallpaper feature wall by Wonder Wallz">
+
+      <!--
+        ════════════════════════════════════════════════════════════════
+        DEVELOPER NOTE — REPLACE THIS IMAGE:
+        Replace the src below with your actual Wonder Wallz room mockup
+        photograph. The image should show a premium interior with a
+        striking wallpaper feature wall clearly visible.
+
+        Ideal image spec:
+          • 1400 × 1800 px (portrait) or 1600 × 1000 px (landscape)
+          • JPG, quality 85–90
+          • Bright, well-lit interior — natural light preferred
+          • Wallpaper pattern should dominate 40–60% of the frame
+          • Minimal clutter — premium furniture, editorial feel
+
+        For Next.js, replace <img> with:
+          <Image
+            src="/images/hero-room-mockup.jpg"
+            alt="Luxury living room with Wonder Wallz botanical mural wallpaper"
+            fill
+            priority
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            sizes="(max-width: 900px) 100vw, 50vw"
+          />
+
+        Placeholder below uses a free Unsplash interior photo via CDN.
+        ════════════════════════════════════════════════════════════════
+      -->
+      <img
+        src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1400&q=85&auto=format&fit=crop"
+        alt="Luxury modern living room featuring a dramatic wallpaper feature wall — the kind of premium interior transformation Wonder Wallz delivers"
+        class="room-photo"
+        width="700"
+        height="900"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+      />
+
+      <!-- Glassmorphism Stat Cards -->
+
+      <!-- Card 1: Rating — top left -->
+      <div class="gb gb-1 gb-rating" aria-hidden="true">
+        <span class="gb-label">Customer Rating</span>
+        <span class="gb-value">4.8 ★</span>
+        <div class="gb-stars">
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="#C9A84C"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="#C9A84C"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="#C9A84C"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="#C9A84C"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="#C9A84C"><path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z"/></svg>
+        </div>
+      </div>
+
+      <!-- Card 2: 500+ Designs — top right -->
+      <div class="gb gb-2" aria-hidden="true">
+        <span class="gb-label">Curated Library</span>
+        <span class="gb-value">500+</span>
+        <span class="gb-sub">Premium Designs</span>
+      </div>
+
+      <!-- Card 3: Custom Size — mid right -->
+      <div class="gb gb-3" aria-hidden="true">
+        <span class="gb-label">Printing</span>
+        <span class="gb-value">Custom Size</span>
+        <span class="gb-sub">Any wall, any dimension</span>
+      </div>
+
+      <!-- Card 4: Pan India — bottom left -->
+      <div class="gb gb-4" aria-hidden="true">
+        <span class="gb-label">Delivery</span>
+        <span class="gb-value">Pan India</span>
+        <span class="gb-sub">Fast & tracked</span>
+      </div>
+
+      <!-- Card 5: HP Latex — bottom right -->
+      <div class="gb gb-5 gb-hp" aria-hidden="true">
+        <span class="gb-label">Technology</span>
+        <span class="gb-value">HP Latex</span>
+        <span class="gb-sub">Eco-friendly · Durable</span>
+      </div>
+
+      <!-- Brand mark overlay at bottom -->
+      <div class="brand-mark" aria-hidden="true">
+        <span class="brand-mark-dot"></span>
+        <span class="brand-mark-text">Wonder Wallz · Custom Wallpaper Specialists</span>
+      </div>
+
+    </div><!-- /hero-visual -->
+
   </section>
 </main>
 
-<script>
-// Subtle perspective tilt on room canvas hover
-const rc = document.querySelector('.room-canvas');
-if(rc){
-  rc.addEventListener('mousemove', e=>{
-    const r = rc.getBoundingClientRect();
-    const x = ((e.clientX - r.left)/r.width - 0.5)*7;
-    const y = ((e.clientY - r.top)/r.height - 0.5)*4;
-    rc.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg)`;
-    rc.style.transition = 'transform 0.1s ease';
-  });
-  rc.addEventListener('mouseleave',()=>{
-    rc.style.transform = '';
-    rc.style.transition = 'transform 0.7s cubic-bezier(.22,.9,.32,1)';
-  });
-}
+<!--
+  ═══════════════════════════════════════════════
+  NEXT.JS COMPONENT — drop this into your project
+  as app/components/Hero.tsx
 
-// ── Report real content height to the parent page (IframeSection.tsx) ──
-// Without this, the parent has no way to know how tall this page actually
-// is, and falls back to a guessed fixed height — cropping content on
-// screens (like mobile) where the real layout is taller.
-//
-// IMPORTANT: we measure the .hero section itself, NOT document/body height.
-// document.scrollHeight is unreliable on iOS Safari because the dynamic
-// address bar collapsing/expanding shifts viewport-relative calculations,
-// which was causing this iframe to report a height taller than the real
-// content (visible as blank space below the section on phones).
-(function () {
-  const heroEl = document.querySelector('.hero') || document.body;
-  let lastReported = 0;
-  let debounceTimer = null;
+  Dependencies:
+    npm install framer-motion
+    (lucide-react already in stack)
 
-  function measureAndReport() {
-    const h = Math.ceil(heroEl.getBoundingClientRect().height);
-    if (Math.abs(h - lastReported) < 2) return;
-    lastReported = h;
-    window.parent.postMessage({ type: 'wonderwallz:resize', height: h }, '*');
-  }
+  Key Framer Motion replacements:
+    • contentRise animation → motion.div with
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.8 }}
 
-  function reportHeight() {
-    // Debounce: wait for things to settle (animations/font swap/layout)
-    // before measuring, instead of measuring on every single trigger.
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(measureAndReport, 120);
-  }
+    • gbFloat → motion.div with
+      animate={{ y: [0, -5, 0] }}
+      transition={{ duration: 8, repeat: Infinity }}
 
-  window.addEventListener('load', reportHeight);
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(reportHeight);
-  }
-  window.addEventListener('orientationchange', reportHeight);
+  Image: Replace <img> with Next.js <Image> component
+  ═══════════════════════════════════════════════
+-->
 
-  if ('ResizeObserver' in window) {
-    const ro = new ResizeObserver(reportHeight);
-    ro.observe(heroEl);
-  } else {
-    window.addEventListener('resize', reportHeight);
-  }
-
-  // A couple of delayed re-checks to catch late layout settling
-  // (e.g. webfont swap, mobile browser chrome collapsing) without
-  // polling indefinitely.
-  setTimeout(reportHeight, 400);
-  setTimeout(reportHeight, 1200);
-
-  reportHeight();
-})();
-
-
-</script>
 </body>
 </html>

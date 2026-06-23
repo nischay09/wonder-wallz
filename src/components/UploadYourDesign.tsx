@@ -13,16 +13,19 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
-  Briefcase,
-  Bookmark,
   CheckCircle2,
+  ClipboardCheck,
   Image as ImageIcon,
+  Leaf,
   Loader2,
   MessageCircle,
+  Ruler,
   ShieldCheck,
   Sparkles,
+  Star,
+  Truck,
   Upload,
-  Users,
+  Wind,
   X,
 } from 'lucide-react';
 
@@ -31,12 +34,18 @@ type SubmitStatus = 'idle' | 'submitting' | 'success';
 
 const MAX_FILE_SIZE_MB = 25;
 
-const FEATURES = [
-  { Icon: Users, label: 'Family Photos' },
-  { Icon: Sparkles, label: 'AI Generated Art' },
-  { Icon: Bookmark, label: 'Pinterest Inspiration' },
-  { Icon: ImageIcon, label: 'Shutterstock Images' },
-  { Icon: Briefcase, label: 'Business Branding' },
+const STEPS = [
+  { Icon: Upload, label: 'Upload Design' },
+  { Icon: Ruler, label: 'Enter Measurements' },
+  { Icon: ClipboardCheck, label: 'Approve Artwork' },
+  { Icon: Truck, label: 'Print & Deliver' },
+];
+
+const TRUST_INDICATORS = [
+  { Icon: ShieldCheck, label: 'HP Latex Printed' },
+  { Icon: Leaf, label: 'Eco-Friendly' },
+  { Icon: Wind, label: 'Odour Free' },
+  { Icon: Truck, label: 'Pan India Delivery' },
 ];
 
 const UNITS: { value: Unit; label: string }[] = [
@@ -45,7 +54,7 @@ const UNITS: { value: Unit; label: string }[] = [
   { value: 'cm', label: 'CM' },
 ];
 
-const WALLPAPER_TYPES = ['Premium Vinyl', 'Smooth Matte', 'Textured Finish', 'Peel & Stick'];
+const WALLPAPER_TYPES = ['Premium Vinyl', 'Smooth Matte', 'Textured Finish', 'Peel & Stick', 'Custom Canvas', 'Framed Custom Canvas'];
 
 const WHATSAPP_HREF = `https://wa.me/10000000000?text=${encodeURIComponent(
   "Hi! I'd like a custom wallpaper quote for my own design."
@@ -115,10 +124,10 @@ export default function UploadYourDesign() {
   return (
     <section
       aria-labelledby="upload-design-heading"
-      className="relative overflow-hidden bg-[#FAF8F5] py-16 lg:py-20"
+      className="relative overflow-hidden bg-[#FAF6EE] py-16 lg:py-20"
     >
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
-        {/* Left: copy + features */}
+        {/* Left: copy + process + trust */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -126,46 +135,74 @@ export default function UploadYourDesign() {
           transition={{ duration: 0.6 }}
           className="flex flex-col"
         >
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-teal-300/60 bg-teal-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-teal-600">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#D9C28A]/60 bg-[#FBF3DF] px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#8A6D2E]">
             <Sparkles className="h-3.5 w-3.5" /> Custom Upload
           </span>
 
           <h2
             id="upload-design-heading"
-            className="mt-5 text-4xl font-extrabold leading-[1.1] text-slate-900 sm:text-5xl"
+            className="mt-5 font-serif text-4xl font-semibold leading-[1.1] text-[#2B2620] sm:text-5xl"
           >
             Have Your Own{' '}
-            <span className="bg-gradient-to-r from-teal-300 via-cyan-300 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#C9A227] to-[#8A6D2E] bg-clip-text text-transparent">
               Design?
             </span>
           </h2>
 
-          <p className="mt-5 max-w-md text-base leading-relaxed text-slate-600 sm:text-lg">
+          <p className="mt-5 max-w-md text-base leading-relaxed text-[#6E6457] sm:text-lg">
             Upload any photo, artwork, or inspiration image and our design team will turn it into a
             museum-quality custom wallpaper, sized exactly to your wall.
           </p>
 
-          <ul className="mt-8 space-y-3" role="list">
-            {FEATURES.map(({ Icon, label }, i) => (
-              <motion.li
+          {/* Lightweight social proof */}
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[#6E6457]">
+            <span className="inline-flex items-center gap-1.5 font-semibold text-[#2B2620]">
+              <Star className="h-4 w-4 fill-[#C9A227] text-[#C9A227]" /> 4.8 Rating
+            </span>
+            <span className="hidden h-1 w-1 rounded-full bg-[#D9C9A0] sm:inline-block" aria-hidden />
+            <span>1000+ Walls Transformed</span>
+            <span className="hidden h-1 w-1 rounded-full bg-[#D9C9A0] sm:inline-block" aria-hidden />
+            <span>500+ Designs</span>
+          </div>
+
+          {/* How it works */}
+          <div className="mt-10">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#8A6D2E]">
+              How It Works
+            </h3>
+            <ol className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4" role="list">
+              {STEPS.map(({ Icon, label }, i) => (
+                <motion.li
+                  key={label}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.07 }}
+                  className="flex flex-col gap-2 rounded-xl border border-[#EDE3CB] bg-white/60 px-3 py-4"
+                >
+                  <span className="flex items-center gap-2 text-[#8A6D2E]">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F3E9CF] text-[10px] font-bold text-[#8A6D2E]">
+                      {i + 1}
+                    </span>
+                    <Icon className="h-4 w-4" strokeWidth={1.75} />
+                  </span>
+                  <span className="text-xs font-medium leading-snug text-[#2B2620]">{label}</span>
+                </motion.li>
+              ))}
+            </ol>
+          </div>
+
+          {/* Trust indicators */}
+          <div className="mt-8 flex flex-wrap gap-2.5" role="list" aria-label="Trust indicators">
+            {TRUST_INDICATORS.map(({ Icon, label }) => (
+              <span
                 key={label}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white shadow-sm px-4 py-3 transition-colors hover:border-teal-400/30 hover:bg-white/[0.06]"
+                role="listitem"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#EDE3CB] bg-white px-3.5 py-1.5 text-xs font-medium text-[#6E6457]"
               >
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-50 to-purple-50 border border-cyan-200 text-teal-600">
-
-                  <Icon className="h-4 w-4 text-cyan-500" strokeWidth={2} />
-                </span>
-                <span className="text-sm font-medium text-slate-800">{label}</span>
-              </motion.li>
+                <Icon className="h-3.5 w-3.5 text-[#8A6D2E]" strokeWidth={1.75} /> {label}
+              </span>
             ))}
-          </ul>
-
-          <div className="mt-8 inline-flex w-fit items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700">
-            <ShieldCheck className="h-4 w-4 text-orange-300" /> Printed using HP Latex technology
           </div>
         </motion.div>
 
@@ -175,7 +212,7 @@ export default function UploadYourDesign() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="relative rounded-3xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/40 backdrop-blur-2xl sm:p-8"
+          className="relative rounded-3xl border border-[#EDE3CB] bg-white p-6 shadow-xl shadow-black/5 sm:p-8"
         >
           <div
             role="button"
@@ -197,8 +234,8 @@ export default function UploadYourDesign() {
             }}
             className={`relative flex min-h-[260px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed text-center transition-all duration-300 ${
               isDragging
-                ? 'scale-[1.01] border-teal-300 bg-teal-400/10'
-                : 'border-slate-300 bg-slate-50 hover:border-teal-500 hover:bg-white'
+                ? 'scale-[1.01] border-[#C9A227] bg-[#FBF3DF]'
+                : 'border-[#D9C9A0] bg-[#FBF8F1] hover:border-[#C9A227] hover:bg-white'
             }`}
           >
             <input
@@ -230,11 +267,11 @@ export default function UploadYourDesign() {
                       removeFile();
                     }}
                     aria-label="Remove uploaded image"
-                    className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-slate-900 backdrop-blur transition-colors hover:bg-red-500/80"
+                    className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition-colors hover:bg-red-500/80"
                   >
                     <X className="h-4 w-4" />
                   </button>
-                  <p className="mt-2 truncate text-xs text-slate-400">
+                  <p className="mt-2 truncate text-xs text-[#8A8070]">
                     {file.name} · {(file.size / 1024 / 1024).toFixed(1)}MB
                   </p>
                 </motion.div>
@@ -246,13 +283,25 @@ export default function UploadYourDesign() {
                   exit={{ opacity: 0 }}
                   className="flex flex-col items-center px-6"
                 >
-                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-teal-400/20 via-purple-500/20 to-orange-400/20">
-                    <Upload className="h-6 w-6 text-teal-300" />
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F3E9CF]">
+                    <Upload className="h-6 w-6 text-[#8A6D2E]" strokeWidth={1.75} />
                   </span>
-                  <p className="mt-4 text-sm font-semibold text-slate-500">Drag & drop your image here</p>
-                  <p className="mt-1 text-xs text-slate-400">
-                    or click to browse · JPG, PNG, WEBP up to {MAX_FILE_SIZE_MB}MB
+                  <p className="mt-4 text-sm font-semibold text-[#2B2620]">
+                    Drag &amp; drop your image here
                   </p>
+                  <p className="mt-1 text-xs text-[#8A8070]">
+                    or click to browse · up to {MAX_FILE_SIZE_MB}MB
+                  </p>
+                  <div className="mt-3 flex items-center gap-1.5">
+                    {['JPG', 'PNG', 'WEBP'].map((fmt) => (
+                      <span
+                        key={fmt}
+                        className="inline-flex items-center gap-1 rounded-full border border-[#EDE3CB] bg-white px-2.5 py-1 text-[10px] font-semibold tracking-wide text-[#8A6D2E]"
+                      >
+                        <ImageIcon className="h-2.5 w-2.5" /> {fmt}
+                      </span>
+                    ))}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -263,15 +312,15 @@ export default function UploadYourDesign() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               role="alert"
-              className="mt-3 flex items-center gap-1.5 text-xs font-medium text-red-300"
+              className="mt-3 flex items-center gap-1.5 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-700"
             >
-              <AlertCircle className="h-3.5 w-3.5" /> {error}
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" /> {error}
             </motion.p>
           )}
 
           <div className="mt-6 grid grid-cols-3 gap-3">
             <div>
-              <label htmlFor="wallWidth" className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label htmlFor="wallWidth" className="mb-1.5 block text-xs font-medium text-[#6E6457]">
                 Width
               </label>
               <input
@@ -282,11 +331,11 @@ export default function UploadYourDesign() {
                 value={width}
                 onChange={(e) => setWidth(e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 outline-none transition-colors focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+                className="w-full rounded-xl border border-[#E7DEC8] bg-white px-3 py-2.5 text-sm text-[#2B2620] placeholder:text-[#A89F8C] outline-none transition-colors focus:border-[#C9A227] focus:ring-4 focus:ring-[#F3E9CF]"
               />
             </div>
             <div>
-              <label htmlFor="wallHeight" className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label htmlFor="wallHeight" className="mb-1.5 block text-xs font-medium text-[#6E6457]">
                 Height
               </label>
               <input
@@ -297,21 +346,21 @@ export default function UploadYourDesign() {
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 placeholder="0"
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 outline-none transition-colors focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+                className="w-full rounded-xl border border-[#E7DEC8] bg-white px-3 py-2.5 text-sm text-[#2B2620] placeholder:text-[#A89F8C] outline-none transition-colors focus:border-[#C9A227] focus:ring-4 focus:ring-[#F3E9CF]"
               />
             </div>
             <div>
-              <label htmlFor="unit" className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label htmlFor="unit" className="mb-1.5 block text-xs font-medium text-[#6E6457]">
                 Unit
               </label>
               <select
                 id="unit"
                 value={unit}
                 onChange={(e) => setUnit(e.target.value as Unit)}
-                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 outline-none transition-colors focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+                className="w-full rounded-xl border border-[#E7DEC8] bg-white px-3 py-2.5 text-sm text-[#2B2620] outline-none transition-colors focus:border-[#C9A227] focus:ring-4 focus:ring-[#F3E9CF]"
               >
                 {UNITS.map((u) => (
-                  <option key={u.value} value={u.value} className="bg-[#0d1420]">
+                  <option key={u.value} value={u.value}>
                     {u.label}
                   </option>
                 ))}
@@ -320,17 +369,17 @@ export default function UploadYourDesign() {
           </div>
 
           <div className="mt-4">
-            <label htmlFor="wallpaperType" className="mb-1.5 block text-xs font-medium text-slate-600">
-              Wallpaper Type
+            <label htmlFor="wallpaperType" className="mb-1.5 block text-xs font-medium text-[#6E6457]">
+              Print Type
             </label>
             <select
               id="wallpaperType"
               value={wallpaperType}
               onChange={(e) => setWallpaperType(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 outline-none transition-colors focus:border-teal-500 focus:ring-4 focus:ring-teal-100"
+              className="w-full rounded-xl border border-[#E7DEC8] bg-white px-3 py-2.5 text-sm text-[#2B2620] outline-none transition-colors focus:border-[#C9A227] focus:ring-4 focus:ring-[#F3E9CF]"
             >
               {WALLPAPER_TYPES.map((t) => (
-                <option key={t} value={t} className="bg-[#0d1420]">
+                <option key={t} value={t}>
                   {t}
                 </option>
               ))}
@@ -344,37 +393,38 @@ export default function UploadYourDesign() {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 role="status"
-                className="mt-4 flex items-center gap-2 overflow-hidden rounded-xl border border-teal-400/30 bg-teal-400/10 px-4 py-3 text-sm text-teal-200"
+                className="mt-4 flex items-center gap-2 overflow-hidden rounded-xl border border-[#CFE0C7] bg-[#F3F6EE] px-4 py-3 text-sm text-[#4B6B3E]"
               >
-                <CheckCircle2 className="h-4 w-4 shrink-0" /> Request received — our design team will
+                <CheckCircle2 className="h-4 w-4 shrink-0" /> Request received — we will
                 reach out within 24 hours.
               </motion.div>
             )}
           </AnimatePresence>
 
+          {/* CTA hierarchy: WhatsApp primary, Quote request secondary */}
           <div className="mt-6 flex flex-col gap-3">
+            <a
+              href={WHATSAPP_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#25D366]/20 transition-transform duration-300 hover:scale-[1.02] hover:bg-[#21bd5c]"
+            >
+              <MessageCircle className="h-4 w-4" /> Chat on WhatsApp — Fastest Response
+            </a>
             <button
               type="button"
               onClick={handleSubmit}
               disabled={status === 'submitting'}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-teal-400 via-cyan-400 to-orange-400 px-6 py-3.5 text-sm font-bold text-[#0a0f1a] shadow-lg shadow-teal-500/20 transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70"
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-[#C9A227]/50 bg-transparent px-6 py-3.5 text-sm font-semibold text-[#8A6D2E] transition-colors duration-300 hover:bg-[#FBF3DF] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {status === 'submitting' ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> Sending Request...
                 </>
               ) : (
-                'Get Custom Quote'
+                'Request a Quote by Email'
               )}
             </button>
-            <a
-              href={WHATSAPP_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl border border-[#25D366]/30 bg-[#25D366]/10 px-6 py-3.5 text-sm font-semibold text-[#3fe07f] transition-colors hover:bg-[#25D366]/20"
-            >
-              <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
-            </a>
           </div>
         </motion.div>
       </div>

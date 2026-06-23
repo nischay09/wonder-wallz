@@ -4,21 +4,42 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, User, X, Menu } from "lucide-react";
+import { ShoppingBag, Search, X, Menu, ChevronDown } from "lucide-react";
+
+/* ── Brand tokens — warm cream / gold, matching the hero ── */
+const INK         = "#221F1C";
+const INK_SOFT    = "#6B6258";
+const GOLD        = "#9C7A3F";
+const GOLD_DARK   = "#7A5E30";
+const CREAM       = "#F4F1EA";
+const CREAM_CARD  = "#FFFDF8";
+const BORDER      = "rgba(156,122,63,0.32)";
+const BORDER_SOFT = "rgba(156,122,63,0.20)";
+const SERIF       = "'Playfair Display', 'Cormorant Garamond', Georgia, serif";
 
 const navLinks = [
-  { label: "Collections", href: "/collections" },
-  { label: "Murals",      href: "/murals" },
-  { label: "Textures",    href: "/textures" },
-  { label: "Lookbook",    href: "/lookbook" },
-  { label: "About",       href: "/about" },
+  { label: "Custom Upload", href: "/custom-upload" },
+  { label: "Inspiration",   href: "/inspiration" },
+  { label: "About Us",      href: "/about" },
+  { label: "Contact",       href: "/contact" },
+];
+
+const collectionsItems = [
+  { name: "Wallpapers",      description: "Premium custom wall coverings",      slug: "wallpapers" },
+  { name: "Blinds",          description: "Custom-fit window solutions",        slug: "blinds" },
+  { name: "Canvas Prints",   description: "Gallery-grade printed canvases",     slug: "canvas-prints" },
+  { name: "Glass Films",     description: "Frosted & decorative glass finishes", slug: "glass-films" },
+  { name: "Wooden Flooring", description: "Warm, natural-grain flooring",       slug: "wooden-flooring" },
+  { name: "PVC Flooring",    description: "Durable, water-resistant flooring",  slug: "pvc-flooring" },
 ];
 
 export function Navbar() {
-  const [scrolled,   setScrolled]   = useState(false);
-  const [hidden,     setHidden]     = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState<string | null>(null);
+  const [scrolled,           setScrolled]           = useState(false);
+  const [hidden,             setHidden]             = useState(false);
+  const [mobileOpen,         setMobileOpen]         = useState(false);
+  const [activeLink,         setActiveLink]         = useState<string | null>(null);
+  const [collectionsOpen,    setCollectionsOpen]    = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
   const { scrollY } = useScroll();
   const lastY = useRef(0);
 
@@ -56,7 +77,7 @@ export function Navbar() {
         className="fixed top-0 left-0 right-0 z-50"
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
-          contain: "layout style paint",
+          contain: "layout style",
           transform: "translateZ(0)",
           backfaceVisibility: "hidden",
           willChange: "transform",
@@ -76,27 +97,27 @@ export function Navbar() {
           <motion.header
             className="w-full"
             animate={{
-              maxWidth: scrolled ? "860px" : "1600px",
+              maxWidth: scrolled ? "880px" : "1640px",
               y:        scrolled ? 0 : 4,
               filter: scrolled
-                ? "drop-shadow(0 8px 32px rgba(0,0,0,0.18))"
-                : "drop-shadow(0 4px 16px rgba(0,0,0,0.10))",
+                ? "drop-shadow(0 8px 32px rgba(40,30,10,0.16))"
+                : "drop-shadow(0 4px 16px rgba(40,30,10,0.08))",
             }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
             {/* ── Nav Shell — always pill, always frosted ── */}
             <motion.nav
-              className="flex items-center justify-between px-2.5 py-2"
+              className="flex items-center justify-between px-3 py-2"
               animate={{
                 borderRadius: "9999px",
                 background: scrolled
-                  ? "rgba(240,236,228,0.86)"
-                  : "rgba(240,236,228,0.70)",
+                  ? "rgba(244,241,234,0.92)"
+                  : "rgba(244,241,234,0.78)",
                 backdropFilter: "blur(24px)",
                 WebkitBackdropFilter: "blur(24px)",
                 borderColor: scrolled
-                  ? "rgba(200,190,175,0.55)"
-                  : "rgba(200,190,175,0.40)",
+                  ? "rgba(156,122,63,0.38)"
+                  : "rgba(156,122,63,0.24)",
               }}
               style={{ border: "1px solid transparent" }}
               transition={{ duration: 0.35, ease: "easeOut" }}
@@ -108,72 +129,175 @@ export function Navbar() {
                    A deliberate, proportional scale-down reads as "elegant"
                    rather than "cramped". ── */}
               <motion.div
-                animate={{ scale: scrolled ? 0.88 : 1 }}
+                animate={{ scale: scrolled ? 0.9 : 1 }}
                 style={{ transformOrigin: "left center" }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
               >
                 <Link
                   href="/"
                   aria-label="Wonder Wallz home"
-                  className="flex items-center gap-2 shrink-0 relative rounded-2xl px-3 py-1.5"
+                  className="flex items-center gap-2.5 shrink-0 relative rounded-2xl px-3.5 py-1.5"
                   style={{
-                    background: "linear-gradient(135deg, #fdfaff 0%, #fff9f5 100%)",
-                    boxShadow: "0 1px 8px rgba(139,63,200,0.12)",
+                    background: "linear-gradient(135deg, #FFFDF8 0%, #F7F1E6 100%)",
+                    boxShadow: "0 1px 8px rgba(156,122,63,0.16)",
+                    border: `1px solid ${BORDER_SOFT}`,
                   }}
                 >
-                  {/* Gradient border ring */}
-                  <span
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      borderRadius: "inherit",
-                      padding: "1.5px",
-                      background: "linear-gradient(135deg, #00BDB0, #7C3AED 40%, #F97316)",
-                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                      WebkitMaskComposite: "xor",
-                      maskComposite: "exclude",
-                      pointerEvents: "none",
-                    }}
-                  />
-
                   {/* Logo image */}
                   <div
                     className="relative w-8 h-8 shrink-0"
-                    style={{ filter: "drop-shadow(0 1px 2px rgba(139,63,200,0.20))" }}
+                    style={{ filter: "drop-shadow(0 1px 2px rgba(122,94,48,0.20))" }}
                   >
                     <Image
-                      src="/logo.png"
+                      src="/logo.jpeg"
                       alt="Wonder Wallz Logo"
+                      sizes="128px"
                       fill
                       className="object-contain"
                       priority
                     />
                   </div>
 
-                  {/* Wordmark — slightly tighter tracking so it sits
-                      comfortably even at the compact scroll size */}
+                  {/* Wordmark — refined serif treatment in ink + gold,
+                      replacing the previous multicolor mark */}
                   <span
-                    className="font-extrabold text-[13px] uppercase whitespace-nowrap"
-                    style={{ letterSpacing: "0.08em" }}
+                    className="text-[14px] uppercase whitespace-nowrap"
+                    style={{ letterSpacing: "0.07em", fontFamily: SERIF, fontWeight: 600, color: INK }}
                   >
-                    <span style={{ color: "#7C3AED" }}>Wonder</span>
-                    <span style={{ color: "#d1c4e0", fontWeight: 300, margin: "0 2px" }}>·</span>
-                    <span style={{ color: "#F97316" }}>Wallz</span>
+                    Wonder
+                    <span style={{ color: GOLD, margin: "0 4px", fontWeight: 400 }}>·</span>
+                    Wallz
                   </span>
                 </Link>
               </motion.div>
 
               {/* ── Desktop Nav Links ── */}
-              <ul className="hidden lg:flex items-center gap-0 mx-2" role="list">
+              <ul className="hidden lg:flex items-center gap-0.5 mx-3" role="list">
+
+                {/* Collections — mega-menu dropdown */}
+                <li
+                  className="relative"
+                  onMouseEnter={() => { setActiveLink("/collections"); setCollectionsOpen(true); }}
+                  onMouseLeave={() => { setActiveLink(null); setCollectionsOpen(false); }}
+                >
+                  <Link
+                    href="/collections"
+                    className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
+                    style={{
+                      color: activeLink === "/collections" ? INK : INK_SOFT,
+                      transition: "color 0.15s",
+                      outlineColor: GOLD,
+                    }}
+                    aria-haspopup="true"
+                    aria-expanded={collectionsOpen}
+                  >
+                    <AnimatePresence>
+                      {activeLink === "/collections" && (
+                        <motion.span
+                          className="absolute inset-0 rounded-xl"
+                          style={{ background: "rgba(156,122,63,0.08)" }}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <span className="relative z-10 flex items-center gap-1.5">
+                      Collections
+                      <motion.span
+                        className="flex items-center"
+                        animate={{ rotate: collectionsOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                      >
+                        <ChevronDown size={13} />
+                      </motion.span>
+                    </span>
+
+                    <AnimatePresence>
+                      {activeLink === "/collections" && (
+                        <motion.span
+                          className="absolute left-5 right-5 rounded-full"
+                          style={{ bottom: "5px", height: "2px", background: GOLD }}
+                          initial={{ scaleX: 0, originX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          exit={{ scaleX: 0, originX: 1 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </Link>
+
+                  {/* Mega-menu panel */}
+                  <AnimatePresence>
+                    {collectionsOpen && (
+                      <motion.div
+                        className="absolute left-1/2 top-full mt-3 w-[560px] -translate-x-1/2 rounded-2xl p-5 z-50"
+                        style={{
+                          background: CREAM_CARD,
+                          border: `1px solid ${BORDER}`,
+                          boxShadow: "0 24px 60px rgba(40,30,10,0.18), 0 4px 14px rgba(40,30,10,0.08)",
+                        }}
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.18, ease: "easeOut" }}
+                        role="menu"
+                      >
+                        <div className="grid grid-cols-2 gap-1">
+                          {collectionsItems.map((item) => (
+                            <Link
+                              key={item.slug}
+                              href={`/collections/${item.slug}`}
+                              onClick={() => setCollectionsOpen(false)}
+                              className="flex flex-col gap-0.5 rounded-xl px-4 py-3 transition-colors hover:bg-[#F4ECDA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                              style={{ outlineColor: GOLD }}
+                              role="menuitem"
+                            >
+                              <span
+                                className="text-[15px] font-semibold"
+                                style={{ fontFamily: SERIF, color: INK }}
+                              >
+                                {item.name}
+                              </span>
+                              <span className="text-[12.5px]" style={{ color: INK_SOFT }}>
+                                {item.description}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+
+                        <div
+                          className="mt-4 pt-3.5 flex items-center justify-between"
+                          style={{ borderTop: `1px solid ${BORDER_SOFT}` }}
+                        >
+                          <span className="text-[12px]" style={{ color: INK_SOFT }}>
+                            500+ curated designs across 6 categories
+                          </span>
+                          <Link
+                            href="/collections"
+                            onClick={() => setCollectionsOpen(false)}
+                            className="text-[12.5px] font-semibold whitespace-nowrap"
+                            style={{ color: GOLD_DARK }}
+                          >
+                            View all →
+                          </Link>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </li>
+
                 {navLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="relative px-4 py-2 text-sm font-medium tracking-wide block"
+                      className="relative px-5 py-2 text-[14px] font-medium block rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                       style={{
-                        color: activeLink === link.href ? "#1a1a1a" : "#4a4a4a",
+                        color: activeLink === link.href ? INK : INK_SOFT,
                         transition: "color 0.15s",
+                        outlineColor: GOLD,
                       }}
                       onMouseEnter={() => setActiveLink(link.href)}
                       onMouseLeave={() => setActiveLink(null)}
@@ -182,7 +306,7 @@ export function Navbar() {
                         {activeLink === link.href && (
                           <motion.span
                             className="absolute inset-0 rounded-xl"
-                            style={{ background: "rgba(139,63,200,0.06)" }}
+                            style={{ background: "rgba(156,122,63,0.08)" }}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -196,11 +320,11 @@ export function Navbar() {
                       <AnimatePresence>
                         {activeLink === link.href && (
                           <motion.span
-                            className="absolute left-4 right-4 rounded-full"
+                            className="absolute left-5 right-5 rounded-full"
                             style={{
-                              bottom: "4px",
+                              bottom: "5px",
                               height: "2px",
-                              background: "linear-gradient(90deg, #00BDB0, #7C3AED, #F97316)",
+                              background: GOLD,
                             }}
                             initial={{ scaleX: 0, originX: 0 }}
                             animate={{ scaleX: 1 }}
@@ -215,20 +339,16 @@ export function Navbar() {
               </ul>
 
               {/* ── Right Icon Group ── */}
-              <div className="flex items-center gap-1 pr-0.5">
+              <div className="flex items-center gap-1.5 pr-0.5">
                 <CircleIconBtn aria-label="Search">
                   <Search size={16} />
-                </CircleIconBtn>
-
-                <CircleIconBtn aria-label="Account" className="hidden md:flex">
-                  <User size={16} />
                 </CircleIconBtn>
 
                 <CircleIconBtn aria-label="Cart (0 items)" className="relative">
                   <ShoppingBag size={16} />
                   <span
                     className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-                    style={{ backgroundColor: "#F97316" }}
+                    style={{ backgroundColor: GOLD_DARK }}
                   >
                     0
                   </span>
@@ -239,14 +359,14 @@ export function Navbar() {
                 <motion.button
                   className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full ml-0.5 overflow-hidden"
                   style={{
-                    background: "rgba(255,255,255,0.7)",
-                    border: "1px solid rgba(200,190,175,0.5)",
-                    color: "#555",
+                    background: "rgba(255,253,248,0.7)",
+                    border: `1px solid ${BORDER}`,
+                    color: INK_SOFT,
                   }}
                   onClick={() => setMobileOpen((v) => !v)}
                   aria-label={mobileOpen ? "Close menu" : "Open menu"}
                   aria-expanded={mobileOpen}
-                  whileHover={{ backgroundColor: "#fff", color: "#7C3AED" }}
+                  whileHover={{ backgroundColor: "#ffffff", color: GOLD_DARK }}
                   whileTap={{ scale: 0.92 }}
                   transition={{ duration: 0.15 }}
                 >
@@ -288,8 +408,8 @@ export function Navbar() {
               style={{
                 background: "rgba(250,247,242,0.98)",
                 backdropFilter: "blur(20px)",
-                boxShadow: "-4px 0 40px rgba(139,63,200,0.12)",
-                borderLeft: "1px solid rgba(200,190,175,0.40)",
+                boxShadow: "-4px 0 40px rgba(122,94,48,0.14)",
+                borderLeft: `1px solid ${BORDER}`,
                 paddingTop: "env(safe-area-inset-top, 0px)",
               }}
               initial={{ x: "100%" }}
@@ -297,73 +417,118 @@ export function Navbar() {
               exit={{ x: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             >
-              {/* Top gradient accent bar */}
+              {/* Top accent line */}
               <div
-                className="h-1 shrink-0"
-                style={{ background: "linear-gradient(90deg, #00BDB0, #7C3AED, #F97316)" }}
+                className="h-[2px] shrink-0"
+                style={{ background: `linear-gradient(90deg, ${GOLD}, ${GOLD_DARK})` }}
               />
 
               {/* Drawer header */}
               <div
                 className="flex items-center justify-between px-5 py-4 border-b"
-                style={{ borderColor: "rgba(200,190,175,0.35)" }}
+                style={{ borderColor: BORDER_SOFT }}
               >
                 {/* Logo badge */}
                 <div
-                  className="flex items-center gap-2 rounded-2xl px-3 py-1.5 relative"
+                  className="flex items-center gap-2 rounded-2xl px-3 py-1.5"
                   style={{
-                    background: "linear-gradient(135deg, #fdfaff 0%, #fff9f5 100%)",
-                    boxShadow: "0 2px 12px rgba(139,63,200,0.12)",
+                    background: "linear-gradient(135deg, #FFFDF8 0%, #F7F1E6 100%)",
+                    boxShadow: "0 2px 12px rgba(156,122,63,0.16)",
+                    border: `1px solid ${BORDER_SOFT}`,
                   }}
                 >
-                  <span
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      borderRadius: "inherit",
-                      padding: "1.5px",
-                      background: "linear-gradient(135deg, #00BDB0, #7C3AED 50%, #F97316)",
-                      WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                      WebkitMaskComposite: "xor",
-                      maskComposite: "exclude",
-                      pointerEvents: "none",
-                    }}
-                  />
                   <div className="relative w-7 h-7">
                     <Image src="/logo.png" alt="Wonder Wallz" fill className="object-contain" />
                   </div>
-                  <span className="font-extrabold text-xs uppercase whitespace-nowrap" style={{ letterSpacing: "0.08em" }}>
-                    <span style={{ color: "#7C3AED" }}>Wonder</span>
-                    <span style={{ color: "#d1c4e0", fontWeight: 300, margin: "0 1px" }}>·</span>
-                    <span style={{ color: "#F97316" }}>Wallz</span>
+                  <span
+                    className="text-[12.5px] uppercase whitespace-nowrap"
+                    style={{ letterSpacing: "0.06em", fontFamily: SERIF, fontWeight: 600, color: INK }}
+                  >
+                    Wonder
+                    <span style={{ color: GOLD, margin: "0 3px", fontWeight: 400 }}>·</span>
+                    Wallz
                   </span>
                 </div>
 
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-purple-50 transition-colors"
+                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
                   aria-label="Close menu"
-                  style={{ color: "#666" }}
+                  style={{ color: INK_SOFT }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <X size={18} />
                 </button>
               </div>
 
               {/* Drawer links */}
-              <nav className="flex flex-col px-4 py-5 gap-1 flex-1">
+              <nav className="flex flex-col px-4 py-5 gap-1 flex-1 overflow-y-auto">
+
+                {/* Collections — expandable accordion */}
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0 }}>
+                  <button
+                    onClick={() => setMobileCollectionsOpen((v) => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
+                    style={{ color: INK, fontFamily: SERIF }}
+                    aria-expanded={mobileCollectionsOpen}
+                  >
+                    Collections
+                    <motion.span
+                      animate={{ rotate: mobileCollectionsOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center"
+                    >
+                      <ChevronDown size={16} style={{ color: GOLD_DARK }} />
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {mobileCollectionsOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        style={{ overflow: "hidden" }}
+                      >
+                        <div className="flex flex-col gap-0.5 pl-4 pb-2 pt-1">
+                          {collectionsItems.map((item) => (
+                            <Link
+                              key={item.slug}
+                              href={`/collections/${item.slug}`}
+                              onClick={() => setMobileOpen(false)}
+                              className="rounded-lg px-4 py-2.5"
+                              style={{ borderLeft: `1px solid ${BORDER_SOFT}` }}
+                            >
+                              <span className="block text-[13.5px] font-medium" style={{ color: INK }}>
+                                {item.name}
+                              </span>
+                              <span className="block text-[11.5px]" style={{ color: INK_SOFT }}>
+                                {item.description}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.href}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06 }}
+                    transition={{ delay: (i + 1) * 0.06 }}
                   >
                     <Link
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold tracking-wide transition-colors hover:bg-purple-50"
-                      style={{ color: "#333" }}
+                      className="flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
+                      style={{ color: INK, fontFamily: SERIF }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
                       {link.label}
                     </Link>
@@ -374,19 +539,16 @@ export function Navbar() {
               {/* Bottom icon row */}
               <div
                 className="flex items-center gap-3 px-6 py-4 border-t"
-                style={{ borderColor: "rgba(200,190,175,0.35)" }}
+                style={{ borderColor: BORDER_SOFT }}
               >
-                <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#555" }}>
+                <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: INK_SOFT }}>
                   <Search size={15} /> Search
                 </button>
-                <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#555" }}>
-                  <User size={15} /> Account
-                </button>
-                <button className="flex items-center gap-1.5 text-xs font-semibold ml-auto relative" style={{ color: "#555" }}>
+                <button className="flex items-center gap-1.5 text-xs font-semibold ml-auto relative" style={{ color: INK_SOFT }}>
                   <ShoppingBag size={15} /> Cart
                   <span
                     className="flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-                    style={{ backgroundColor: "#F97316" }}
+                    style={{ backgroundColor: GOLD_DARK }}
                   >0</span>
                 </button>
               </div>
@@ -398,7 +560,7 @@ export function Navbar() {
   );
 }
 
-/* ── Circular Icon Button (matches screenshot's round ghost buttons) ── */
+/* ── Circular Icon Button (matches the floating pill's round ghost buttons) ── */
 function CircleIconBtn({
   children,
   className = "",
@@ -413,14 +575,14 @@ function CircleIconBtn({
       aria-label={ariaLabel}
       className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-colors ${className}`}
       style={{
-        color: "#555",
-        background: "rgba(255,255,255,0.70)",
-        border: "1px solid rgba(200,190,175,0.50)",
+        color: INK_SOFT,
+        background: "rgba(255,253,248,0.70)",
+        border: `1px solid ${BORDER}`,
       }}
       whileHover={{
         backgroundColor: "#ffffff",
-        color: "#7C3AED",
-        borderColor: "rgba(124,58,237,0.25)",
+        color: GOLD_DARK,
+        borderColor: "rgba(156,122,63,0.45)",
       }}
       whileTap={{ scale: 0.92 }}
       transition={{ duration: 0.15 }}
