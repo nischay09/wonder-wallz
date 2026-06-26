@@ -5,6 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Search, X, Menu, ChevronDown } from "lucide-react";
+import { products } from "@/lib/products";
+import { getMegaMenuNavItem, getStandardNavLinks } from "@/lib/navigation";
 
 /* ── Brand tokens — warm cream / gold, matching the hero ── */
 const INK         = "#221F1C";
@@ -17,21 +19,18 @@ const BORDER      = "rgba(156,122,63,0.32)";
 const BORDER_SOFT = "rgba(156,122,63,0.20)";
 const SERIF       = "'Playfair Display', 'Cormorant Garamond', Georgia, serif";
 
-const navLinks = [
-  { label: "Custom Upload", href: "/custom-upload" },
-  { label: "Inspiration",   href: "/inspiration" },
-  { label: "About Us",      href: "/about" },
-  { label: "Contact",       href: "/contact" },
-];
-
-const collectionsItems = [
-  { name: "Wallpapers",      description: "Premium custom wall coverings",      slug: "wallpapers" },
-  { name: "Blinds",          description: "Custom-fit window solutions",        slug: "blinds" },
-  { name: "Canvas Prints",   description: "Gallery-grade printed canvases",     slug: "canvas-prints" },
-  { name: "Glass Films",     description: "Frosted & decorative glass finishes", slug: "glass-films" },
-  { name: "Wooden Flooring", description: "Warm, natural-grain flooring",       slug: "wooden-flooring" },
-  { name: "PVC Flooring",    description: "Durable, water-resistant flooring",  slug: "pvc-flooring" },
-];
+/*
+ * Data-driven sources:
+ *  - `products` (src/lib/products.ts) powers the Collections mega-menu
+ *    and the mobile accordion. Add a product there and it shows up here
+ *    automatically — no changes needed in this file.
+ *  - `primaryNavigation` (src/lib/navigation.ts) powers the plain nav
+ *    links plus the mega-menu trigger's label/href, kept separate from
+ *    product data so the two can evolve independently.
+ */
+const megaMenuNavItem =
+  getMegaMenuNavItem() ?? { label: "Collections", href: "/collections", type: "mega-menu" as const };
+const navLinks = getStandardNavLinks();
 
 export function Navbar() {
   const [scrolled,           setScrolled]           = useState(false);
@@ -174,17 +173,17 @@ export function Navbar() {
               {/* ── Desktop Nav Links ── */}
               <ul className="hidden lg:flex items-center gap-0.5 mx-3" role="list">
 
-                {/* Collections — mega-menu dropdown */}
+                {/* Collections — mega-menu dropdown, sourced from products.ts */}
                 <li
                   className="relative"
-                  onMouseEnter={() => { setActiveLink("/collections"); setCollectionsOpen(true); }}
+                  onMouseEnter={() => { setActiveLink(megaMenuNavItem.href); setCollectionsOpen(true); }}
                   onMouseLeave={() => { setActiveLink(null); setCollectionsOpen(false); }}
                 >
                   <Link
-                    href="/collections"
+                    href={megaMenuNavItem.href}
                     className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
                     style={{
-                      color: activeLink === "/collections" ? INK : INK_SOFT,
+                      color: activeLink === megaMenuNavItem.href ? INK : INK_SOFT,
                       transition: "color 0.15s",
                       outlineColor: GOLD,
                     }}
@@ -192,7 +191,7 @@ export function Navbar() {
                     aria-expanded={collectionsOpen}
                   >
                     <AnimatePresence>
-                      {activeLink === "/collections" && (
+                      {activeLink === megaMenuNavItem.href && (
                         <motion.span
                           className="absolute inset-0 rounded-xl"
                           style={{ background: "rgba(156,122,63,0.08)" }}
@@ -205,7 +204,7 @@ export function Navbar() {
                     </AnimatePresence>
 
                     <span className="relative z-10 flex items-center gap-1.5">
-                      Collections
+                      {megaMenuNavItem.label}
                       <motion.span
                         className="flex items-center"
                         animate={{ rotate: collectionsOpen ? 180 : 0 }}
@@ -216,7 +215,7 @@ export function Navbar() {
                     </span>
 
                     <AnimatePresence>
-                      {activeLink === "/collections" && (
+                      {activeLink === megaMenuNavItem.href && (
                         <motion.span
                           className="absolute left-5 right-5 rounded-full"
                           style={{ bottom: "5px", height: "2px", background: GOLD }}
@@ -229,7 +228,7 @@ export function Navbar() {
                     </AnimatePresence>
                   </Link>
 
-                  {/* Mega-menu panel */}
+                  {/* Mega-menu panel — one card per product in products.ts */}
                   <AnimatePresence>
                     {collectionsOpen && (
                       <motion.div
@@ -246,10 +245,10 @@ export function Navbar() {
                         role="menu"
                       >
                         <div className="grid grid-cols-2 gap-1">
-                          {collectionsItems.map((item) => (
+                          {products.map((product) => (
                             <Link
-                              key={item.slug}
-                              href={`/collections/${item.slug}`}
+                              key={product.id}
+                              href={product.href}
                               onClick={() => setCollectionsOpen(false)}
                               className="flex flex-col gap-0.5 rounded-xl px-4 py-3 transition-colors hover:bg-[#F4ECDA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                               style={{ outlineColor: GOLD }}
@@ -259,10 +258,10 @@ export function Navbar() {
                                 className="text-[15px] font-semibold"
                                 style={{ fontFamily: SERIF, color: INK }}
                               >
-                                {item.name}
+                                {product.title}
                               </span>
                               <span className="text-[12.5px]" style={{ color: INK_SOFT }}>
-                                {item.description}
+                                {product.description}
                               </span>
                             </Link>
                           ))}
@@ -273,10 +272,10 @@ export function Navbar() {
                           style={{ borderTop: `1px solid ${BORDER_SOFT}` }}
                         >
                           <span className="text-[12px]" style={{ color: INK_SOFT }}>
-                            500+ curated designs across 6 categories
+                            500+ curated designs across {products.length} categories
                           </span>
                           <Link
-                            href="/collections"
+                            href={megaMenuNavItem.href}
                             onClick={() => setCollectionsOpen(false)}
                             className="text-[12.5px] font-semibold whitespace-nowrap"
                             style={{ color: GOLD_DARK }}
@@ -465,7 +464,7 @@ export function Navbar() {
               {/* Drawer links */}
               <nav className="flex flex-col px-4 py-5 gap-1 flex-1 overflow-y-auto">
 
-                {/* Collections — expandable accordion */}
+                {/* Collections — expandable accordion, sourced from products.ts */}
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0 }}>
                   <button
                     onClick={() => setMobileCollectionsOpen((v) => !v)}
@@ -473,7 +472,7 @@ export function Navbar() {
                     style={{ color: INK, fontFamily: SERIF }}
                     aria-expanded={mobileCollectionsOpen}
                   >
-                    Collections
+                    {megaMenuNavItem.label}
                     <motion.span
                       animate={{ rotate: mobileCollectionsOpen ? 180 : 0 }}
                       transition={{ duration: 0.2 }}
@@ -493,19 +492,19 @@ export function Navbar() {
                         style={{ overflow: "hidden" }}
                       >
                         <div className="flex flex-col gap-0.5 pl-4 pb-2 pt-1">
-                          {collectionsItems.map((item) => (
+                          {products.map((product) => (
                             <Link
-                              key={item.slug}
-                              href={`/collections/${item.slug}`}
+                              key={product.id}
+                              href={product.href}
                               onClick={() => setMobileOpen(false)}
                               className="rounded-lg px-4 py-2.5"
                               style={{ borderLeft: `1px solid ${BORDER_SOFT}` }}
                             >
                               <span className="block text-[13.5px] font-medium" style={{ color: INK }}>
-                                {item.name}
+                                {product.title}
                               </span>
                               <span className="block text-[11.5px]" style={{ color: INK_SOFT }}>
-                                {item.description}
+                                {product.description}
                               </span>
                             </Link>
                           ))}

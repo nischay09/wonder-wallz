@@ -392,30 +392,74 @@ body{
   .hero{
     grid-template-columns:1fr;
     grid-template-rows:auto auto;
-    min-height:auto;
+    min-height:85vh;
+    overflow:visible; /* allow the transition divider below to sit outside the clipped photo area */
+    margin-bottom:3.25rem; /* intentional breathing room before the next section */
+    position:relative;
+  }
+  /* Soft, deliberate hand-off into whatever section follows */
+  .hero::after{
+    content:'';
+    position:absolute;
+    left:50%;bottom:-1.6rem;
+    transform:translateX(-50%);
+    width:56px;height:3px;
+    border-radius:2px;
+    background:linear-gradient(90deg,var(--gold),var(--gold-light));
+    opacity:0.55;
   }
   .hero-content{
-    padding:4.5rem 1.5rem 2.5rem;
+    padding:4rem 1.5rem 1.25rem; /* less wasted space at the bottom of the content column */
     order:1;
   }
   .hero-content::after{display:none}
   .hero-visual{
     order:2;
-    height:70vw;
-    min-height:280px;
-    max-height:460px;
+    height:34vh;
+    min-height:200px;
+    max-height:300px;
+    overflow:hidden; /* keep the photo itself clipped even though .hero no longer is */
   }
   .gb{display:none} /* hide on mobile — space is precious */
   .brand-mark{display:none}
-  .social-proof{max-width:100%}
-  .trust-grid{max-width:100%}
+
+  /* Stats / social-proof card — slightly shorter and tighter on mobile */
+  .social-proof{
+    max-width:100%;
+    padding:11px 14px;
+    margin-bottom:1.5rem;
+  }
+  .sp-number{font-size:1.4rem}
+  .sp-label{font-size:9.5px}
+  .sp-stat + .sp-stat{padding-left:14px}
+
+  .trust-grid{max-width:100%;margin-bottom:1.5rem}
+  .subheadline{margin-bottom:1.75rem}
+
+  /* CTA group: primary + WhatsApp share the row evenly, full width;
+     the text CTA drops to its own line lower down with real breathing room */
+  .cta-group{
+    gap:10px;
+  }
+  .cta-primary,.cta-whatsapp{
+    flex:1 1 0;
+    justify-content:center;
+    text-align:center;
+  }
+  .cta-secondary{
+    flex:1 1 100%;
+    justify-content:center;
+    text-align:center;
+    margin-top:1.5rem;
+    padding:4px 4px 2px;
+  }
 }
 
 @media(max-width:600px){
-  .hero-content{padding:4.5rem 1.25rem 2rem}
+  .hero-content{padding:3.75rem 1.25rem 1.25rem}
   .headline{font-size:2.4rem}
   .cta-group{gap:10px}
-  .cta-primary,.cta-whatsapp{padding:13px 20px;font-size:13.5px}
+  .cta-primary,.cta-whatsapp{padding:13px 16px;font-size:13.5px}
 }
 
 @media(max-width:390px){
@@ -541,13 +585,13 @@ body{
         <a
           href="/quote"
           class="cta-primary"
-          aria-label="Get a free wallpaper quote from Wonder Wallz"
+          aria-label="Start your custom wallpaper project with Wonder Wallz"
         >
           <!-- Pencil/spark icon -->
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M11.5 2.5L13.5 4.5L5.5 12.5L2.5 13.5L3.5 10.5L11.5 2.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
           </svg>
-          Get Free Quote
+          Start Your Project
         </a>
 
         <!-- WhatsApp -->
@@ -566,11 +610,11 @@ body{
 
         <!-- Secondary: Browse -->
         <a
-          href="/collections"
+          href="#shop-by-product"
           class="cta-secondary"
-          aria-label="Browse Wonder Wallz wallpaper collections"
+          aria-label="Browse Wonder Wallz products by category"
         >
-          Browse Collections
+          Browse Products
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path d="M2.5 7H11.5M8 3.5L11.5 7L8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>

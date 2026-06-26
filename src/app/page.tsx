@@ -22,20 +22,21 @@
 import type { Metadata } from "next";
 
 // ── React component imports ──────────────────────────────────────────────────
-import FeaturedCategories from "@/components/FeaturedCategories";
-import WhyWonderWallz from "@/components/WhyWonderWallz";
-import HowItWorks from "@/components/HowItWorks";
-import WonderWallzGallery from "@/components/WonderWallzGallery";
+import ShopByProduct from "@/components/ShopByProduct";
+import FAQSection from "@/components/FAQSection";
+import ProjectBuilder from "@/components/ProjectBuilder/ProjectBuilder";
+import WonderWallzTrust from "@/components/WonderWallzTrust";
 import WonderWallzCTA from "@/components/WonderWallz_CTA";
+import WallTransformations from "@/components/WallTransformations/WallTransformations";
+import SocialProof from "@/components/SocialProof/SocialProof";
 import IframeSection from "@/components/IframeSection";
-import UploadYourDesign from "@/components/UploadYourDesign";
 
 
 // ── SEO Metadata ─────────────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  title: "Wonder Wallz – Premium Custom Wallpapers for Homes & Offices in India",
+  title: "Wonder Wallz – Premium Custom Wallpapers, Custom glass films, Custom canvas, Flooring, Blinds and Curtains and upholstery for Homes & Offices in India",
   description:
-    "Transform any wall with Wonder Wallz. Explore 1,500+ custom-sized designer wallpapers — floral, luxury, geometric, nature & more. Order easily on WhatsApp. Pan-India delivery.",
+    "Transform any wall or room with Wonder Wallz. Explore 500+ custom-sized designer wallpapers — Artistic, Religion , Kids , etc. Also see our wide range of Flooring, Blinds and Curtains and upholstery. Order easily on WhatsApp. Pan-India delivery.",
   keywords: [
     "wallpaper India",
     "custom wallpaper",
@@ -47,6 +48,11 @@ export const metadata: Metadata = {
     "premium wallpaper",
     "peel and stick wallpaper",
     "office wallpaper",
+    "Blinds and Curtains",
+    "custom glass films",
+    "custom canvas",
+    "flooring",
+    "upholstery",
   ],
   metadataBase: new URL("https://wonderwallz.in"),
   alternates: { canonical: "/" },
@@ -146,64 +152,114 @@ export default function HomePage() {
           defaultHeight={820}
           id="hero"
         />
-        {/* ── 2. UPLOAD YOUR DESIGN ─────────────────────────────────────── */}
-        {/*
-        * Wonder Wallz signature feature.
-        * Customers can upload their own image, artwork, Pinterest inspiration,
-        * Shutterstock reference, family photo, or business branding and receive
-        * a custom wallpaper quote based on their wall dimensions.
+        {/* ──────── 2. WONDER WALLZ TRUST ─────────────────────────────── */}
+       {/*
+        * Premium trust-building section combining brand highlights,
+        * customer benefits, key statistics and the purchase journey.
         *
-        * Designed as a high-conversion lead generation section positioned
-        * immediately after the hero.
+        * Explains why customers should choose Wonder Wallz and how
+        * ordering works, replacing the previous "Why Wonder Wallz"
+        * and "How It Works" sections.
+        *
+        * Designed to build confidence before showcasing customer
+        * installations, testimonials and final conversion CTAs.
         */}
-        <UploadYourDesign />
-
-        {/* ── 2. FEATURED CATEGORIES ──────────────────────────────────────── */}
+         <WonderWallzTrust />
+        
+        {/* ──────── 3. SHOP BY PRODUCT ───────────────────────────────── */}
         {/*
-         * Browse by collection: Floral, Luxury, Kids Room, Marble, Nature,
-         * Abstract, Religious, Geometric, Office, Hotel.
-         */}
-        <FeaturedCategories />
-
-        {/* ── 3. WHY WONDER WALLZ ─────────────────────────────────────────── */}
+        * Primary product discovery hub.
+        *
+        * Introduces every product category offered by Wonder Wallz and
+        * serves as the main navigation into the shopping experience.
+        *
+        * Powered by src/lib/products.ts as the single source of truth
+        * for product data across the navbar, homepage and future pages.
+        */}
+        <ShopByProduct />
+        {/* ──────── 4. CUSTOM PROJECT BUILDER ─────────────────────────────── */}
         {/*
-         * Four USP cards: Custom Sizes · HD Print · Easy Install · Delivery.
-         * Animated on scroll with Framer Motion.
+         * Wonder Wallz signature feature.
+         *
+         * Customers can create a custom project by adding one or more design
+         * requests for wallpapers, custom glass films or canvas prints.
+         *
+         * Each request will eventually support image uploads, dimensions,
+         * design instructions, project summaries and email quotation.
+         *
+         * This section serves as the foundation of the Wonder Wallz quotation
+         * workflow and will replace the previous Upload Your Design section.
          */}
-        <WhyWonderWallz />
+        <ProjectBuilder />        
 
-        {/* ── 4. HOW IT WORKS ─────────────────────────────────────────────── */}
-        {/*
-         * Schema.org HowTo — 4 steps: Choose → Measure → WhatsApp → Receive.
-         * Timeline layout with staggered entrance animations.
-         */}
-        <HowItWorks />
+       
 
-        {/* ── 5. CUSTOMER TRANSFORMATIONS (Before / After) ────────────────── */}
+        {/* ──────── 5. WALL TRANSFORMATIONS ─────────────────────────────── */}
         {/*
-         * Interactive drag-to-compare slider carousel (Swiper + custom JS).
-         * Embedded as iframe; place the file in /public/html/.
+         * Wonder Wallz portfolio showcase.
+         *
+         * Displays real before & after interior transformations using
+         * wallpapers, custom glass films and other Wonder Wallz products.
+         *
+         * The section is fully data-driven from `src/lib/transformations.ts`
+         * and showcases completed projects through an interactive comparison
+         * slider with project details and direct navigation to the relevant
+         * collection.
+         *
+         * Purpose:
+         * - Build customer trust with real installations
+         * - Demonstrate product quality and transformation impact
+         * - Drive visitors from inspiration to product collections
+         * - Serve as a reusable portfolio component across the website
          */}
-        <IframeSection
-          src="/html/wonder_wallz_before_after_showcase.html"
-          title="Customer wall transformations — before and after Wonder Wallz"
-          defaultHeight={680}
-          id="transformations"
-        />
+        <WallTransformations />    
+        {/* ──────── 6. SOCIAL PROOF ───────────────────────────────────────── */}
+        {/*
+         * Builds trust by combining authentic customer testimonials with
+         * Wonder Wallz showroom locations.
+         *
+         * The section reinforces brand credibility through real customer
+         * experiences while encouraging visitors to visit our physical stores.
+         *
+         * Data is sourced from:
+         * - src/lib/testimonials.ts
+         * - src/lib/stores.ts
+         *
+         * Purpose:
+         * - Showcase customer satisfaction
+         * - Highlight physical showroom presence
+         * - Strengthen purchase confidence
+         * - Bridge visitors to the FAQ and final conversion
+         */}
+        <SocialProof />            
 
-        {/* ── 6. INSPIRATION GALLERY ──────────────────────────────────────── */}
-        {/*
-         * Filterable masonry grid with 20 curated room/style images.
-         * Hover reveals overlay with tag + "Get Inspired" CTA.
-         */}
-        <WonderWallzGallery />
+        
 
-        {/* ── 7. CTA BANNER ───────────────────────────────────────────────── */}
-        {/*
-         * Dark glassmorphism banner: "Ready to Transform Your Walls?"
-         * Primary action: WhatsApp chat for a free personalised quote.
-         */}
-        <WonderWallzCTA />
+       {/* ──────── 7. FAQ + WHY WONDER WALLZ ─────────────────────────────── */}
+       {/*
+        * Resolves common customer questions while reinforcing Wonder Wallz's
+        * expertise, credibility and service commitment before the final footer.
+        *
+        * Left Column:
+        * - Frequently Asked Questions
+        * - Ordering & payment process
+        * - Installation & delivery
+        * - Custom product workflow
+        *
+        * Right Column:
+        * - Why Wonder Wallz?
+        * - Brand story & company overview
+        * - Founder & experience highlights
+        * - Store locations
+        * - Final call-to-action
+        *
+        * Purpose:
+        * - Reduce customer hesitation
+        * - Answer last-minute questions
+        * - Build confidence through transparency
+        * - Guide visitors toward starting their project
+        */}
+        <FAQSection />
       </main>
     </>
   );
