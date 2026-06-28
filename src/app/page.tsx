@@ -4,17 +4,22 @@
  *
  * Sections (in order):
  *  1. Hero                    → wonder_wallz_hero.html         (iframe embed)
- *  2. Featured Categories     → FeaturedCategories.jsx
- *  3. Why Wonder Wallz        → WhyWonderWallz.jsx
- *  4. How It Works            → HowItWorks.jsx
- *  5. Customer Transformations→ wonder_wallz_before_after_showcase.html (iframe embed)
- *  6. Inspiration Gallery     → WonderWallzGallery.jsx
- *  7. CTA Banner              → WonderWallz_CTA.jsx
+ *  2. Wonder Wallz Trust       → WonderWallzTrust.jsx
+ *  3. Shop by Product          → ShopByProduct.jsx
+ *  4. Wall Transformations     → WallTransformations.jsx
+ *  5. Social Proof             → SocialProof.jsx
+ *  6. FAQ + Why Wonder Wallz   → FAQSection.jsx
  *
- * NOTE: The two HTML-only sections (Hero & Before/After) are embedded via
- * <iframe> with `scrolling="no"` and auto-resize so they behave like native
- * sections. If you later convert them to React/JSX you can drop the iframes
- * and import them directly.
+ * NOTE: The custom-order journey (Upload Design → Project Builder → Email)
+ * now lives on its own dedicated page at /app/custom-design/page.tsx and is
+ * intentionally NOT rendered on the homepage. Catalogue products (Readymade
+ * Wallpapers, Blinds, Curtains, Flooring) continue to flow through
+ * Collections → Quick View → Cart → WhatsApp, unaffected by this change.
+ *
+ * NOTE: The Hero section is HTML-only (animations, canvas, Swiper, custom
+ * fonts) and is embedded via <iframe> with `scrolling="no"` and auto-resize
+ * so it behaves like a native section. If you later convert it to React/JSX
+ * you can drop the iframe and import it directly.
  *
  * Metadata follows Next.js 13+ App Router conventions.
  */
@@ -24,7 +29,6 @@ import type { Metadata } from "next";
 // ── React component imports ──────────────────────────────────────────────────
 import ShopByProduct from "@/components/ShopByProduct";
 import FAQSection from "@/components/FAQSection";
-import ProjectBuilder from "@/components/ProjectBuilder/ProjectBuilder";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
 import WonderWallzCTA from "@/components/WonderWallz_CTA";
 import WallTransformations from "@/components/WallTransformations/WallTransformations";
@@ -177,24 +181,8 @@ export default function HomePage() {
         * for product data across the navbar, homepage and future pages.
         */}
         <ShopByProduct />
-        {/* ──────── 4. CUSTOM PROJECT BUILDER ─────────────────────────────── */}
-        {/*
-         * Wonder Wallz signature feature.
-         *
-         * Customers can create a custom project by adding one or more design
-         * requests for wallpapers, custom glass films or canvas prints.
-         *
-         * Each request will eventually support image uploads, dimensions,
-         * design instructions, project summaries and email quotation.
-         *
-         * This section serves as the foundation of the Wonder Wallz quotation
-         * workflow and will replace the previous Upload Your Design section.
-         */}
-        <ProjectBuilder />        
 
-       
-
-        {/* ──────── 5. WALL TRANSFORMATIONS ─────────────────────────────── */}
+        {/* ──────── 4. WALL TRANSFORMATIONS ─────────────────────────────── */}
         {/*
          * Wonder Wallz portfolio showcase.
          *
@@ -213,7 +201,7 @@ export default function HomePage() {
          * - Serve as a reusable portfolio component across the website
          */}
         <WallTransformations />    
-        {/* ──────── 6. SOCIAL PROOF ───────────────────────────────────────── */}
+        {/* ──────── 5. SOCIAL PROOF ───────────────────────────────────────── */}
         {/*
          * Builds trust by combining authentic customer testimonials with
          * Wonder Wallz showroom locations.
@@ -235,7 +223,7 @@ export default function HomePage() {
 
         
 
-       {/* ──────── 7. FAQ + WHY WONDER WALLZ ─────────────────────────────── */}
+       {/* ──────── 6. FAQ + WHY WONDER WALLZ ─────────────────────────────── */}
        {/*
         * Resolves common customer questions while reinforcing Wonder Wallz's
         * expertise, credibility and service commitment before the final footer.

@@ -96,14 +96,14 @@ function PlaceholderBg({ gradient }: { gradient: [string, string] }) {
 }
 
 // ─── Main product card ────────────────────────────────────────────────────────
-interface ProductCardProps {
+export interface ProductCardProps {
   product: Product;
   aspectClass?: string;
   /** When true, title/description are rendered larger (featured row) */
   prominent?: boolean;
 }
 
-function ProductCard({
+export function ProductCard({
   product,
   aspectClass = "aspect-[4/5]",
   prominent = false,

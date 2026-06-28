@@ -139,6 +139,7 @@ const products = [
 ];
 
 const company = [
+  { label: "Custom Design", href: "/custom-design" },
   { label: "About", href: "/about" },
   { label: "Store Locations", href: "/locations" },
   { label: "FAQ", href: "/faq" },

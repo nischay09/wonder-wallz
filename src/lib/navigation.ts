@@ -29,7 +29,7 @@ export interface NavItem {
 
 export const primaryNavigation: NavItem[] = [
   { label: "Collections", href: "/collections", type: "mega-menu" },
-  { label: "Custom Upload", href: "/custom-upload", type: "link" },
+  { label: "Custom Upload", href: "/custom-design", type: "link" },
   { label: "Inspiration", href: "/inspiration", type: "link" },
   { label: "About Us", href: "/about", type: "link" },
   { label: "Contact", href: "/contact", type: "link" },

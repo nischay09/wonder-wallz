@@ -34,10 +34,6 @@ html{scroll-behavior:smooth}
   --glass-bg:    rgba(252,248,241,0.92);
   --glass-border:rgba(201,168,76,0.3);
   --shadow-warm: rgba(28,20,16,0.18);
-  /* Height of the fixed floating navbar in the parent page.
-     Used inside the iframe to push hero content below it on mobile.
-     Update this value if the navbar height changes. */
-  --navbar-h:    72px;
 }
 
 body{
@@ -395,22 +391,11 @@ body{
 @media(max-width:900px){
   .hero{
     grid-template-columns:1fr;
-    grid-template-rows:auto;
-    min-height:100svh;
-    overflow:hidden;
-    margin-bottom:3.25rem;
+    grid-template-rows:auto auto;
+    min-height:85vh;
+    overflow:visible; /* allow the transition divider below to sit outside the clipped photo area */
+    margin-bottom:3.25rem; /* intentional breathing room before the next section */
     position:relative;
-    /* Room photo as full-bleed background on mobile */
-    background-image:
-      linear-gradient(
-        160deg,
-        rgba(248,244,238,0.96) 0%,
-        rgba(248,244,238,0.90) 55%,
-        rgba(248,244,238,0.55) 100%
-      ),
-      url('https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1400&q=85&auto=format&fit=crop');
-    background-size:cover;
-    background-position:center right;
   }
   /* Soft, deliberate hand-off into whatever section follows */
   .hero::after{
@@ -424,17 +409,21 @@ body{
     opacity:0.55;
   }
   .hero-content{
-    padding-top:    calc(var(--navbar-h) + env(safe-area-inset-top, 0px) + 1.25rem);
-    padding-right:  1.5rem;
-    padding-bottom: 2.5rem;
-    padding-left:   1.5rem;
+    padding:
+      calc(env(safe-area-inset-top) + 6rem)
+      1.5rem
+      1.25rem; /* less wasted space at the bottom of the content column */
     order:1;
-    background:none; /* let hero background show through */
   }
   .hero-content::after{display:none}
-  /* Hide the stacked image block — photo is now the background */
-  .hero-visual{display:none}
-  .gb{display:none}
+  .hero-visual{
+    order:2;
+    height:34vh;
+    min-height:200px;
+    max-height:300px;
+    overflow:hidden; /* keep the photo itself clipped even though .hero no longer is */
+  }
+  .gb{display:none} /* hide on mobile — space is precious */
   .brand-mark{display:none}
 
   /* Stats / social-proof card — slightly shorter and tighter on mobile */
@@ -450,10 +439,10 @@ body{
   .trust-grid{max-width:100%;margin-bottom:1.5rem}
   .subheadline{margin-bottom:1.75rem}
 
+  /* CTA group: primary + WhatsApp share the row evenly, full width;
+     the text CTA drops to its own line lower down with real breathing room */
   .cta-group{
     gap:10px;
-    flex-wrap:wrap;
-    justify-content:center;
   }
   .cta-primary,.cta-whatsapp{
     flex:1 1 0;
@@ -461,29 +450,16 @@ body{
     text-align:center;
   }
   .cta-secondary{
-    flex:0 0 auto;
-    align-self:center;
-    margin-top:1.25rem;
-    padding:10px 20px;
-    border-radius:40px;
-    border:1px solid var(--ink-faint) !important;
-    border-bottom:1px solid var(--ink-faint) !important;
-    background:rgba(248,244,238,0.6);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-    color:var(--ink-muted);
-    font-size:13px;
-    letter-spacing:0.02em;
+    flex:1 1 100%;
+    justify-content:center;
+    text-align:center;
+    margin-top:1.5rem;
+    padding:4px 4px 2px;
   }
 }
 
 @media(max-width:600px){
-  .hero-content{
-    padding-top:    calc(var(--navbar-h) + env(safe-area-inset-top, 0px) + 1rem);
-    padding-right:  1.25rem;
-    padding-bottom: 1.25rem;
-    padding-left:   1.25rem;
-  }
+  .hero-content{padding:3.75rem 1.25rem 1.25rem}
   .headline{font-size:2.4rem}
   .cta-group{gap:10px}
   .cta-primary,.cta-whatsapp{padding:13px 16px;font-size:13.5px}

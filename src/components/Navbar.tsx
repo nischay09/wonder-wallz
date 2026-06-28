@@ -3,12 +3,16 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Search, X, Menu, ChevronDown } from "lucide-react";
+import { Search, X, Menu, ChevronDown } from "lucide-react";
 import { products } from "@/lib/products";
 import { getMegaMenuNavItem, getStandardNavLinks } from "@/lib/navigation";
+import { ProjectCartButton } from "@/components/ProjectCart/ProjectCartButton";
+import { ProjectCartDrawer } from "@/components/ProjectCart/ProjectCartDrawer";
+import { useProjectCart, selectCartWorkflow } from "@/store/projectCart";
 
-/* ── Brand tokens — warm cream / gold, matching the hero ── */
+/* ── Brand tokens ── */
 const INK         = "#221F1C";
 const INK_SOFT    = "#6B6258";
 const GOLD        = "#9C7A3F";
@@ -19,35 +23,67 @@ const BORDER      = "rgba(156,122,63,0.32)";
 const BORDER_SOFT = "rgba(156,122,63,0.20)";
 const SERIF       = "'Playfair Display', 'Cormorant Garamond', Georgia, serif";
 
-/*
- * Data-driven sources:
- *  - `products` (src/lib/products.ts) powers the Collections mega-menu
- *    and the mobile accordion. Add a product there and it shows up here
- *    automatically — no changes needed in this file.
- *  - `primaryNavigation` (src/lib/navigation.ts) powers the plain nav
- *    links plus the mega-menu trigger's label/href, kept separate from
- *    product data so the two can evolve independently.
- */
 const megaMenuNavItem =
   getMegaMenuNavItem() ?? { label: "Collections", href: "/collections", type: "mega-menu" as const };
 const navLinks = getStandardNavLinks();
 
+// ── Home nav item (placed before Collections) ──────────────────────────────
+const homeNavItem = { label: "Home", href: "/" };
+
+// ── Active-route detection (usePathname) ────────────────────────────────────
+// "/" matches only the exact home route. Every other href matches itself or
+// any nested path beneath it (e.g. "/collections" also matches "/collections/foo").
+function isActiveRoute(pathname: string | null, href: string) {
+  if (!pathname) return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+// ── Task 5: Review Project handler ──────────────────────────────────────────
+function useHandleReviewProject() {
+  const cartWorkflow = useProjectCart(selectCartWorkflow);
+
+  return () => {
+    switch (cartWorkflow) {
+      case "standard":
+        console.log("STANDARD FLOW");
+        break;
+      case "custom":
+        console.log("CUSTOM FLOW");
+        break;
+      case "mixed":
+        console.log("MIXED FLOW");
+        break;
+      default:
+        break;
+    }
+  };
+}
+
 export function Navbar() {
-  const [scrolled,           setScrolled]           = useState(false);
-  const [hidden,             setHidden]             = useState(false);
-  const [mobileOpen,         setMobileOpen]         = useState(false);
-  const [activeLink,         setActiveLink]         = useState<string | null>(null);
-  const [collectionsOpen,    setCollectionsOpen]    = useState(false);
+  const [scrolled,              setScrolled]              = useState(false);
+  const [hidden,                setHidden]                = useState(false);
+  const [mobileOpen,            setMobileOpen]            = useState(false);
+  const [activeLink,            setActiveLink]            = useState<string | null>(null);
+  const [collectionsOpen,       setCollectionsOpen]       = useState(false);
   const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(false);
+
+  // ── Task 4: Drawer state lives here ─────────────────────────────────────
+  const [cartOpen, setCartOpen] = useState(false);
+  const openCart  = () => setCartOpen(true);
+  const closeCart = () => setCartOpen(false);
+
+  // Task 5
+  const handleReviewProject = useHandleReviewProject();
+
+  // ── Active link highlighting ────────────────────────────────────────────
+  const pathname = usePathname();
+
   const { scrollY } = useScroll();
   const lastY = useRef(0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 60);
-
-    // Auto-hide on the way down, reveal on the way up — keeps the pill
-    // out of the hero's headline while scrolling, and brings it right
-    // back the moment the visitor wants it.
     const delta = latest - lastY.current;
     if (latest < 120) {
       setHidden(false);
@@ -67,11 +103,7 @@ export function Navbar() {
 
   return (
     <>
-      {/* ── Floating Navbar Wrapper ──
-          Outer layer is a plain (non-animated) fixed container that just
-          reserves the device's notch/Dynamic-Island inset. All motion
-          lives on the inner layer so the safe-area padding never fights
-          the scroll animation. */}
+      {/* ── Floating Navbar Wrapper ── */}
       <div
         className="fixed top-0 left-0 right-0 z-50"
         style={{
@@ -104,7 +136,7 @@ export function Navbar() {
             }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
-            {/* ── Nav Shell — always pill, always frosted ── */}
+            {/* ── Nav Shell ── */}
             <motion.nav
               className="flex items-center justify-between px-3 py-2"
               animate={{
@@ -123,10 +155,7 @@ export function Navbar() {
               aria-label="Main navigation"
             >
 
-              {/* ── Logo Badge — settles into a smaller, tidier mark on
-                   scroll instead of getting squeezed by shrinking padding.
-                   A deliberate, proportional scale-down reads as "elegant"
-                   rather than "cramped". ── */}
+              {/* ── Logo Badge ── */}
               <motion.div
                 animate={{ scale: scrolled ? 0.9 : 1 }}
                 style={{ transformOrigin: "left center" }}
@@ -142,7 +171,6 @@ export function Navbar() {
                     border: `1px solid ${BORDER_SOFT}`,
                   }}
                 >
-                  {/* Logo image */}
                   <div
                     className="relative w-8 h-8 shrink-0"
                     style={{ filter: "drop-shadow(0 1px 2px rgba(122,94,48,0.20))" }}
@@ -156,9 +184,6 @@ export function Navbar() {
                       priority
                     />
                   </div>
-
-                  {/* Wordmark — refined serif treatment in ink + gold,
-                      replacing the previous multicolor mark */}
                   <span
                     className="text-[14px] uppercase whitespace-nowrap"
                     style={{ letterSpacing: "0.07em", fontFamily: SERIF, fontWeight: 600, color: INK }}
@@ -173,7 +198,36 @@ export function Navbar() {
               {/* ── Desktop Nav Links ── */}
               <ul className="hidden lg:flex items-center gap-0.5 mx-3" role="list">
 
-                {/* Collections — mega-menu dropdown, sourced from products.ts */}
+                {/* Home */}
+                <li className="relative">
+                  <Link
+                    href={homeNavItem.href}
+                    className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
+                    style={{
+                      color: activeLink === homeNavItem.href || isActiveRoute(pathname, homeNavItem.href) ? INK : INK_SOFT,
+                      transition: "color 0.15s",
+                      outlineColor: GOLD,
+                    }}
+                    onMouseEnter={() => setActiveLink(homeNavItem.href)}
+                    onMouseLeave={() => setActiveLink(null)}
+                  >
+                    {homeNavItem.label}
+                    <AnimatePresence>
+                      {(activeLink === homeNavItem.href || isActiveRoute(pathname, homeNavItem.href)) && (
+                        <motion.span
+                          className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
+                          style={{ background: GOLD }}
+                          initial={{ scaleX: 0, originX: 0 }}
+                          animate={{ scaleX: 1 }}
+                          exit={{ scaleX: 0, originX: 1 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </Link>
+                </li>
+
+                {/* Collections — mega-menu */}
                 <li
                   className="relative"
                   onMouseEnter={() => { setActiveLink(megaMenuNavItem.href); setCollectionsOpen(true); }}
@@ -183,42 +237,28 @@ export function Navbar() {
                     href={megaMenuNavItem.href}
                     className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
                     style={{
-                      color: activeLink === megaMenuNavItem.href ? INK : INK_SOFT,
+                      color: activeLink === megaMenuNavItem.href || isActiveRoute(pathname, megaMenuNavItem.href) ? INK : INK_SOFT,
                       transition: "color 0.15s",
                       outlineColor: GOLD,
                     }}
-                    aria-haspopup="true"
-                    aria-expanded={collectionsOpen}
                   >
-                    <AnimatePresence>
-                      {activeLink === megaMenuNavItem.href && (
-                        <motion.span
-                          className="absolute inset-0 rounded-xl"
-                          style={{ background: "rgba(156,122,63,0.08)" }}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.15 }}
-                        />
-                      )}
-                    </AnimatePresence>
-
-                    <span className="relative z-10 flex items-center gap-1.5">
+                    <span className="flex items-center gap-1">
                       {megaMenuNavItem.label}
                       <motion.span
-                        className="flex items-center"
                         animate={{ rotate: collectionsOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        transition={{ duration: 0.2 }}
+                        className="flex items-center"
                       >
-                        <ChevronDown size={13} />
+                        <ChevronDown size={13} style={{ color: GOLD_DARK }} />
                       </motion.span>
                     </span>
 
+                    {/* Active underline */}
                     <AnimatePresence>
-                      {activeLink === megaMenuNavItem.href && (
+                      {(activeLink === megaMenuNavItem.href || isActiveRoute(pathname, megaMenuNavItem.href)) && (
                         <motion.span
-                          className="absolute left-5 right-5 rounded-full"
-                          style={{ bottom: "5px", height: "2px", background: GOLD }}
+                          className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
+                          style={{ background: GOLD }}
                           initial={{ scaleX: 0, originX: 0 }}
                           animate={{ scaleX: 1 }}
                           exit={{ scaleX: 0, originX: 1 }}
@@ -228,103 +268,71 @@ export function Navbar() {
                     </AnimatePresence>
                   </Link>
 
-                  {/* Mega-menu panel — one card per product in products.ts */}
+                  {/* Mega-menu panel */}
                   <AnimatePresence>
                     {collectionsOpen && (
                       <motion.div
-                        className="absolute left-1/2 top-full mt-3 w-[560px] -translate-x-1/2 rounded-2xl p-5 z-50"
-                        style={{
-                          background: CREAM_CARD,
-                          border: `1px solid ${BORDER}`,
-                          boxShadow: "0 24px 60px rgba(40,30,10,0.18), 0 4px 14px rgba(40,30,10,0.08)",
-                        }}
-                        initial={{ opacity: 0, y: -8 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
+                        exit={{ opacity: 0, y: 4 }}
                         transition={{ duration: 0.18, ease: "easeOut" }}
-                        role="menu"
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[600px] rounded-2xl p-5 grid grid-cols-2 gap-2"
+                        style={{
+                          background: "rgba(250,247,242,0.98)",
+                          backdropFilter: "blur(24px)",
+                          border: `1px solid ${BORDER}`,
+                          boxShadow: "0 16px 48px rgba(40,30,10,0.14)",
+                        }}
                       >
-                        <div className="grid grid-cols-2 gap-1">
-                          {products.map((product) => (
-                            <Link
-                              key={product.id}
-                              href={product.href}
-                              onClick={() => setCollectionsOpen(false)}
-                              className="flex flex-col gap-0.5 rounded-xl px-4 py-3 transition-colors hover:bg-[#F4ECDA] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                              style={{ outlineColor: GOLD }}
-                              role="menuitem"
-                            >
-                              <span
-                                className="text-[15px] font-semibold"
-                                style={{ fontFamily: SERIF, color: INK }}
-                              >
-                                {product.title}
-                              </span>
-                              <span className="text-[12.5px]" style={{ color: INK_SOFT }}>
-                                {product.description}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-
-                        <div
-                          className="mt-4 pt-3.5 flex items-center justify-between"
-                          style={{ borderTop: `1px solid ${BORDER_SOFT}` }}
-                        >
-                          <span className="text-[12px]" style={{ color: INK_SOFT }}>
-                            500+ curated designs across {products.length} categories
-                          </span>
+                        {products.map((product) => (
                           <Link
-                            href={megaMenuNavItem.href}
-                            onClick={() => setCollectionsOpen(false)}
-                            className="text-[12.5px] font-semibold whitespace-nowrap"
-                            style={{ color: GOLD_DARK }}
+                            key={product.id}
+                            href={product.href}
+                            className="flex items-start gap-3 p-3 rounded-xl transition-colors group"
+                            style={{ borderRadius: "12px" }}
+                            onMouseEnter={e => (e.currentTarget.style.background = "#F4ECDA")}
+                            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
                           >
-                            View all →
+                            <div
+                              className="w-10 h-10 rounded-lg shrink-0 mt-0.5"
+                              style={{
+                                background: `linear-gradient(135deg, ${product.placeholderGradient[0]}, ${product.placeholderGradient[1]})`,
+                              }}
+                            />
+                            <div>
+                              <p className="text-[13.5px] font-semibold" style={{ color: INK, fontFamily: SERIF }}>
+                                {product.title}
+                              </p>
+                              <p className="text-[12px] mt-0.5" style={{ color: INK_SOFT }}>
+                                {product.description}
+                              </p>
+                            </div>
                           </Link>
-                        </div>
+                        ))}
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </li>
 
                 {navLinks.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href} className="relative">
                     <Link
                       href={link.href}
-                      className="relative px-5 py-2 text-[14px] font-medium block rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                      className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
                       style={{
-                        color: activeLink === link.href ? INK : INK_SOFT,
+                        color: activeLink === link.href || isActiveRoute(pathname, link.href) ? INK : INK_SOFT,
                         transition: "color 0.15s",
                         outlineColor: GOLD,
                       }}
                       onMouseEnter={() => setActiveLink(link.href)}
                       onMouseLeave={() => setActiveLink(null)}
                     >
+                      {link.label}
                       <AnimatePresence>
-                        {activeLink === link.href && (
+                        {(activeLink === link.href || isActiveRoute(pathname, link.href)) && (
                           <motion.span
-                            className="absolute inset-0 rounded-xl"
-                            style={{ background: "rgba(156,122,63,0.08)" }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.15 }}
-                          />
-                        )}
-                      </AnimatePresence>
-
-                      <span className="relative z-10">{link.label}</span>
-
-                      <AnimatePresence>
-                        {activeLink === link.href && (
-                          <motion.span
-                            className="absolute left-5 right-5 rounded-full"
-                            style={{
-                              bottom: "5px",
-                              height: "2px",
-                              background: GOLD,
-                            }}
+                            className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
+                            style={{ background: GOLD }}
                             initial={{ scaleX: 0, originX: 0 }}
                             animate={{ scaleX: 1 }}
                             exit={{ scaleX: 0, originX: 1 }}
@@ -343,18 +351,10 @@ export function Navbar() {
                   <Search size={16} />
                 </CircleIconBtn>
 
-                <CircleIconBtn aria-label="Cart (0 items)" className="relative">
-                  <ShoppingBag size={16} />
-                  <span
-                    className="absolute -top-0.5 -right-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-                    style={{ backgroundColor: GOLD_DARK }}
-                  >
-                    0
-                  </span>
-                </CircleIconBtn>
+                {/* Task 2 + 4: Live cart button — opens the drawer */}
+                <ProjectCartButton onOpen={openCart} variant="icon" />
 
-                {/* Mobile hamburger — morphs into a close icon when the
-                    drawer is open, and now toggles both ways */}
+                {/* Mobile hamburger */}
                 <motion.button
                   className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full ml-0.5 overflow-hidden"
                   style={{
@@ -427,7 +427,6 @@ export function Navbar() {
                 className="flex items-center justify-between px-5 py-4 border-b"
                 style={{ borderColor: BORDER_SOFT }}
               >
-                {/* Logo badge */}
                 <div
                   className="flex items-center gap-2 rounded-2xl px-3 py-1.5"
                   style={{
@@ -464,12 +463,26 @@ export function Navbar() {
               {/* Drawer links */}
               <nav className="flex flex-col px-4 py-5 gap-1 flex-1 overflow-y-auto">
 
-                {/* Collections — expandable accordion, sourced from products.ts */}
+                {/* Home */}
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0 }}>
+                  <Link
+                    href={homeNavItem.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
+                    style={{ color: isActiveRoute(pathname, homeNavItem.href) ? GOLD_DARK : INK, fontFamily: SERIF }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    {homeNavItem.label}
+                  </Link>
+                </motion.div>
+
+                {/* Collections — expandable accordion */}
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.06 }}>
                   <button
                     onClick={() => setMobileCollectionsOpen((v) => !v)}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
-                    style={{ color: INK, fontFamily: SERIF }}
+                    style={{ color: isActiveRoute(pathname, megaMenuNavItem.href) ? GOLD_DARK : INK, fontFamily: SERIF }}
                     aria-expanded={mobileCollectionsOpen}
                   >
                     {megaMenuNavItem.label}
@@ -519,13 +532,13 @@ export function Navbar() {
                     key={link.href}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: (i + 1) * 0.06 }}
+                    transition={{ delay: (i + 2) * 0.06 }}
                   >
                     <Link
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
                       className="flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
-                      style={{ color: INK, fontFamily: SERIF }}
+                      style={{ color: isActiveRoute(pathname, link.href) ? GOLD_DARK : INK, fontFamily: SERIF }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
@@ -535,7 +548,7 @@ export function Navbar() {
                 ))}
               </nav>
 
-              {/* Bottom icon row */}
+              {/* Bottom icon row — Task 3: mobile cart button */}
               <div
                 className="flex items-center gap-3 px-6 py-4 border-t"
                 style={{ borderColor: BORDER_SOFT }}
@@ -543,23 +556,24 @@ export function Navbar() {
                 <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: INK_SOFT }}>
                   <Search size={15} /> Search
                 </button>
-                <button className="flex items-center gap-1.5 text-xs font-semibold ml-auto relative" style={{ color: INK_SOFT }}>
-                  <ShoppingBag size={15} /> Cart
-                  <span
-                    className="flex items-center justify-center w-4 h-4 rounded-full text-[9px] font-bold text-white"
-                    style={{ backgroundColor: GOLD_DARK }}
-                  >0</span>
-                </button>
+                {/* Task 3: live cart button in mobile bar */}
+                <ProjectCartButton
+                  onOpen={() => { setMobileOpen(false); openCart(); }}
+                  variant="row"
+                />
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
+
+      {/* ── Task 4: Project Cart Drawer ── */}
+      <ProjectCartDrawer isOpen={cartOpen} onClose={closeCart} />
     </>
   );
 }
 
-/* ── Circular Icon Button (matches the floating pill's round ghost buttons) ── */
+/* ── Circular Icon Button ── */
 function CircleIconBtn({
   children,
   className = "",
