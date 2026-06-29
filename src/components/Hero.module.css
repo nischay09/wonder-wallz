@@ -520,14 +520,17 @@
   color: rgba(232, 201, 122, 0.9);
 }
 
-/* ── MOBILE ── */
+/* ── MOBILE ──
+   Photo becomes a full-bleed background behind the content instead of
+   a separate stacked block: .heroVisual is laid absolute under
+   .heroContent, which goes transparent and gets a scrim for readability. */
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    min-height: 85vh;
-    overflow: visible;
-    margin-bottom: 3.25rem;
+    grid-template-rows: 1fr;
+    min-height: 100vh;
+    overflow: hidden;
+    margin-bottom: 0;
     position: relative;
   }
   /* Soft, deliberate hand-off into whatever section follows */
@@ -535,28 +538,101 @@
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -1.6rem;
+    bottom: 1rem;
     transform: translateX(-50%);
     width: 56px;
     height: 3px;
     border-radius: 2px;
     background: linear-gradient(90deg, var(--gold), var(--gold-light));
-    opacity: 0.55;
+    opacity: 0.7;
+    z-index: 4;
   }
+
+  /* Photo fills the entire hero, content sits on top of it */
+  .heroVisual {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    order: initial;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  /* Scrim: dark at the bottom (where the text/CTAs sit) fading to a
+     lighter wash near the top, so the photo still reads as a photo
+     up top but the copy stays legible lower down. */
+  .heroVisual::before {
+    background: linear-gradient(
+      180deg,
+      rgba(28, 20, 16, 0.35) 0%,
+      rgba(28, 20, 16, 0.55) 40%,
+      rgba(28, 20, 16, 0.86) 100%
+    );
+    z-index: 2;
+  }
+  .heroVisual::after {
+    display: none;
+  }
+
   .heroContent {
-    padding: calc(env(safe-area-inset-top) + 6rem) 1.5rem 1.25rem;
-    order: 1;
+    position: relative;
+    z-index: 3;
+    background: transparent;
+    min-height: 100vh;
+    justify-content: flex-end;
+    padding: calc(env(safe-area-inset-top) + 2rem) 1.5rem
+      calc(env(safe-area-inset-bottom) + 2.5rem);
+    order: initial;
   }
   .heroContent::after {
     display: none;
   }
-  .heroVisual {
-    order: 2;
-    height: 34vh;
-    min-height: 200px;
-    max-height: 300px;
-    overflow: hidden;
+
+  /* Text/elements recolored for legibility over the dark scrim */
+  .eyebrow {
+    color: var(--gold-light);
   }
+  .eyebrowLine {
+    background: var(--gold-light);
+  }
+  .headline,
+  .headline em {
+    color: #fff;
+  }
+  .subheadline {
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .trustItem {
+    color: rgba(255, 255, 255, 0.88);
+  }
+  .trustCheck {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(232, 201, 122, 0.5);
+  }
+  .socialProof {
+    background: rgba(28, 20, 16, 0.45);
+    border-color: rgba(232, 201, 122, 0.25);
+  }
+  .spNumber {
+    color: #fff;
+  }
+  .spLabel {
+    color: rgba(255, 255, 255, 0.65);
+  }
+  .spStat + .spStat {
+    border-left-color: rgba(232, 201, 122, 0.25);
+  }
+  .ctaSecondary {
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom-color: rgba(255, 255, 255, 0.45);
+  }
+  .ctaSecondary:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
   .gb {
     display: none;
   }

@@ -14,6 +14,10 @@
  * • Framer Motion: fade backdrop, scale modal, staggered results
  * • Full Wonder Wallz design system (tokens from Navbar)
  * • Modular — zero coupling to Navbar internals
+ * • Fully responsive: below 768px the popover becomes a true centered
+ *   modal — safe-area aware, overflow-safe, 44px+ touch targets.
+ *   Desktop layout/markup is untouched (see RESPONSIVE_STYLES below,
+ *   scoped entirely behind `@media (max-width: 767.98px)`).
  *
  * Usage
  * ─────
@@ -49,6 +53,90 @@ const BORDER     = "rgba(156,122,63,0.28)";
 const BORDER_SOFT= "rgba(156,122,63,0.18)";
 const SERIF      = "'Playfair Display', 'Cormorant Garamond', Georgia, serif";
 const SANS       = "'Inter', system-ui, -apple-system, sans-serif";
+
+// ─── Responsive overrides (mobile only) ───────────────────────────────────────
+// Everything here is gated behind `max-width: 767.98px` so desktop (≥768px)
+// renders with zero behavioural or visual change. We use a small set of
+// scoped class names + `!important` because the component is styled via
+// inline `style` props (for the JS-driven design tokens above) — `!important`
+// in an author stylesheet is the only thing that can win against an inline
+// style without rewriting the whole component to CSS variables.
+//
+// NOTE: we deliberately never touch `transform` in these overrides. Framer
+// Motion owns the `transform` property on the modal (it animates `scale`/`y`
+// itself), so overriding it here would either fight the animation or get
+// silently clobbered every frame. Horizontal/vertical centering on mobile is
+// instead handled by turning the *wrapper* into a centered flex container —
+// a sibling concern Framer never touches.
+const RESPONSIVE_STYLES = `
+  @media (max-width: 767.98px) {
+    .ww-search-modal-wrapper {
+      align-items: center !important;
+      justify-content: center !important;
+      padding:
+        max(16px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(16px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left)) !important;
+    }
+
+    .ww-search-modal {
+      width: min(92vw, 420px) !important;
+      max-width: 92vw !important;
+      max-height: min(78vh, calc(100vh - 48px)) !important;
+      box-sizing: border-box !important;
+    }
+
+    .ww-search-input-row {
+      padding: 12px 14px !important;
+      gap: 8px !important;
+    }
+
+    .ww-search-input {
+      font-size: 16px !important; /* prevents iOS Safari auto-zoom on focus */
+      min-width: 0 !important;
+    }
+
+    .ww-search-clear-btn {
+      width: 44px !important;
+      height: 44px !important;
+    }
+
+    .ww-search-esc-btn {
+      min-width: 44px !important;
+      min-height: 44px !important;
+      padding: 8px 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    .ww-popular-chips-wrap {
+      gap: 10px !important;
+    }
+
+    .ww-popular-chip {
+      padding: 12px 16px !important;
+      min-height: 44px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      box-sizing: border-box !important;
+    }
+
+    .ww-search-result-link {
+      padding: 12px 14px !important;
+      min-height: 44px !important;
+      box-sizing: border-box !important;
+    }
+
+    .ww-search-footer-hint {
+      flex-wrap: wrap !important;
+      row-gap: 8px !important;
+      column-gap: 14px !important;
+      padding: 10px 14px !important;
+    }
+  }
+`;
 
 // ─── Popular suggestions ───────────────────────────────────────────────────────
 const POPULAR_SEARCHES = [
@@ -185,405 +273,442 @@ export function SearchModal({ isOpen, onClose, onOpen }: SearchModalProps) {
   const showNoResults = query.trim().length >= 1 && results.length === 0;
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* ── Backdrop ── */}
-          <motion.div
-            key="search-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.22, ease: "easeOut" }}
-            onClick={onClose}
-            style={{
-              position: "fixed",
-              inset: 0,
-              zIndex: 200,
-              background: "rgba(34,31,28,0.54)",
-              backdropFilter: "blur(6px)",
-              WebkitBackdropFilter: "blur(6px)",
-            }}
-            aria-hidden="true"
-          />
+    <>
+      {/* Mobile-only responsive overrides — see RESPONSIVE_STYLES comment above */}
+      <style>{RESPONSIVE_STYLES}</style>
 
-          {/* ── Modal ── */}
-          <motion.div
-            key="search-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Site search"
-            initial={{ opacity: 0, scale: 0.96, y: -8 }}
-            animate={{ opacity: 1, scale: 1,    y: 0  }}
-            exit={{ opacity: 0, scale: 0.96, y: -8  }}
-            transition={{ duration: 0.24, ease: [0.25, 0.46, 0.45, 0.94] }}
-            style={{
-              position: "fixed",
-              top: "clamp(5vh, 10vh, 10vh)",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 201,
-              width: "min(640px, calc(100vw - 2rem))",
-              maxHeight: "min(680px, calc(100vh - 12vh))",
-              display: "flex",
-              flexDirection: "column",
-              borderRadius: "20px",
-              background: CREAM_CARD,
-              border: `1px solid ${BORDER}`,
-              boxShadow: "0 24px 80px rgba(34,31,28,0.24), 0 4px 16px rgba(156,122,63,0.12)",
-              overflow: "hidden",
-            }}
-          >
-            {/* ── Input row ── */}
-            <div
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* ── Backdrop ── */}
+            <motion.div
+              key="search-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              onClick={onClose}
               style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 200,
+                background: "rgba(34,31,28,0.54)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
+              }}
+              aria-hidden="true"
+            />
+
+            {/*
+              ── Positioning wrapper ──
+              Desktop: top-aligned (paddingTop ≈ 10vh), centered horizontally.
+              Mobile (<768px, via RESPONSIVE_STYLES): centered both axes,
+              padded out to the iOS safe-area insets. `pointer-events: none`
+              here lets clicks in the empty area fall through to the
+              backdrop's onClick (click-outside-to-close), while the modal
+              itself re-enables pointer events.
+            */}
+            <div
+              className="ww-search-modal-wrapper"
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 201,
                 display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "14px 16px",
-                borderBottom: `1px solid ${BORDER_SOFT}`,
-                background: CREAM_CARD,
-                flexShrink: 0,
+                justifyContent: "center",
+                alignItems: "flex-start",
+                paddingTop: "clamp(5vh, 10vh, 10vh)",
+                paddingLeft: "1rem",
+                paddingRight: "1rem",
+                pointerEvents: "none",
+                boxSizing: "border-box",
               }}
             >
-              <Search size={18} style={{ color: GOLD, flexShrink: 0 }} />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Search wallpapers, blinds, flooring..."
-                aria-label="Search"
-                aria-autocomplete="list"
-                aria-controls="search-results"
+              {/* ── Modal ── */}
+              <motion.div
+                key="search-modal"
+                className="ww-search-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Site search"
+                initial={{ opacity: 0, scale: 0.96, y: -8 }}
+                animate={{ opacity: 1, scale: 1,    y: 0  }}
+                exit={{ opacity: 0, scale: 0.96, y: -8  }}
+                transition={{ duration: 0.24, ease: [0.25, 0.46, 0.45, 0.94] }}
                 style={{
-                  flex: 1,
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  fontSize: "15px",
-                  fontFamily: SANS,
-                  color: INK,
-                  letterSpacing: "0.01em",
+                  width: "min(640px, calc(100vw - 2rem))",
+                  maxHeight: "min(680px, calc(100vh - 12vh))",
+                  display: "flex",
+                  flexDirection: "column",
+                  borderRadius: "20px",
+                  background: CREAM_CARD,
+                  border: `1px solid ${BORDER}`,
+                  boxShadow: "0 24px 80px rgba(34,31,28,0.24), 0 4px 16px rgba(156,122,63,0.12)",
+                  overflow: "hidden",
+                  pointerEvents: "auto",
                 }}
-                spellCheck={false}
-                autoComplete="off"
-              />
-              {query.length > 0 && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-                  aria-label="Clear search"
+              >
+                {/* ── Input row ── */}
+                <div
+                  className="ww-search-input-row"
                   style={{
-                    border: "none",
-                    background: GOLD_LIGHT,
-                    borderRadius: "50%",
-                    width: 26,
-                    height: 26,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    color: GOLD_DARK,
+                    gap: "10px",
+                    padding: "14px 16px",
+                    borderBottom: `1px solid ${BORDER_SOFT}`,
+                    background: CREAM_CARD,
                     flexShrink: 0,
                   }}
                 >
-                  <X size={13} />
-                </motion.button>
-              )}
-              <button
-                onClick={onClose}
-                aria-label="Close search"
-                style={{
-                  border: `1px solid ${BORDER_SOFT}`,
-                  background: "transparent",
-                  borderRadius: "6px",
-                  padding: "2px 7px",
-                  fontSize: "11px",
-                  fontFamily: SANS,
-                  color: INK_MUTED,
-                  cursor: "pointer",
-                  letterSpacing: "0.02em",
-                  flexShrink: 0,
-                }}
-              >
-                Esc
-              </button>
-            </div>
-
-            {/* ── Body ── */}
-            <div style={{ overflowY: "auto", flex: 1 }}>
-
-              {/* Empty state — popular searches */}
-              {showEmpty && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.18 }}
-                  style={{ padding: "20px 16px" }}
-                >
-                  <p
+                  <Search size={18} style={{ color: GOLD, flexShrink: 0 }} />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    className="ww-search-input"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Search wallpapers, blinds, flooring..."
+                    aria-label="Search"
+                    aria-autocomplete="list"
+                    aria-controls="search-results"
                     style={{
-                      fontSize: "11px",
+                      flex: 1,
+                      width: "100%",
+                      minWidth: 0,
+                      border: "none",
+                      outline: "none",
+                      background: "transparent",
+                      fontSize: "15px",
                       fontFamily: SANS,
-                      fontWeight: 600,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                      color: INK_MUTED,
-                      marginBottom: "12px",
+                      color: INK,
+                      letterSpacing: "0.01em",
                     }}
-                  >
-                    Popular Searches
-                  </p>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                    {POPULAR_SEARCHES.map((s) => (
-                      <motion.button
-                        key={s}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => handleSuggestion(s)}
-                        style={{
-                          border: `1px solid ${BORDER}`,
-                          background: CREAM,
-                          borderRadius: "9999px",
-                          padding: "6px 14px",
-                          fontSize: "13px",
-                          fontFamily: SANS,
-                          color: INK_SOFT,
-                          cursor: "pointer",
-                          letterSpacing: "0.01em",
-                          transition: "background 0.15s, color 0.15s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = GOLD_LIGHT;
-                          e.currentTarget.style.color = GOLD_DARK;
-                          e.currentTarget.style.borderColor = "rgba(156,122,63,0.4)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = CREAM;
-                          e.currentTarget.style.color = INK_SOFT;
-                          e.currentTarget.style.borderColor = BORDER;
-                        }}
-                      >
-                        {s}
-                      </motion.button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* No results */}
-              {showNoResults && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  style={{
-                    padding: "40px 16px",
-                    textAlign: "center",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <Search size={28} style={{ color: BORDER }} />
-                  <p style={{ fontFamily: SERIF, fontSize: "16px", color: INK, fontWeight: 600 }}>
-                    No results for "{query}"
-                  </p>
-                  <p style={{ fontFamily: SANS, fontSize: "13px", color: INK_MUTED }}>
-                    Try a different spelling or browse our collections below.
-                  </p>
-                  <Link
-                    href="/collections"
-                    onClick={onClose}
-                    style={{
-                      marginTop: "8px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      fontSize: "13px",
-                      fontFamily: SANS,
-                      fontWeight: 600,
-                      color: GOLD_DARK,
-                      textDecoration: "none",
-                    }}
-                  >
-                    Browse all collections <ArrowRight size={13} />
-                  </Link>
-                </motion.div>
-              )}
-
-              {/* Results list */}
-              {results.length > 0 && (
-                <ul
-                  id="search-results"
-                  ref={listRef}
-                  role="listbox"
-                  aria-label="Search results"
-                  style={{ listStyle: "none", margin: 0, padding: "8px 0" }}
-                >
-                  {results.map((entry, i) => {
-                    const meta = KIND_META[entry.kind];
-                    const isActive = i === cursor;
-                    return (
-                      <motion.li
-                        key={entry.id}
-                        role="option"
-                        aria-selected={isActive}
-                        initial={{ opacity: 0, x: -4 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.14, delay: i * 0.025 }}
-                      >
-                        <Link
-                          href={entry.href}
-                          onClick={onClose}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "12px",
-                            padding: "10px 16px",
-                            textDecoration: "none",
-                            background: isActive ? GOLD_LIGHT : "transparent",
-                            transition: "background 0.12s",
-                            cursor: "pointer",
-                          }}
-                          onMouseEnter={(e) => {
-                            setCursor(i);
-                            (e.currentTarget as HTMLAnchorElement).style.background = GOLD_LIGHT;
-                          }}
-                          onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLAnchorElement).style.background = isActive ? GOLD_LIGHT : "transparent";
-                          }}
-                        >
-                          {/* Icon badge */}
-                          <span
-                            style={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: "8px",
-                              background: isActive ? "rgba(156,122,63,0.18)" : CREAM,
-                              border: `1px solid ${BORDER_SOFT}`,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
-                              color: meta.color,
-                            }}
-                          >
-                            {meta.icon}
-                          </span>
-
-                          {/* Title + description */}
-                          <span style={{ flex: 1, minWidth: 0 }}>
-                            <span
-                              style={{
-                                display: "block",
-                                fontSize: "14px",
-                                fontFamily: SANS,
-                                fontWeight: 600,
-                                color: INK,
-                                letterSpacing: "0.005em",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {entry.title}
-                            </span>
-                            <span
-                              style={{
-                                display: "block",
-                                fontSize: "12px",
-                                fontFamily: SANS,
-                                color: INK_MUTED,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {entry.description}
-                            </span>
-                          </span>
-
-                          {/* Kind pill */}
-                          <span
-                            style={{
-                              fontSize: "10.5px",
-                              fontFamily: SANS,
-                              fontWeight: 600,
-                              letterSpacing: "0.06em",
-                              textTransform: "uppercase",
-                              color: meta.color,
-                              background: isActive ? "rgba(156,122,63,0.16)" : CREAM,
-                              border: `1px solid ${BORDER_SOFT}`,
-                              borderRadius: "9999px",
-                              padding: "2px 8px",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {meta.badge}
-                          </span>
-                        </Link>
-                      </motion.li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-
-            {/* ── Footer hint ── */}
-            {!showEmpty && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "16px",
-                  padding: "10px 16px",
-                  borderTop: `1px solid ${BORDER_SOFT}`,
-                  flexShrink: 0,
-                  background: CREAM,
-                }}
-              >
-                {[
-                  { key: "↑↓", label: "navigate" },
-                  { key: "↵", label: "open" },
-                  { key: "Esc", label: "close" },
-                ].map(({ key, label }) => (
-                  <span
-                    key={key}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      fontSize: "11px",
-                      fontFamily: SANS,
-                      color: INK_MUTED,
-                    }}
-                  >
-                    <kbd
+                    spellCheck={false}
+                    autoComplete="off"
+                  />
+                  {query.length > 0 && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      onClick={() => { setQuery(""); inputRef.current?.focus(); }}
+                      aria-label="Clear search"
+                      className="ww-search-clear-btn"
                       style={{
-                        border: `1px solid ${BORDER}`,
-                        borderRadius: "4px",
-                        padding: "1px 5px",
-                        fontSize: "10px",
-                        fontFamily: SANS,
-                        color: INK_SOFT,
-                        background: CREAM_CARD,
+                        border: "none",
+                        background: GOLD_LIGHT,
+                        borderRadius: "50%",
+                        width: 26,
+                        height: 26,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        color: GOLD_DARK,
+                        flexShrink: 0,
                       }}
                     >
-                      {key}
-                    </kbd>
-                    {label}
-                  </span>
-                ))}
-              </div>
-            )}
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+                      <X size={13} />
+                    </motion.button>
+                  )}
+                  <button
+                    onClick={onClose}
+                    aria-label="Close search"
+                    className="ww-search-esc-btn"
+                    style={{
+                      border: `1px solid ${BORDER_SOFT}`,
+                      background: "transparent",
+                      borderRadius: "6px",
+                      padding: "2px 7px",
+                      fontSize: "11px",
+                      fontFamily: SANS,
+                      color: INK_MUTED,
+                      cursor: "pointer",
+                      letterSpacing: "0.02em",
+                      flexShrink: 0,
+                    }}
+                  >
+                    Esc
+                  </button>
+                </div>
+
+                {/* ── Body ── */}
+                <div className="ww-search-body" style={{ overflowY: "auto", flex: 1, WebkitOverflowScrolling: "touch" }}>
+
+                  {/* Empty state — popular searches */}
+                  {showEmpty && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.18 }}
+                      style={{ padding: "20px 16px" }}
+                    >
+                      <p
+                        style={{
+                          fontSize: "11px",
+                          fontFamily: SANS,
+                          fontWeight: 600,
+                          letterSpacing: "0.08em",
+                          textTransform: "uppercase",
+                          color: INK_MUTED,
+                          marginBottom: "12px",
+                        }}
+                      >
+                        Popular Searches
+                      </p>
+                      <div className="ww-popular-chips-wrap" style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                        {POPULAR_SEARCHES.map((s) => (
+                          <motion.button
+                            key={s}
+                            className="ww-popular-chip"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => handleSuggestion(s)}
+                            style={{
+                              border: `1px solid ${BORDER}`,
+                              background: CREAM,
+                              borderRadius: "9999px",
+                              padding: "6px 14px",
+                              fontSize: "13px",
+                              fontFamily: SANS,
+                              color: INK_SOFT,
+                              cursor: "pointer",
+                              letterSpacing: "0.01em",
+                              transition: "background 0.15s, color 0.15s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = GOLD_LIGHT;
+                              e.currentTarget.style.color = GOLD_DARK;
+                              e.currentTarget.style.borderColor = "rgba(156,122,63,0.4)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = CREAM;
+                              e.currentTarget.style.color = INK_SOFT;
+                              e.currentTarget.style.borderColor = BORDER;
+                            }}
+                          >
+                            {s}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* No results */}
+                  {showNoResults && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      style={{
+                        padding: "40px 16px",
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <Search size={28} style={{ color: BORDER }} />
+                      <p style={{ fontFamily: SERIF, fontSize: "16px", color: INK, fontWeight: 600 }}>
+                        No results for "{query}"
+                      </p>
+                      <p style={{ fontFamily: SANS, fontSize: "13px", color: INK_MUTED }}>
+                        Try a different spelling or browse our collections below.
+                      </p>
+                      <Link
+                        href="/collections"
+                        onClick={onClose}
+                        style={{
+                          marginTop: "8px",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontSize: "13px",
+                          fontFamily: SANS,
+                          fontWeight: 600,
+                          color: GOLD_DARK,
+                          textDecoration: "none",
+                        }}
+                      >
+                        Browse all collections <ArrowRight size={13} />
+                      </Link>
+                    </motion.div>
+                  )}
+
+                  {/* Results list */}
+                  {results.length > 0 && (
+                    <ul
+                      id="search-results"
+                      ref={listRef}
+                      role="listbox"
+                      aria-label="Search results"
+                      style={{ listStyle: "none", margin: 0, padding: "8px 0" }}
+                    >
+                      {results.map((entry, i) => {
+                        const meta = KIND_META[entry.kind];
+                        const isActive = i === cursor;
+                        return (
+                          <motion.li
+                            key={entry.id}
+                            role="option"
+                            aria-selected={isActive}
+                            initial={{ opacity: 0, x: -4 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.14, delay: i * 0.025 }}
+                          >
+                            <Link
+                              href={entry.href}
+                              onClick={onClose}
+                              className="ww-search-result-link"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "12px",
+                                padding: "10px 16px",
+                                textDecoration: "none",
+                                background: isActive ? GOLD_LIGHT : "transparent",
+                                transition: "background 0.12s",
+                                cursor: "pointer",
+                              }}
+                              onMouseEnter={(e) => {
+                                setCursor(i);
+                                (e.currentTarget as HTMLAnchorElement).style.background = GOLD_LIGHT;
+                              }}
+                              onMouseLeave={(e) => {
+                                (e.currentTarget as HTMLAnchorElement).style.background = isActive ? GOLD_LIGHT : "transparent";
+                              }}
+                            >
+                              {/* Icon badge */}
+                              <span
+                                style={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: "8px",
+                                  background: isActive ? "rgba(156,122,63,0.18)" : CREAM,
+                                  border: `1px solid ${BORDER_SOFT}`,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  flexShrink: 0,
+                                  color: meta.color,
+                                }}
+                              >
+                                {meta.icon}
+                              </span>
+
+                              {/* Title + description */}
+                              <span style={{ flex: 1, minWidth: 0 }}>
+                                <span
+                                  style={{
+                                    display: "block",
+                                    fontSize: "14px",
+                                    fontFamily: SANS,
+                                    fontWeight: 600,
+                                    color: INK,
+                                    letterSpacing: "0.005em",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                >
+                                  {entry.title}
+                                </span>
+                                <span
+                                  style={{
+                                    display: "block",
+                                    fontSize: "12px",
+                                    fontFamily: SANS,
+                                    color: INK_MUTED,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                >
+                                  {entry.description}
+                                </span>
+                              </span>
+
+                              {/* Kind pill */}
+                              <span
+                                style={{
+                                  fontSize: "10.5px",
+                                  fontFamily: SANS,
+                                  fontWeight: 600,
+                                  letterSpacing: "0.06em",
+                                  textTransform: "uppercase",
+                                  color: meta.color,
+                                  background: isActive ? "rgba(156,122,63,0.16)" : CREAM,
+                                  border: `1px solid ${BORDER_SOFT}`,
+                                  borderRadius: "9999px",
+                                  padding: "2px 8px",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                {meta.badge}
+                              </span>
+                            </Link>
+                          </motion.li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+
+                {/* ── Footer hint ── */}
+                {!showEmpty && (
+                  <div
+                    className="ww-search-footer-hint"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "16px",
+                      padding: "10px 16px",
+                      borderTop: `1px solid ${BORDER_SOFT}`,
+                      flexShrink: 0,
+                      background: CREAM,
+                    }}
+                  >
+                    {[
+                      { key: "↑↓", label: "navigate" },
+                      { key: "↵", label: "open" },
+                      { key: "Esc", label: "close" },
+                    ].map(({ key, label }) => (
+                      <span
+                        key={key}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          fontSize: "11px",
+                          fontFamily: SANS,
+                          color: INK_MUTED,
+                        }}
+                      >
+                        <kbd
+                          style={{
+                            border: `1px solid ${BORDER}`,
+                            borderRadius: "4px",
+                            padding: "1px 5px",
+                            fontSize: "10px",
+                            fontFamily: SANS,
+                            color: INK_SOFT,
+                            background: CREAM_CARD,
+                          }}
+                        >
+                          {key}
+                        </kbd>
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
