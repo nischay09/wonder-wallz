@@ -207,7 +207,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
               <div
                 className="absolute inset-0"
                 style={{
-                  backgroundImage: product.coverImage ? `url(${product.coverImage})` : undefined,
+                  backgroundImage: product.image ? `url(${product.image})` : undefined,
                   backgroundSize: "cover",
                   backgroundPosition: "center",
                   transform: imageZoom ? "scale(1.06)" : "scale(1)",

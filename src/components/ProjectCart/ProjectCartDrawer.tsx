@@ -200,9 +200,9 @@ function CartItemRow({ item, index }: CartItemRowProps) {
     >
       {/* Product image */}
       <div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden rounded-[12px] bg-[#F3EDE4]">
-        {item.product.coverImage ? (
+        {item.product.image ? (
           <Image
-            src={item.product.coverImage}
+            src={item.product.image}
             alt={item.product.title}
             fill
             sizes="88px"
