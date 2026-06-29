@@ -30,7 +30,6 @@ import type { Metadata } from "next";
 import ShopByProduct from "@/components/ShopByProduct";
 import FAQSection from "@/components/FAQSection";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
-import WonderWallzCTA from "@/components/WonderWallz_CTA";
 import WallTransformations from "@/components/WallTransformations/WallTransformations";
 import SocialProof from "@/components/SocialProof/SocialProof";
 import IframeSection from "@/components/IframeSection";
