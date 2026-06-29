@@ -1,0 +1,650 @@
+/**
+ * Hero.module.css
+ * Styles extracted verbatim from the original wonder_wallz_hero.html.
+ * No visual changes — only scoped to this component instead of living
+ * in a standalone <style> block.
+ *
+ * NOTE: this component uses 'Cormorant Garamond' (headline/serif accents)
+ * and 'Inter' (body). Make sure these are loaded globally (e.g. via
+ * next/font/google in app/layout.tsx) — they are NOT loaded inside this
+ * module since CSS Modules shouldn't reach outside their own scope for
+ * <link> tags. If Cormorant Garamond is not already loaded elsewhere in
+ * the app, add it alongside the existing Fraunces/Inter font setup.
+ */
+
+/* ── TOKENS — scoped to the hero root instead of :root to avoid leaking
+   into the rest of the app / colliding with global design tokens ── */
+.heroRoot {
+  --ivory: #f8f4ee;
+  --ivory-deep: #ede6d8;
+  --ink: #1c1410;
+  --ink-muted: #6b5b4e;
+  --ink-faint: #a8977f;
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-pale: rgba(201, 168, 76, 0.12);
+  --blue: #2d7ff9;
+  --purple: #7a3df0;
+  --orange: #ff8a00;
+  --wa-green: #25d366;
+  --wa-dark: #1da851;
+  --glass-bg: rgba(252, 248, 241, 0.92);
+  --glass-border: rgba(201, 168, 76, 0.3);
+  --shadow-warm: rgba(28, 20, 16, 0.18);
+
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+}
+
+/* ── HERO LAYOUT ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* ── LEFT COLUMN ── */
+.heroContent {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 4rem 4rem 5.5rem;
+  background: var(--ivory);
+}
+
+/* Subtle vertical rule separating columns */
+.heroContent::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 0;
+  width: 1px;
+  height: 80%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(201, 168, 76, 0.25) 30%,
+    rgba(201, 168, 76, 0.25) 70%,
+    transparent
+  );
+}
+
+/* Load-in animations */
+.heroContent > * {
+  opacity: 0;
+  animation: rise 0.9s cubic-bezier(0.22, 0.9, 0.32, 1) forwards;
+}
+.eyebrow {
+  animation-delay: 0.05s;
+}
+.headline {
+  animation-delay: 0.18s;
+}
+.subheadline {
+  animation-delay: 0.32s;
+}
+.trustGrid {
+  animation-delay: 0.46s;
+}
+.socialProof {
+  animation-delay: 0.58s;
+}
+.ctaGroup {
+  animation-delay: 0.7s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Eyebrow */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+}
+.eyebrowLine {
+  width: 28px;
+  height: 1px;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* H1 Headline — Cormorant for luxury serif weight */
+.headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 4vw, 4.2rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 1.5rem;
+}
+.headline em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--ink);
+}
+/* Gold underline beneath "Masterpieces" */
+.accentWord {
+  position: relative;
+  display: inline-block;
+}
+.accentWord::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 1px;
+}
+
+/* Subheadline */
+.subheadline {
+  font-size: 1rem;
+  line-height: 1.78;
+  color: var(--ink-muted);
+  max-width: 430px;
+  margin-bottom: 2.5rem;
+}
+
+/* Trust grid — four ticks in a 2×2 grid */
+.trustGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  margin-bottom: 2rem;
+  max-width: 360px;
+}
+.trustItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0.01em;
+}
+.trustCheck {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.trustCheck svg {
+  width: 9px;
+  height: 9px;
+}
+
+/* Social proof row */
+.socialProof {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 2.5rem;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+  max-width: 420px;
+}
+.spStat {
+  text-align: center;
+  flex: 1;
+}
+.spStat + .spStat {
+  border-left: 1px solid rgba(201, 168, 76, 0.2);
+  padding-left: 20px;
+}
+.spNumber {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  display: block;
+}
+.spLabel {
+  font-size: 10.5px;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 3px;
+  display: block;
+}
+.spStars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+.spStars svg {
+  width: 11px;
+  height: 11px;
+  fill: var(--gold);
+}
+
+/* CTA group */
+.ctaGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Primary CTA — dark rich button */
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: var(--ivory);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 15px 28px;
+  border-radius: 4px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.18s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px var(--shadow-warm);
+  white-space: nowrap;
+}
+.ctaPrimary:hover {
+  background: #2d1f18;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(28, 20, 16, 0.3);
+}
+.ctaPrimary:active {
+  transform: translateY(0);
+}
+.ctaPrimary svg {
+  flex-shrink: 0;
+}
+
+/* WhatsApp CTA */
+.ctaWhatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--wa-green);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 15px 24px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.18s;
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.3);
+  white-space: nowrap;
+}
+.ctaWhatsapp:hover {
+  background: var(--wa-dark);
+  transform: translateY(-2px);
+}
+.ctaWhatsapp svg {
+  flex-shrink: 0;
+}
+
+/* Secondary ghost CTA */
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-muted);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 15px 4px;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--ink-faint);
+  cursor: pointer;
+}
+.ctaSecondary:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.ctaSecondary svg {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.ctaSecondary:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── RIGHT COLUMN — PHOTO ── */
+.heroVisual {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Vignette: left-side fade to ivory so it blends with left column */
+.heroVisual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(248, 244, 238, 0.6) 0%,
+    rgba(248, 244, 238, 0.12) 20%,
+    transparent 40%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+/* Warm amber tint layer for premium look */
+.heroVisual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(28, 20, 16, 0.04) 0%,
+    transparent 40%,
+    rgba(28, 20, 16, 0.15) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ── GLASSMORPHISM BADGE CARDS ── */
+.gb {
+  position: absolute;
+  z-index: 10;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(28, 20, 16, 0.16), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  padding: 10px 14px;
+  white-space: nowrap;
+  animation: gbFloat 8s ease-in-out infinite;
+}
+@keyframes gbFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.gbLabel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: block;
+  margin-bottom: 2px;
+}
+.gbValue {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1;
+  display: block;
+}
+.gbSub {
+  font-size: 10px;
+  color: var(--ink-muted);
+  margin-top: 1px;
+  display: block;
+}
+
+/* Badge position classes */
+.gb1 {
+  top: 14%;
+  left: 5%;
+  animation-delay: 0s;
+}
+.gb2 {
+  top: 14%;
+  right: 6%;
+  animation-delay: 0.6s;
+}
+.gb3 {
+  top: 48%;
+  right: 6%;
+  animation-delay: 1.2s;
+}
+.gb4 {
+  bottom: 18%;
+  left: 5%;
+  animation-delay: 1.8s;
+}
+.gb5 {
+  bottom: 18%;
+  right: 6%;
+  animation-delay: 0.9s;
+}
+
+/* Rating badge special */
+.gbRating .gbStars {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+}
+.gbRating .gbStars svg {
+  width: 10px;
+  height: 10px;
+  fill: var(--gold);
+}
+.gbRating .gbValue {
+  font-size: 1.5rem;
+}
+
+/* HP badge accent line */
+.gbHp::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 1px;
+  margin-bottom: 6px;
+}
+
+/* ── BRAND MARK on photo ── */
+.brandMark {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(28, 20, 16, 0.72);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 40px;
+  padding: 7px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.brandMarkDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+.brandMarkText {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(232, 201, 122, 0.9);
+}
+
+/* ── MOBILE ── */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: 85vh;
+    overflow: visible;
+    margin-bottom: 3.25rem;
+    position: relative;
+  }
+  /* Soft, deliberate hand-off into whatever section follows */
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -1.6rem;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    opacity: 0.55;
+  }
+  .heroContent {
+    padding: calc(env(safe-area-inset-top) + 6rem) 1.5rem 1.25rem;
+    order: 1;
+  }
+  .heroContent::after {
+    display: none;
+  }
+  .heroVisual {
+    order: 2;
+    height: 34vh;
+    min-height: 200px;
+    max-height: 300px;
+    overflow: hidden;
+  }
+  .gb {
+    display: none;
+  }
+  .brandMark {
+    display: none;
+  }
+
+  .socialProof {
+    max-width: 100%;
+    padding: 11px 14px;
+    margin-bottom: 1.5rem;
+  }
+  .spNumber {
+    font-size: 1.4rem;
+  }
+  .spLabel {
+    font-size: 9.5px;
+  }
+  .spStat + .spStat {
+    padding-left: 14px;
+  }
+
+  .trustGrid {
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+  }
+  .subheadline {
+    margin-bottom: 1.75rem;
+  }
+
+  .ctaGroup {
+    gap: 10px;
+  }
+  .ctaPrimary,
+  .ctaWhatsapp {
+    flex: 1 1 0;
+    justify-content: center;
+    text-align: center;
+  }
+  .ctaSecondary {
+    flex: 1 1 100%;
+    justify-content: center;
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 4px 4px 2px;
+  }
+}
+
+@media (max-width: 600px) {
+  .heroContent {
+    padding: 3.75rem 1.25rem 1.25rem;
+  }
+  .headline {
+    font-size: 2.4rem;
+  }
+  .ctaGroup {
+    gap: 10px;
+  }
+  .ctaPrimary,
+  .ctaWhatsapp {
+    padding: 13px 16px;
+    font-size: 13.5px;
+  }
+}
+
+@media (max-width: 390px) {
+  .headline {
+    font-size: 2rem;
+  }
+}
+
+/* Tablet landscape */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .heroContent {
+    padding: 4rem 2.5rem 3rem 3rem;
+  }
+  .headline {
+    font-size: clamp(2.4rem, 3.5vw, 3.4rem);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .heroContent > *,
+  .gb,
+  .brandMarkDot {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

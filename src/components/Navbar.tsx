@@ -7,10 +7,12 @@ import { usePathname } from "next/navigation";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import { Search, X, Menu, ChevronDown } from "lucide-react";
 import { products } from "@/lib/products";
-import { getMegaMenuNavItem, getStandardNavLinks } from "@/lib/navigation";
+import { getMegaMenuNavItem } from "@/lib/navigation";
 import { ProjectCartButton } from "@/components/ProjectCart/ProjectCartButton";
 import { ProjectCartDrawer } from "@/components/ProjectCart/ProjectCartDrawer";
 import { useProjectCart, selectCartWorkflow } from "@/store/projectCart";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
+import { SearchModal } from "@/components/Search/SearchModal";
 
 /* ── Brand tokens ── */
 const INK         = "#221F1C";
@@ -25,7 +27,22 @@ const SERIF       = "'Playfair Display', 'Cormorant Garamond', Georgia, serif";
 
 const megaMenuNavItem =
   getMegaMenuNavItem() ?? { label: "Collections", href: "/collections", type: "mega-menu" as const };
-const navLinks = getStandardNavLinks();
+
+// ── Standard nav links ──────────────────────────────────────────────────────
+// Inspiration and About Us scroll to existing homepage sections.
+// They carry a `sectionId` instead of a hash href so useSectionScroll can
+// drive scrollIntoView reliably from any route — including when the URL
+// already contains the same hash (plain hash links do nothing in that case).
+const navLinks: Array<{
+  label: string;
+  href: string;
+  sectionId?: string;
+}> = [
+  { label: "Custom Design", href: "/custom-design" },
+  { label: "Inspiration",   href: "/", sectionId: "wall-transformations" },
+  { label: "About Us",      href: "/", sectionId: "faq" },
+  { label: "Contact",       href: "/contact" },
+];
 
 // ── Home nav item (placed before Collections) ──────────────────────────────
 const homeNavItem = { label: "Home", href: "/" };
@@ -73,8 +90,16 @@ export function Navbar() {
   const openCart  = () => setCartOpen(true);
   const closeCart = () => setCartOpen(false);
 
+  // ── Search modal state ───────────────────────────────────────────────────
+  const [searchOpen, setSearchOpen] = useState(false);
+  const openSearch  = () => setSearchOpen(true);
+  const closeSearch = () => setSearchOpen(false);
+
   // Task 5
   const handleReviewProject = useHandleReviewProject();
+
+  // ── Reliable section scrolling (Inspiration / About Us) ─────────────────
+  const scrollToSection = useSectionScroll();
 
   // ── Active link highlighting ────────────────────────────────────────────
   const pathname = usePathname();
@@ -315,39 +340,73 @@ export function Navbar() {
                 </li>
 
                 {navLinks.map((link) => (
-                  <li key={link.href} className="relative">
-                    <Link
-                      href={link.href}
-                      className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
-                      style={{
-                        color: activeLink === link.href || isActiveRoute(pathname, link.href) ? INK : INK_SOFT,
-                        transition: "color 0.15s",
-                        outlineColor: GOLD,
-                      }}
-                      onMouseEnter={() => setActiveLink(link.href)}
-                      onMouseLeave={() => setActiveLink(null)}
-                    >
-                      {link.label}
-                      <AnimatePresence>
-                        {(activeLink === link.href || isActiveRoute(pathname, link.href)) && (
-                          <motion.span
-                            className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
-                            style={{ background: GOLD }}
-                            initial={{ scaleX: 0, originX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            exit={{ scaleX: 0, originX: 1 }}
-                            transition={{ duration: 0.2, ease: "easeOut" }}
-                          />
-                        )}
-                      </AnimatePresence>
-                    </Link>
+                  <li key={link.href + (link.sectionId ?? "")} className="relative">
+                    {link.sectionId ? (
+                      // Section link — use a button so scrollToSection fires
+                      // every click, even when the URL hash hasn't changed.
+                      <button
+                        type="button"
+                        className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
+                        style={{
+                          color: activeLink === link.sectionId ? INK : INK_SOFT,
+                          transition: "color 0.15s",
+                          outlineColor: GOLD,
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => scrollToSection(link.sectionId!)}
+                        onMouseEnter={() => setActiveLink(link.sectionId!)}
+                        onMouseLeave={() => setActiveLink(null)}
+                      >
+                        {link.label}
+                        <AnimatePresence>
+                          {activeLink === link.sectionId && (
+                            <motion.span
+                              className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
+                              style={{ background: GOLD }}
+                              initial={{ scaleX: 0, originX: 0 }}
+                              animate={{ scaleX: 1 }}
+                              exit={{ scaleX: 0, originX: 1 }}
+                              transition={{ duration: 0.2, ease: "easeOut" }}
+                            />
+                          )}
+                        </AnimatePresence>
+                      </button>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="relative px-5 py-2 text-[14px] font-medium block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded-xl"
+                        style={{
+                          color: activeLink === link.href || isActiveRoute(pathname, link.href) ? INK : INK_SOFT,
+                          transition: "color 0.15s",
+                          outlineColor: GOLD,
+                        }}
+                        onMouseEnter={() => setActiveLink(link.href)}
+                        onMouseLeave={() => setActiveLink(null)}
+                      >
+                        {link.label}
+                        <AnimatePresence>
+                          {(activeLink === link.href || isActiveRoute(pathname, link.href)) && (
+                            <motion.span
+                              className="absolute bottom-0 left-5 right-5 h-[1.5px] rounded-full"
+                              style={{ background: GOLD }}
+                              initial={{ scaleX: 0, originX: 0 }}
+                              animate={{ scaleX: 1 }}
+                              exit={{ scaleX: 0, originX: 1 }}
+                              transition={{ duration: 0.2, ease: "easeOut" }}
+                            />
+                          )}
+                        </AnimatePresence>
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
 
               {/* ── Right Icon Group ── */}
               <div className="flex items-center gap-1.5 pr-0.5">
-                <CircleIconBtn aria-label="Search">
+                <CircleIconBtn aria-label="Search" onClick={openSearch}>
                   <Search size={16} />
                 </CircleIconBtn>
 
@@ -529,21 +588,34 @@ export function Navbar() {
 
                 {navLinks.map((link, i) => (
                   <motion.div
-                    key={link.href}
+                    key={link.href + (link.sectionId ?? "")}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: (i + 2) * 0.06 }}
                   >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMobileOpen(false)}
-                      className="flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
-                      style={{ color: isActiveRoute(pathname, link.href) ? GOLD_DARK : INK, fontFamily: SERIF }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      {link.label}
-                    </Link>
+                    {link.sectionId ? (
+                      <button
+                        type="button"
+                        className="w-full flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
+                        style={{ color: INK, fontFamily: SERIF, background: "none", border: "none", cursor: "pointer" }}
+                        onClick={() => { setMobileOpen(false); scrollToSection(link.sectionId!); }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center px-4 py-3 rounded-xl text-[15px] font-semibold transition-colors"
+                        style={{ color: isActiveRoute(pathname, link.href) ? GOLD_DARK : INK, fontFamily: SERIF }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
               </nav>
@@ -553,7 +625,7 @@ export function Navbar() {
                 className="flex items-center gap-3 px-6 py-4 border-t"
                 style={{ borderColor: BORDER_SOFT }}
               >
-                <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: INK_SOFT }}>
+                <button className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: INK_SOFT }} onClick={() => { setMobileOpen(false); openSearch(); }}>
                   <Search size={15} /> Search
                 </button>
                 {/* Task 3: live cart button in mobile bar */}
@@ -569,6 +641,9 @@ export function Navbar() {
 
       {/* ── Task 4: Project Cart Drawer ── */}
       <ProjectCartDrawer isOpen={cartOpen} onClose={closeCart} />
+
+      {/* ── Search Modal ── */}
+      <SearchModal isOpen={searchOpen} onClose={closeSearch} onOpen={openSearch} />
     </>
   );
 }
@@ -577,15 +652,18 @@ export function Navbar() {
 function CircleIconBtn({
   children,
   className = "",
+  onClick,
   "aria-label": ariaLabel,
 }: {
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
   "aria-label": string;
 }) {
   return (
     <motion.button
       aria-label={ariaLabel}
+      onClick={onClick}
       className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-colors ${className}`}
       style={{
         color: INK_SOFT,

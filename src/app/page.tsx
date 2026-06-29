@@ -3,7 +3,7 @@
  * /app/page.tsx  (Next.js App Router)
  *
  * Sections (in order):
- *  1. Hero                    → wonder_wallz_hero.html         (iframe embed)
+ *  1. Hero                    → components/Hero.tsx
  *  2. Wonder Wallz Trust       → WonderWallzTrust.jsx
  *  3. Shop by Product          → ShopByProduct.jsx
  *  4. Wall Transformations     → WallTransformations.jsx
@@ -16,10 +16,10 @@
  * Wallpapers, Blinds, Curtains, Flooring) continue to flow through
  * Collections → Quick View → Cart → WhatsApp, unaffected by this change.
  *
- * NOTE: The Hero section is HTML-only (animations, canvas, Swiper, custom
- * fonts) and is embedded via <iframe> with `scrolling="no"` and auto-resize
- * so it behaves like a native section. If you later convert it to React/JSX
- * you can drop the iframe and import it directly.
+ * NOTE: The Hero section is now a native React component (components/Hero.tsx).
+ * It was previously embedded via <iframe> from a standalone HTML file
+ * (/public/html/wonder_wallz_hero.html); that file and the IframeSection
+ * embed are no longer used here.
  *
  * Metadata follows Next.js 13+ App Router conventions.
  */
@@ -27,12 +27,15 @@
 import type { Metadata } from "next";
 
 // ── React component imports ──────────────────────────────────────────────────
+import Hero from "@/components/Hero";
 import ShopByProduct from "@/components/ShopByProduct";
 import FAQSection from "@/components/FAQSection";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
 import WallTransformations from "@/components/WallTransformations/WallTransformations";
 import SocialProof from "@/components/SocialProof/SocialProof";
-import IframeSection from "@/components/IframeSection";
+import { Suspense } from "react";
+import { SectionScrollHandler } from "@/components/SectionScrollHandler";
+
 
 
 // ── SEO Metadata ─────────────────────────────────────────────────────────────
@@ -136,6 +139,10 @@ const jsonLd = {
 export default function HomePage() {
   return (
     <>
+      {/* Reads ?scrollTo=<id> on mount and scrolls, then cleans the URL */}
+      <Suspense fallback={null}>
+        <SectionScrollHandler />
+      </Suspense>
       {/* JSON-LD structured data */}
       <script
         type="application/ld+json"
@@ -145,16 +152,9 @@ export default function HomePage() {
       <main id="main-content">
         {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
         {/*
-         * The hero is a feature-rich standalone HTML page (animations, canvas,
-         * Swiper, custom fonts). We embed it as a full-viewport iframe.
-         * Place wonder_wallz_hero.html inside /public/html/.
+         * Native React component — no longer an iframe embed.
          */}
-        <IframeSection
-          src="/html/wonder_wallz_hero.html"
-          title="Wonder Wallz hero — Transform your walls with premium wallpapers"
-          defaultHeight={820}
-          id="hero"
-        />
+        <Hero />
         {/* ──────── 2. WONDER WALLZ TRUST ─────────────────────────────── */}
        {/*
         * Premium trust-building section combining brand highlights,
@@ -199,7 +199,9 @@ export default function HomePage() {
          * - Drive visitors from inspiration to product collections
          * - Serve as a reusable portfolio component across the website
          */}
-        <WallTransformations />    
+        <section id="wall-transformations" className="scroll-mt-28">
+          <WallTransformations />   
+        </section>   
         {/* ──────── 5. SOCIAL PROOF ───────────────────────────────────────── */}
         {/*
          * Builds trust by combining authentic customer testimonials with
@@ -246,7 +248,9 @@ export default function HomePage() {
         * - Build confidence through transparency
         * - Guide visitors toward starting their project
         */}
+      <section id="faq" className="scroll-mt-28">
         <FAQSection />
+      </section>
       </main>
     </>
   );
