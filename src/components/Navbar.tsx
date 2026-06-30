@@ -47,6 +47,24 @@ const navLinks: Array<{
 // ── Home nav item (placed before Collections) ──────────────────────────────
 const homeNavItem = { label: "Home", href: "/" };
 
+// ── Shared brand logo mark ──────────────────────────────────────────────────
+// Single source of truth for the logo asset so desktop and mobile never drift
+// (mobile was previously pointing at a non-existent "/logo.png", which is why
+// it rendered as a broken image). Wrapper sizing/positioning stays with each
+// call site so layout/spacing is unaffected.
+function BrandLogoMark({ priority = false }: { priority?: boolean }) {
+  return (
+    <Image
+      src="/logo.jpeg"
+      alt="Wonder Wallz Logo"
+      sizes="128px"
+      fill
+      className="object-contain"
+      priority={priority}
+    />
+  );
+}
+
 // ── Active-route detection (usePathname) ────────────────────────────────────
 // "/" matches only the exact home route. Every other href matches itself or
 // any nested path beneath it (e.g. "/collections" also matches "/collections/foo").
@@ -200,14 +218,7 @@ export function Navbar() {
                     className="relative w-8 h-8 shrink-0"
                     style={{ filter: "drop-shadow(0 1px 2px rgba(122,94,48,0.20))" }}
                   >
-                    <Image
-                      src="/logo.jpeg"
-                      alt="Wonder Wallz Logo"
-                      sizes="128px"
-                      fill
-                      className="object-contain"
-                      priority
-                    />
+                    <BrandLogoMark priority />
                   </div>
                   <span
                     className="text-[14px] uppercase whitespace-nowrap"
@@ -495,7 +506,7 @@ export function Navbar() {
                   }}
                 >
                   <div className="relative w-7 h-7">
-                    <Image src="/logo.png" alt="Wonder Wallz" fill className="object-contain" />
+                    <BrandLogoMark />
                   </div>
                   <span
                     className="text-[12.5px] uppercase whitespace-nowrap"

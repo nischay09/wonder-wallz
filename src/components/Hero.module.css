@@ -624,15 +624,6 @@
   .spStat + .spStat {
     border-left-color: rgba(232, 201, 122, 0.25);
   }
-  .ctaSecondary {
-    color: rgba(255, 255, 255, 0.85);
-    border-bottom-color: rgba(255, 255, 255, 0.45);
-  }
-  .ctaSecondary:hover {
-    color: #fff;
-    border-color: #fff;
-  }
-
   .gb {
     display: none;
   }
@@ -676,8 +667,22 @@
     flex: 1 1 100%;
     justify-content: center;
     text-align: center;
-    margin-top: 1.5rem;
-    padding: 4px 4px 2px;
+    margin-top: 0.75rem;
+    padding: 14px 24px;
+    min-height: 48px;
+    background: rgba(248, 244, 238, 0.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(232, 201, 122, 0.55);
+    border-radius: 14px;
+    color: #fff;
+    font-weight: 600;
+    transition: background 0.2s, border-color 0.2s, transform 0.18s;
+  }
+  .ctaSecondary:active {
+    background: rgba(248, 244, 238, 0.24);
+    border-color: rgba(232, 201, 122, 0.85);
+    transform: translateY(1px) scale(0.99);
   }
 }
 
