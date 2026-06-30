@@ -2,7 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { FC } from "react";
+import { products } from "@/lib/products";
+import { useSectionScroll } from "@/hooks/useSectionScroll";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -60,38 +63,44 @@ const FooterLink: FC<{
   href: string;
   children: React.ReactNode;
   external?: boolean;
-}> = ({ href, children, external }) => (
-  <Link
-    href={href}
-    target={external ? "_blank" : undefined}
-    rel={external ? "noopener noreferrer" : undefined}
-    className="group flex items-center gap-1.5 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200"
-  >
-    <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 rounded-full" />
-    {children}
-  </Link>
-);
+  onClick?: () => void;
+}> = ({ href, children, external, onClick }) =>
+  onClick ? (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex items-center gap-1.5 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200 text-left"
+    >
+      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 rounded-full" />
+      {children}
+    </button>
+  ) : (
+    <Link
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      className="group flex items-center gap-1.5 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200"
+    >
+      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 rounded-full" />
+      {children}
+    </Link>
+  );
 
-// ─── Wonder Wallz Logo SVG ────────────────────────────────────────────────────
+// ─── Wonder Wallz Logo ────────────────────────────────────────────────────────
+// Reuses the same /logo.jpeg asset as the Navbar's BrandLogoMark so there is
+// only one logo asset/implementation across the site.
 
 const WonderWallzLogo: FC<{ className?: string }> = ({ className }) => (
   <div className={`flex items-center gap-3 ${className}`}>
-    {/* Inline logo mark – a simplified "WW" monogram matching brand colours */}
-    <svg
-      width="40"
-      height="32"
-      viewBox="0 0 40 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      {/* Teal W-left */}
-      <path d="M0 2 L5 26 L10 12 L15 26 L20 2" stroke="#2DD4BF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      {/* Purple W-right */}
-      <path d="M14 2 L19 26 L24 12 L29 26 L34 2" stroke="#8B5CF6" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-      {/* Orange ribbon accent */}
-      <path d="M10 14 Q20 6 30 14" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-    </svg>
+    <div className="relative w-10 h-10 shrink-0">
+      <Image
+        src="/logo.jpeg"
+        alt="Wonder Wallz Logo"
+        sizes="128px"
+        fill
+        className="object-contain"
+      />
+    </div>
     <div>
       <span className="text-xl font-bold tracking-tight text-white leading-none">
         Wonder
@@ -101,7 +110,7 @@ const WonderWallzLogo: FC<{ className?: string }> = ({ className }) => (
   </div>
 );
 
-// ─── Social Icons ─────────────────────────────────────────────────────────────
+// ─── Icons ─────────────────────────────────────────────────────────────────────
 
 const PhoneIcon = () => (
   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -127,54 +136,72 @@ const InstagramIcon = () => (
   </svg>
 );
 
+const MapPinIcon = () => (
+  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+  </svg>
+);
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
+// Product links are sourced directly from the project's single source of
+// truth (src/lib/products.ts) instead of being hardcoded here, so the
+// footer always stays in sync with the Navbar's "Collections" menu.
 
-const products = [
-  { label: "Wallpapers", href: "/products/wallpapers" },
-  { label: "Blinds", href: "/products/blinds" },
-  { label: "Curtains", href: "/products/curtains" },
-  { label: "Flooring", href: "/products/flooring" },
-  { label: "Glass Films", href: "/products/glass-films" },
-  { label: "Canvas Prints", href: "/products/canvas-prints" },
-];
-
-const company = [
+// "Company" links: Home, Collections, Custom Design, About Us, Contact, FAQ.
+// "Collections" reuses the same megamenu href the Navbar points to.
+// "About Us" reuses the Navbar's homepage-section scroll behaviour
+// (sectionId "faq" — same section the Navbar's "About Us" link scrolls to).
+// "FAQ" is kept as a direct link to that same homepage section for users
+// who land on it from elsewhere; it scrolls just like "About Us" does.
+const company: Array<{ label: string; href: string; sectionId?: string }> = [
+  { label: "Home", href: "/" },
+  { label: "Collections", href: "/collections" },
   { label: "Custom Design", href: "/custom-design" },
-  { label: "About", href: "/about" },
-  { label: "Store Locations", href: "/locations" },
-  { label: "FAQ", href: "/faq" },
+  { label: "About Us", href: "/", sectionId: "faq" },
   { label: "Contact", href: "/contact" },
+  { label: "FAQ", href: "/", sectionId: "faq" },
 ];
 
-const support = [
-  { label: "Custom Orders", href: "/support/custom-orders" },
-  { label: "Installation", href: "/support/installation" },
-  { label: "Delivery", href: "/support/delivery" },
-  { label: "After Sales Support", href: "/support/after-sales" },
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms", href: "/terms" },
+const legal = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms & Conditions", href: "/terms-and-conditions" },
+  { label: "Shipping Policy", href: "/shipping-policy" },
+  { label: "Refund & Return Policy", href: "/refund-policy" },
 ];
 
+// Real Wonder Wallz showroom addresses, mapped to the two customer
+// journeys defined in src/lib/collections.ts (custom vs. standard).
 const stores = [
   {
-    name: "Wonder Wallz – Chandni Chowk",
-    detail: "Custom Wallpapers, Glass Films, Canvas Prints & Design Consultation",
-    mapHref: "https://maps.google.com/?q=Wonder+Wallz+Chandni+Chowk",
+    name: "Wonder Wallz – Custom Design Showroom",
+    detail: "Wallpapers, Wall Murals, Custom Glass Films & Canvas Prints",
+    address: "157C, Lenin Sarani Rd, near Jyoti Cinema, Esplanade, Chandni Chawk, Bowbazar, Kolkata, West Bengal 700013",
+    mapHref: "https://maps.google.com/?q=157C+Lenin+Sarani+Rd+Jyoti+Cinema+Esplanade+Chandni+Chawk+Bowbazar+Kolkata+West+Bengal+700013",
   },
   {
-    name: "Wonder Wallz – Merlin Homeland Mall",
-    detail: "Blinds, Curtains, Flooring, Readymade Wallpapers & Home Interior Products",
-    subDetail: "2nd Floor",
-    mapHref: "https://maps.google.com/?q=Wonder+Wallz+Merlin+Homeland+Mall",
+    name: "Wonder Wallz – Interior Products Showroom",
+    detail: "Blinds, Curtains, Upholstery, Flooring & Readymade Wallpapers",
+    address: "Merlin Homeland, 18B Ashutosh Mukherjee Road, Bhowanipore, Kolkata, West Bengal 700025",
+    mapHref: "https://maps.google.com/?q=Merlin+Homeland+18B+Ashutosh+Mukherjee+Road+Bhowanipore+Kolkata+West+Bengal+700025",
   },
 ];
 
-const socialLinks = [
+// Real Wonder Wallz contact details. Email is left as a placeholder until
+// the final address is available, per project instructions. Instagram is
+// left as a placeholder until the final profile is available.
+const contactLinks = [
   {
-    label: "Phone",
-    href: "tel:+919876543210",
+    label: "Custom Projects",
+    href: "tel:+919883100377",
     icon: <PhoneIcon />,
-    display: "+91 98765 43210",
+    display: "Custom Projects · 98831 00377",
+  },
+  {
+    label: "Interior Products",
+    href: "tel:+919830173898",
+    icon: <PhoneIcon />,
+    display: "Interior Products · 98301 73898",
   },
   {
     label: "Email",
@@ -184,7 +211,7 @@ const socialLinks = [
   },
   {
     label: "WhatsApp",
-    href: "https://wa.me/919876543210",
+    href: "https://wa.me/919883100377",
     icon: <WhatsAppIcon />,
     display: "Chat with us",
     external: true,
@@ -207,6 +234,10 @@ const trustPillars = [
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export const Footer: FC<FooterProps> = ({ className = "" }) => {
+  // Reuses the exact same homepage-section scroll helper the Navbar uses
+  // for "Inspiration" / "About Us", instead of a duplicate implementation.
+  const scrollToSection = useSectionScroll();
+
   return (
     <footer
       className={`relative bg-[#111009] text-white overflow-hidden ${className}`}
@@ -260,8 +291,8 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
             <FooterHeading>Products</FooterHeading>
             <nav aria-label="Product links" className="flex flex-col gap-2.5">
               {products.map((item) => (
-                <FooterLink key={item.label} href={item.href}>
-                  {item.label}
+                <FooterLink key={item.id} href={item.href}>
+                  {item.title}
                 </FooterLink>
               ))}
             </nav>
@@ -272,16 +303,24 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
             <FooterHeading>Company</FooterHeading>
             <nav aria-label="Company links" className="flex flex-col gap-2.5">
               {company.map((item) => (
-                <FooterLink key={item.label} href={item.href}>
+                <FooterLink
+                  key={item.label}
+                  href={item.href}
+                  onClick={
+                    item.sectionId
+                      ? () => scrollToSection(item.sectionId!)
+                      : undefined
+                  }
+                >
                   {item.label}
                 </FooterLink>
               ))}
             </nav>
 
             <div className="mt-8">
-              <FooterHeading>Support</FooterHeading>
-              <nav aria-label="Support links" className="flex flex-col gap-2.5">
-                {support.map((item) => (
+              <FooterHeading>Legal</FooterHeading>
+              <nav aria-label="Legal links" className="flex flex-col gap-2.5">
+                {legal.map((item) => (
                   <FooterLink key={item.label} href={item.href}>
                     {item.label}
                   </FooterLink>
@@ -304,20 +343,15 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
                 >
                   <p className="text-sm font-medium text-stone-200 group-hover:text-amber-300 transition-colors duration-200 mb-1 leading-snug">
                     {store.name}
-                    {store.subDetail && (
-                      <span className="ml-1 text-xs text-stone-500">
-                        ({store.subDetail})
-                      </span>
-                    )}
                   </p>
                   <p className="text-xs text-stone-500 leading-relaxed group-hover:text-stone-400 transition-colors duration-200">
                     {store.detail}
                   </p>
+                  <p className="text-xs text-stone-600 leading-relaxed mt-1">
+                    {store.address}
+                  </p>
                   <span className="inline-flex items-center gap-1 text-xs text-amber-500/70 group-hover:text-amber-400 mt-1.5 transition-colors duration-200">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
+                    <MapPinIcon />
                     Get directions
                   </span>
                 </a>
@@ -326,7 +360,7 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
 
             <FooterHeading>Contact</FooterHeading>
             <div className="flex flex-col gap-3">
-              {socialLinks.map((item) => (
+              {contactLinks.map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
