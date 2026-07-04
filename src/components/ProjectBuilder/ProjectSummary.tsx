@@ -11,7 +11,8 @@
 
 import { motion } from 'framer-motion';
 import { Layers } from 'lucide-react';
-import type { ProjectRequest } from './types';
+import type { ProjectRequest } from '../../lib/types';
+import { getProductionTime } from '../../lib/materials';
 
 interface ProjectSummaryProps {
   requests: ProjectRequest[];
@@ -72,16 +73,19 @@ export default function ProjectSummary({ requests }: ProjectSummaryProps) {
         <SummaryStat
           label="Wallpapers"
           value={wallpapers === 0 ? '—' : wallpapers}
+          note={wallpapers > 0 ? getProductionTime('Wallpaper') : undefined}
           highlight
         />
         <SummaryStat
           label="Glass Films"
           value={glassFilms === 0 ? '—' : glassFilms}
+          note={glassFilms > 0 ? getProductionTime('Custom Glass Film') : undefined}
           highlight
         />
         <SummaryStat
           label="Canvas Prints"
           value={canvasPrints === 0 ? '—' : canvasPrints}
+          note={canvasPrints > 0 ? getProductionTime('Canvas Print') : undefined}
           highlight
         />
       </div>

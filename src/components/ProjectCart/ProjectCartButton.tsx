@@ -7,7 +7,7 @@
  * Calls onOpen to open ProjectCartDrawer — no local state needed.
  */
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useProjectCart, selectItemCount } from "@/store/projectCart";
 
@@ -20,9 +20,10 @@ interface ProjectCartButtonProps {
 export function ProjectCartButton({ onOpen, variant = "icon" }: ProjectCartButtonProps) {
   const storeCount = useProjectCart(selectItemCount);
 
-  // Start at 0 to match SSR output, then sync after hydration.
-  // Prevents the aria-label mismatch that causes a hydration error
-  // when Zustand rehydrates a non-zero count from localStorage.
+  // Defer to client only — avoids SSR/client hydration mismatch
+  // from Zustand's localStorage persistence. Render 0 on the server
+  // and on first client paint, then sync to the real store value
+  // once mounted.
   const [count, setCount] = useState(0);
   useEffect(() => {
     setCount(storeCount);

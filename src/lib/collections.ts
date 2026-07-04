@@ -41,13 +41,75 @@ export interface CollectionProduct {
   name: string;
   /** Short one-liner shown on the card */
   description: string;
-  /** Relative image path from /public */
+  /** Relative image path from /public — used in gallery/grid thumbnails */
   image: string;
+  /**
+   * Optional higher-resolution image path, loaded only inside Quick View.
+   * Falls back to `image` when not provided.
+   */
+  highResImage?: string;
+  /**
+   * Optional gallery of additional catalogue images (e.g. alternate crops,
+   * detail shots). When present, Quick View shows prev/next navigation and
+   * thumbnails; falls back to a single-image view otherwise.
+   */
+  images?: string[];
   /** Gradient fallback when image is unavailable [from, to] */
   placeholderGradient: [string, string];
   /** Subcategory slug this product belongs to (optional) */
   subcategory?: string;
+  /**
+   * Exact customer-facing collection name, e.g. "Wonder Collection" or
+   * "Kids Collection". Takes precedence over deriving a label from
+   * `subcategory` (which is a routing slug and may not match 1:1).
+   * Used for wallpaper designs, where there is no unique per-design name —
+   * customers see "{collectionLabel} / Design {designNumber}" only.
+   */
+  collectionLabel?: string;
+  /** For wallpaper designs: the design/image number within its collection folder. */
+  designNumber?: number;
 }
+
+// ─── Wallpaper materials ────────────────────────────────────────────────────
+//
+// Single source of truth for the actual Wonder Wallz wallpaper materials.
+// Use this list everywhere a material/type needs to be shown or selected
+// (Quick View, filters, etc). Do not hardcode material names elsewhere.
+
+export type WallpaperMaterial =
+  | "Non-Woven"
+  | "Textured"
+  | "Golden Paper"
+  | "Vinyl Matte"
+  | "Vinyl Glossy";
+
+export interface WallpaperMaterialInfo {
+  name: WallpaperMaterial;
+  description: string;
+}
+
+export const WALLPAPER_MATERIALS: WallpaperMaterialInfo[] = [
+  {
+    name: "Non-Woven",
+    description: "Premium tear-resistant wallpaper suitable for most residential interiors.",
+  },
+  {
+    name: "Textured",
+    description: "Embossed finish that adds depth and helps hide minor wall imperfections.",
+  },
+  {
+    name: "Golden Paper",
+    description: "Luxury metallic finish for premium feature walls and statement interiors.",
+  },
+  {
+    name: "Vinyl Matte",
+    description: "Durable washable wallpaper with a soft non-reflective finish.",
+  },
+  {
+    name: "Vinyl Glossy",
+    description: "Smooth glossy finish with vibrant colours and easy maintenance.",
+  },
+];
 
 export interface Collection {
   /** Stable unique id, e.g. "wallpapers" */
@@ -129,7 +191,143 @@ function seedProducts(
   }));
 }
 
-// ─── Collections ──────────────────────────────────────────────────────────────
+/**
+ * Single source of truth for every wallpaper collection folder under /public.
+ *
+ * The wallpaper catalogue has no unique names for individual designs — each
+ * image is just numbered within its folder (e.g. `/Wonder/15.webp`), and
+ * folders don't necessarily start at 1 or have contiguous ranges without
+ * gaps assumed — `start`/`end` describe exactly which numbered files exist.
+ * The full per-design product list is generated automatically from this
+ * config below — nothing about the ranges is hardcoded anywhere else.
+ *
+ * IMPORTANT: `start`/`end` must match the actual lowest/highest numbered
+ * file in `folder`. Update this config whenever images are added/removed —
+ * the folder itself remains the single source of truth for what exists;
+ * this array is just its description.
+ * (If this project later adds a build step that scans /public directly,
+ * `start`/`end` can be derived via `fs.readdirSync` instead of set by hand —
+ * the shape of the generated products stays identical either way.)
+ */
+interface WallpaperCollectionConfig {
+  /** URL-safe slug — doubles as the id prefix ("wonder" → "wonder-15") and the subcategory filter slug. */
+  slug: string;
+  /** Exact customer-facing collection name, e.g. "Wonder Collection". */
+  title: string;
+  /** Public folder name under /public (exact casing/spacing as on disk), e.g. "Wonder". */
+  folder: string;
+  /** Lowest numbered file in this folder. */
+  start: number;
+  /** Highest numbered file in this folder. */
+  end: number;
+  /** File extension used in this folder (defaults to "webp"). */
+  extension?: string;
+  /** Card gradient fallback (defaults to the shared wallpaper gradient). */
+  gradient?: [string, string];
+  /**
+   * Design numbers to skip within [start, end] — e.g. files that exist in
+   * the folder but shouldn't appear in the catalogue (test images, misfires,
+   * duplicates, etc). Numbers outside the start/end range are ignored.
+   */
+  exclude?: number[];
+}
+
+const DEFAULT_WALLPAPER_GRADIENT: [string, string] = ["#F3E8D5", "#D6C4AE"];
+
+const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
+  {
+    slug: "wonder-collection",
+    title: "Wonder Collection",
+    folder: "Wonder",
+    start: 9,
+    end: 117,
+    // Example: skip specific files that exist on disk but shouldn't show up
+    // in the catalogue (e.g. a test upload or a duplicate). Remove/edit as
+    // needed — leave as `[]` or omit entirely if nothing needs skipping.
+    exclude: [],
+  },
+  {
+    slug: "religion",
+    title: "Religion",
+    folder: "Religion",
+    start: 1,
+    end: 60,
+    gradient: ["#F0E4D0", "#C9A876"],
+  },
+  {
+    slug: "kids",
+    title: "Kids Collection",
+    folder: "KIDS Collection",
+    start: 1,
+    end: 40,
+    gradient: ["#E6F0F5", "#B8D4E3"],
+  },
+  {
+    slug: "art",
+    title: "Art Collection",
+    folder: "art",
+    start: 1,
+    end: 40,
+    gradient: ["#EFE3E8", "#C9A9B8"],
+  },
+  {
+    slug: "wall-murals",
+    title: "Wall Murals",
+    folder: "Wall mural",
+    start: 1,
+    end: 100,
+  },
+  {
+    slug: "3d-wall-murals",
+    title: "3D Wall Murals",
+    folder: "3D wall mural",
+    start: 1,
+    end: 40,
+    gradient: ["#E4E9EE", "#B3C0CC"],
+  },
+  {
+    slug: "amazing-wall",
+    title: "Amazing Wall",
+    folder: "Amazing Wall",
+    start: 1,
+    end: 40,
+  },
+];
+
+/**
+ * Generates one CollectionProduct per design (start..end inclusive) for
+ * every configured wallpaper folder. No design names are invented —
+ * customers only ever see "{title}" + "Design {n}"; the id (e.g.
+ * "wonder-15") is for routing/architecture only.
+ */
+function generateWallpaperDesigns(configs: WallpaperCollectionConfig[]): CollectionProduct[] {
+  return configs.flatMap((cfg) => {
+    const ext = cfg.extension ?? "webp";
+    const gradient = cfg.gradient ?? DEFAULT_WALLPAPER_GRADIENT;
+    const excluded = new Set(cfg.exclude ?? []);
+    const designCount = cfg.end - cfg.start + 1;
+
+    return Array.from({ length: designCount }, (_, i) => cfg.start + i)
+      .filter((designNumber) => !excluded.has(designNumber))
+      .map((designNumber) => {
+        const imagePath = `/${cfg.folder}/${designNumber}.${ext}`;
+        const product: CollectionProduct = {
+          id: `${cfg.slug}-${designNumber}`,
+          name: `Design ${designNumber}`,
+          description: `${cfg.title} design, custom-printed to your exact wall size.`,
+          image: imagePath,
+          highResImage: imagePath,
+          placeholderGradient: gradient,
+          subcategory: cfg.slug,
+          collectionLabel: cfg.title,
+          designNumber,
+        };
+        return product;
+      });
+  });
+}
+
+
 
 export const collections: Collection[] = [
   // ── WALLPAPERS ─────────────────────────────────────────────────────────────
@@ -150,30 +348,13 @@ export const collections: Collection[] = [
     subcategories: [
       sub("wallpapers", "wonder-collection", "Wonder Collection"),
       sub("wallpapers", "religion", "Religion"),
-      sub("wallpapers", "art", "Art"),
-      sub("wallpapers", "kids", "Kids"),
+      sub("wallpapers", "art", "Art Collection"),
+      sub("wallpapers", "kids", "Kids Collection"),
       sub("wallpapers", "wall-murals", "Wall Murals"),
       sub("wallpapers", "3d-wall-murals", "3D Wall Murals"),
+      sub("wallpapers", "amazing-wall", "Amazing Wall"),
     ],
-    products: seedProducts(
-      "wallpapers",
-      [
-        { name: "Golden Mandala Mural", description: "Intricate hand-drawn mandala in warm gold tones", subcategory: "religion" },
-        { name: "Tokyo Skyline Panorama", description: "Dramatic cityscape stretching full wall width", subcategory: "wall-murals" },
-        { name: "Enchanted Forest", description: "Illustrated woodland with soft watercolour depth", subcategory: "kids" },
-        { name: "Abstract Brushstrokes", description: "Bold contemporary art in ochre and indigo", subcategory: "art" },
-        { name: "Geometric 3D Prisms", description: "Optical depth illusion in cool silver tones", subcategory: "3d-wall-murals" },
-        { name: "Wonder Blossoms", description: "Signature floral print from the Wonder Collection", subcategory: "wonder-collection" },
-        { name: "Sacred Geometry", description: "Precision line-work in antique gold", subcategory: "religion" },
-        { name: "Tropical Canopy", description: "Lush palm leaves in deep botanical greens", subcategory: "wall-murals" },
-        { name: "Galaxy Dreamscape", description: "Nebula-inspired cosmos for bedroom ceilings", subcategory: "kids" },
-        { name: "Marble Texture Panel", description: "Photorealistic Calacatta marble in full detail", subcategory: "art" },
-        { name: "Arch Illusion", description: "Classic architectural trompe-l'œil in soft stone", subcategory: "3d-wall-murals" },
-        { name: "Autumn Foliage", description: "Rich rust and amber leaves, lifelike scale", subcategory: "wonder-collection" },
-      ],
-      "/Wonder/10.webp",
-      ["#F3E8D5", "#D6C4AE"]
-    ),
+    products: generateWallpaperDesigns(WALLPAPER_COLLECTIONS),
   },
 
   // ── BLINDS ─────────────────────────────────────────────────────────────────

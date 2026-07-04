@@ -1,35 +1,47 @@
 'use client';
 
 /**
- * ProjectBuilder — Iteration 2
+ * ProjectBuilder — Iteration 3
  * Wonder Wallz premium project builder.
- * Full state management, image upload/preview, and live project summary.
+ * Full state management, image upload/preview, live project summary,
+ * and email submission via the reusable emailService.
  *
  * Component tree:
- *   ProjectBuilder          ← state owner, section shell, layout
- *     ProjectRequestCard    ← one design request (product, images, dims, notes)
+ *   ProjectBuilder          ← state owner, section shell, layout, submission
+ *     CustomerDetailsForm   ← name / phone / email / city
+ *     ProjectRequestCard    ← one design request (product, material, images, dims, notes)
  *       ImageUploader       ← multi-image upload + preview + removal
  *     ProjectSummary        ← live breakdown by product type
  */
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, CheckCircle2, AlertCircle, Loader2, MessageCircle } from 'lucide-react';
 import ProjectRequestCard from './ProjectRequestCard';
 import ProjectSummary from './ProjectSummary';
-import ImageUploader from "./ImageUploader";
+import CustomerDetailsForm from './CustomerDetailsForm';
 import {
   makeRequest,
   cloneRequest,
-  PRODUCTS,
-  UNITS,
+  makeCustomerDetails,
+  validateCustomerDetails,
   type ProjectRequest,
-} from "./types";
+  type CustomerDetails,
+  type CustomerDetailsErrors,
+} from '../../lib/types';
+import { sendProjectEnquiry, getWhatsAppFallbackUrl } from '../../lib/emailService';
+import { buildProjectEnquiryPayload } from '../../lib/projectEnquiryMapper';
+
+type SubmissionStatus = 'idle' | 'sending' | 'success' | 'error';
 
 export default function ProjectBuilder() {
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [requests, setRequests] = useState<ProjectRequest[]>([]);
+  const [customer, setCustomer] = useState<CustomerDetails>(makeCustomerDetails());
+  const [customerErrors, setCustomerErrors] = useState<CustomerDetailsErrors>({});
+  const [status, setStatus] = useState<SubmissionStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     setRequests([makeRequest()]);
@@ -64,6 +76,38 @@ export default function ProjectBuilder() {
   /** Append a blank request at the end. */
   function addRequest() {
     setRequests((prev) => [...prev, makeRequest()]);
+  }
+
+  function updateCustomer(patch: Partial<CustomerDetails>) {
+    setCustomer((prev) => ({ ...prev, ...patch }));
+  }
+
+  /** Validate, send via the email service, and only reset the form on success. */
+  async function handleSubmit() {
+    // Guard against duplicate submissions (e.g. rapid double-clicks) —
+    // the button is also disabled while sending, but this makes the
+    // protection explicit regardless of click timing.
+    if (status === 'sending') return;
+
+    const { valid, errors } = validateCustomerDetails(customer);
+    setCustomerErrors(errors);
+    if (!valid) return;
+
+    setStatus('sending');
+    setErrorMessage('');
+
+    const payload = buildProjectEnquiryPayload(customer, requests);
+    const result = await sendProjectEnquiry(payload);
+
+    if (result.success) {
+      setStatus('success');
+      setRequests([makeRequest()]);
+      setCustomer(makeCustomerDetails());
+      setCustomerErrors({});
+    } else {
+      setStatus('error');
+      setErrorMessage(result.error ?? 'Something went wrong while sending your enquiry.');
+    }
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -105,6 +149,13 @@ export default function ProjectBuilder() {
           </p>
         </motion.div>
 
+        {/* ── Customer details ───────────────────────────────────────────────── */}
+        <CustomerDetailsForm
+          customer={customer}
+          errors={customerErrors}
+          onUpdate={updateCustomer}
+        />
+
         {/* ── Request cards ──────────────────────────────────────────────────── */}
         <div className="space-y-5">
           <AnimatePresence mode="popLayout" initial={false}>
@@ -139,6 +190,76 @@ export default function ProjectBuilder() {
         {/* ── Project summary ────────────────────────────────────────────────── */}
         <div className="mt-8">
           <ProjectSummary requests={requests} />
+        </div>
+
+        {/* ── Submission ──────────────────────────────────────────────────────── */}
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={status === 'sending'}
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#C9A227] to-[#8A6D2E] py-4 text-sm font-semibold text-white shadow-[0_4px_20px_-4px_rgba(138,109,46,0.5)] transition-all duration-200 hover:shadow-[0_6px_24px_-4px_rgba(138,109,46,0.6)] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {status === 'sending' && <Loader2 className="h-4 w-4 animate-spin" />}
+            {status === 'sending' ? 'Sending Request...' : 'Submit Custom Design Request'}
+          </button>
+
+          {status === 'success' && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-4 text-sm text-green-800"
+            >
+              <div className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <div className="space-y-1">
+                  <p className="font-semibold">Project Request Submitted</p>
+                  <p>Thank you for choosing Wonder Wallz.</p>
+                  <p>
+                    Our team will review your project and contact you shortly with a detailed
+                    quotation.
+                  </p>
+                  <p>
+                    If your project is urgent, you can also reach us directly on WhatsApp.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={getWhatsAppFallbackUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-green-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-green-700"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                Chat on WhatsApp
+              </a>
+            </motion.div>
+          )}
+
+          {status === 'error' && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm text-red-800"
+            >
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                <span>
+                  We couldn't send your enquiry right now. Please try again in a moment, or reach
+                  us directly on WhatsApp and we'll take it from there.
+                </span>
+              </div>
+              <a
+                href={getWhatsAppFallbackUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-green-600 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-green-700"
+              >
+                <MessageCircle className="h-3.5 w-3.5" />
+                Continue on WhatsApp
+              </a>
+            </motion.div>
+          )}
         </div>
       </div>
     </section>

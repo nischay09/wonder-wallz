@@ -3,11 +3,12 @@
 /**
  * ProjectRequestCard
  * One design request within the project builder.
- * Handles product selection, image upload/preview, dimensions, and notes.
+ * Handles product selection, material selection, image upload/preview,
+ * dimensions, live estimate, and notes.
  */
 
 import { motion } from 'framer-motion';
-import { Copy, Trash2 } from 'lucide-react';
+import { Copy, Trash2, Info } from 'lucide-react';
 import ImageUploader from './ImageUploader';
 import {
   PRODUCTS,
@@ -17,7 +18,23 @@ import {
   type ProjectRequest,
   type Product,
   type Unit,
-} from './types';
+} from '../../lib/types';
+import {
+  getMaterialsForProduct,
+  getMaterialById,
+  getDefaultMaterial,
+  CANVAS_FRAME_NOTE,
+  ESTIMATE_DISCLAIMER,
+  getMinBillableAreaNote,
+} from '../../lib/materials';
+import {
+  toSquareFeet,
+  calculateBillableArea,
+  isMinBillableAreaApplied,
+  calculateEstimatedTotal,
+  formatArea,
+  formatCurrency,
+} from '../../lib/estimator';
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
 
@@ -88,6 +105,89 @@ function ProductSelector({
   );
 }
 
+function MaterialSelector({
+  product,
+  value,
+  onChange,
+}: {
+  product: Product;
+  value: string;
+  onChange: (materialId: string) => void;
+}) {
+  const materials = getMaterialsForProduct(product);
+  const selected = getMaterialById(product, value) ?? materials[0];
+
+  return (
+    <div>
+      <div role="group" aria-label="Material" className="flex flex-wrap gap-2">
+        {materials.map((m) => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => onChange(m.id)}
+            className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
+              selected?.id === m.id
+                ? 'border-[#C9A227] bg-[#FBF3DF] text-[#7A5C1E] shadow-sm'
+                : 'border-[#E7DEC8] bg-white text-[#6E6457] hover:border-[#D9C28A] hover:bg-[#FDFAF3]'
+            }`}
+          >
+            {m.name}
+          </button>
+        ))}
+      </div>
+      {selected && (
+        <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-[#8A8070]">
+          <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+          {selected.description}
+        </p>
+      )}
+      {product === 'Canvas Print' && (
+        <p className="mt-1.5 text-xs font-medium text-[#8A6D2E]">{CANVAS_FRAME_NOTE}</p>
+      )}
+    </div>
+  );
+}
+
+function EstimatorStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[10px] font-semibold uppercase tracking-widest text-[#8A6D2E]">
+        {label}
+      </span>
+      <span className="text-sm font-bold leading-tight text-[#2B2620]">{value}</span>
+    </div>
+  );
+}
+
+function EstimatorCard({ request }: { request: ProjectRequest }) {
+  const material = getMaterialById(request.product, request.materialId) ?? getDefaultMaterial(request.product);
+  const coverageAreaSqFt = toSquareFeet(parseFloat(request.width), parseFloat(request.height), request.unit);
+  const billableAreaSqFt = calculateBillableArea(coverageAreaSqFt, request.product);
+  const estimatedTotal = calculateEstimatedTotal(billableAreaSqFt, material);
+  const minAreaApplied = isMinBillableAreaApplied(coverageAreaSqFt, request.product);
+
+  return (
+    <div className="rounded-2xl border border-[#E7DEC8] bg-[#FAF7EF] px-5 py-4">
+      {/* Display only Coverage Area + Estimated Total — no rate, no formula. */}
+      <div className="grid grid-cols-2 gap-4">
+        <EstimatorStat label="Coverage Area" value={formatArea(coverageAreaSqFt)} />
+        <EstimatorStat label="Estimated Total" value={formatCurrency(estimatedTotal)} />
+      </div>
+
+      {minAreaApplied && (
+        <p className="mt-3 flex items-start gap-1.5 border-t border-[#EDE3CB] pt-3 text-[11px] leading-relaxed text-[#8A6D2E]">
+          <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+          {getMinBillableAreaNote(request.product)}
+        </p>
+      )}
+
+      <p className={`text-[11px] leading-relaxed text-[#A89F8C] ${minAreaApplied ? 'mt-2' : 'mt-3 border-t border-[#EDE3CB] pt-3'}`}>
+        {ESTIMATE_DISCLAIMER}
+      </p>
+    </div>
+  );
+}
+
 // ─── Card ─────────────────────────────────────────────────────────────────────
 
 interface ProjectRequestCardProps {
@@ -108,6 +208,12 @@ export default function ProjectRequestCard({
   onRemove,
 }: ProjectRequestCardProps) {
   const cardId = `card-${request.id}`;
+
+  /** Changing product resets the material to that product's default. */
+  function handleProductChange(p: Product) {
+    const defaultMaterial = getDefaultMaterial(p);
+    onUpdate({ product: p, materialId: defaultMaterial?.id ?? '' });
+  }
 
   return (
     <motion.article
@@ -154,9 +260,16 @@ export default function ProjectRequestCard({
         {/* Product type */}
         <div>
           <FieldLabel>Product</FieldLabel>
-          <ProductSelector
-            value={request.product}
-            onChange={(p) => onUpdate({ product: p })}
+          <ProductSelector value={request.product} onChange={handleProductChange} />
+        </div>
+
+        {/* Material */}
+        <div>
+          <FieldLabel>Material</FieldLabel>
+          <MaterialSelector
+            product={request.product}
+            value={request.materialId}
+            onChange={(materialId) => onUpdate({ materialId })}
           />
         </div>
 
@@ -207,6 +320,12 @@ export default function ProjectRequestCard({
               </select>
             </div>
           </div>
+        </div>
+
+        {/* Live estimate */}
+        <div>
+          <FieldLabel>Estimate</FieldLabel>
+          <EstimatorCard request={request} />
         </div>
 
         {/* Notes */}

@@ -9,6 +9,7 @@ const folders = [
   "public/KIDS Collection",
   "public/Wall mural",
   "public/3D wall mural",
+  "public/Amazing Wall",
 ];
 
 async function convertFolder(folder) {
@@ -24,6 +25,10 @@ async function convertFolder(folder) {
       folder,
       path.basename(file, ext) + ".webp"
     );
+    if (fs.existsSync(outputPath)) {
+      console.log(`↷ Skipping ${outputPath}`);
+      continue;
+    }
 
     try {
       await sharp(inputPath)

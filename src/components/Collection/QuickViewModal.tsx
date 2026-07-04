@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import type { CollectionProduct, WorkflowType } from "@/lib/collections";
+import type { CollectionProduct, WorkflowType, WallpaperMaterial } from "@/lib/collections";
+import { WALLPAPER_MATERIALS } from "@/lib/collections";
 import { useProjectCart } from "@/store/projectCart";
 import type { LinearUnit } from "@/lib/pricing";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Unit = "ft" | "in" | "cm";
-type Material = "Silk Non-Woven" | "Premium Vinyl" | "Textured Canvas";
+type Material = WallpaperMaterial;
 
 interface QuickViewModalProps {
   product: CollectionProduct | null;
@@ -24,6 +24,31 @@ interface QuickViewModalProps {
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
+
+// ─── Business rules ─────────────────────────────────────────────────────────
+//
+// Customers simply enter wall width and height — there is no media width or
+// roll length restriction shown or enforced for wallpapers.
+const MIN_BILLABLE_AREA_SQFT = 20;
+
+// Internal rate table (₹ per sq ft) used only to derive the Estimated Total.
+// This is never rendered — customers only ever see the final total.
+const MATERIAL_RATE_PER_SQFT: Record<WallpaperMaterial, number> = {
+  "Non-Woven": 60,
+  "Textured": 100,
+  "Golden Paper": 120,
+  "Vinyl Matte": 60,
+  "Vinyl Glossy": 60,
+};
+
+const ESTIMATE_DISCLAIMER =
+  "This estimate is provided for budgeting purposes only. Final pricing will be confirmed after reviewing your artwork, dimensions, GST, transportation, installation requirements and any other project-specific production requirements.";
+
+const currencyFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
 
 const QUALITY_BADGES = [
   {
@@ -66,18 +91,16 @@ const QUALITY_BADGES = [
   },
 ];
 
-const MATERIALS: Material[] = ["Silk Non-Woven", "Premium Vinyl", "Textured Canvas"];
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCart }: QuickViewModalProps) {
-  const [selectedMaterial, setSelectedMaterial] = useState<Material>("Silk Non-Woven");
+  const [selectedMaterial, setSelectedMaterial] = useState<Material>(WALLPAPER_MATERIALS[0].name);
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
-  const [unit, setUnit] = useState<Unit>("ft");
   const [quantity, setQuantity] = useState(1);
-  const [imageZoom, setImageZoom] = useState(false);
   const [addedFeedback, setAddedFeedback] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -85,16 +108,30 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
   // Zustand action
   const addItem = useProjectCart((s) => s.addItem);
 
+  // Gallery — falls back gracefully to a single image when no gallery is provided.
+  const gallery = useMemo(() => {
+    if (!product) return [];
+    if (product.images && product.images.length > 0) return product.images;
+    return [product.highResImage ?? product.image];
+  }, [product]);
+
+  const hasGallery = gallery.length > 1;
+
+  const goToImage = useCallback((next: number) => {
+    setImageLoaded(false);
+    setActiveImage(((next % gallery.length) + gallery.length) % gallery.length);
+  }, [gallery.length]);
+
   // Reset state when product changes
   useEffect(() => {
     if (product) {
-      setSelectedMaterial("Silk Non-Woven");
+      setSelectedMaterial(WALLPAPER_MATERIALS[0].name);
       setWidth("");
       setHeight("");
-      setUnit("ft");
       setQuantity(1);
-      setImageZoom(false);
       setAddedFeedback(false);
+      setImageLoaded(false);
+      setActiveImage(0);
     }
   }, [product?.id]);
 
@@ -125,23 +162,48 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
 
   const isCustom = workflow === "custom";
 
+  // ── Measurement math — customers enter both width and height; there is no
+  // media width or roll length restriction here. ─────────────────────────────
+  const widthNum = parseFloat(width) || 0;
+  const heightNum = parseFloat(height) || 0;
+  const widthEntered = width.trim() !== "";
+  const heightEntered = height.trim() !== "";
+
+  const coverageAreaSqFt = useMemo(() => {
+    if (widthNum <= 0 || heightNum <= 0) return null;
+    return widthNum * heightNum;
+  }, [widthNum, heightNum]);
+
+  const minAreaApplied = coverageAreaSqFt != null && coverageAreaSqFt < MIN_BILLABLE_AREA_SQFT;
+
+  const billableAreaSqFt = useMemo(() => {
+    if (coverageAreaSqFt == null) return null;
+    return Math.max(coverageAreaSqFt, MIN_BILLABLE_AREA_SQFT);
+  }, [coverageAreaSqFt]);
+
+  const estimatedTotal = useMemo(() => {
+    if (!billableAreaSqFt) return null;
+    const rate = MATERIAL_RATE_PER_SQFT[selectedMaterial];
+    return Math.round(billableAreaSqFt * rate * quantity);
+  }, [billableAreaSqFt, selectedMaterial, quantity]);
+
   const buildWhatsAppMessage = () => {
     const name = product?.name ?? "this product";
-    const msg = `Hi Wonder Wallz, I'm interested in ${name}. Width: ${width || "__"} ${unit} Height: ${height || "__"} ${unit} Material: ${selectedMaterial} Quantity: ${quantity} Please share pricing.`;
+    const msg = `Hi Wonder Wallz, I'm interested in ${name}. Width: ${width || "__"} ft, Height: ${height || "__"} ft. Material: ${selectedMaterial} Quantity: ${quantity} Please share pricing.`;
     return `https://wa.me/919999999999?text=${encodeURIComponent(msg)}`;
   };
 
   // ── Task 1: Add To Project ──────────────────────────────────────────────────
   const handleAddToProject = useCallback(() => {
-    if (!product) return;
+    if (!product || !widthEntered || !heightEntered) return;
 
     addItem({
       id: crypto.randomUUID(),
       // CollectionProduct is compatible with Product; cast to satisfy the store
       product: product as unknown as Parameters<typeof addItem>[0]["product"],
-      width: parseFloat(width) || 0,
-      height: parseFloat(height) || 0,
-      unit: unit as LinearUnit,
+      width: widthNum,
+      height: heightNum,
+      unit: "ft" as LinearUnit,
       material: selectedMaterial,
       quantity,
     });
@@ -153,7 +215,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
       onClose();
       onAddedToCart?.();
     }, 800);
-  }, [product, addItem, width, height, unit, selectedMaterial, quantity, onClose, onAddedToCart]);
+  }, [product, addItem, widthNum, heightNum, widthEntered, heightEntered, selectedMaterial, quantity, onClose, onAddedToCart]);
 
   const handlePrimaryCTA = () => {
     if (isCustom) {
@@ -178,94 +240,173 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
           style={{ backgroundColor: "rgba(44, 31, 20, 0.6)", backdropFilter: "blur(6px)" }}
           role="dialog"
           aria-modal="true"
-          aria-label={`Quick view: ${product.name}`}
+          aria-label={`Quick view: ${product.collectionLabel ? `${product.collectionLabel} — ${product.name}` : product.name}`}
         >
           {/* Modal panel */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 12 }}
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.35, ease: EASE_BRAND }}
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col"
+            className="relative w-full max-w-3xl max-h-[94vh] overflow-hidden rounded-[28px] shadow-2xl flex flex-col"
             style={{ backgroundColor: "#FAF7F2" }}
           >
-            {/* ── TOP: Full-width image ── */}
-            <div
-              className="relative w-full flex-shrink-0 overflow-hidden"
-              style={{ height: "280px" }}
-            >
+            <div className="flex-1 overflow-y-auto overscroll-contain">
+
+              {/* ── PREVIEW: large edge-to-edge catalogue image ──
+                   object-contain preserves the original framing — wall,
+                   floor, chair and window all stay visible exactly as shot,
+                   with no aggressive cropping or stretching. */}
               <div
-                className="absolute inset-0"
+                className="relative w-full flex-shrink-0 overflow-hidden"
                 style={{
+                  aspectRatio: "16 / 10",
+                  maxHeight: "56vh",
                   background: `linear-gradient(135deg, ${product.placeholderGradient[0]} 0%, ${product.placeholderGradient[1]} 100%)`,
                 }}
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  backgroundImage: product.image ? `url(${product.image})` : undefined,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  transform: imageZoom ? "scale(1.06)" : "scale(1)",
-                  transition: "transform 0.5s ease",
-                  cursor: "zoom-in",
-                }}
-                onClick={() => setImageZoom((z) => !z)}
-              />
-              {/* Close button */}
-              <button
-                ref={closeButtonRef}
-                onClick={onClose}
-                className="absolute top-3 right-3 z-10 flex items-center justify-center w-8 h-8 rounded-full focus:outline-none focus-visible:ring-2"
-                style={{ background: "rgba(44,31,20,0.55)", color: "#FAF7F2" }}
-                aria-label="Close quick view"
               >
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-                </svg>
-              </button>
+                <Image
+                  key={gallery[activeImage]}
+                  src={gallery[activeImage]}
+                  alt={product.name}
+                  fill
+                  quality={95}
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  priority={activeImage === 0}
+                  loading={activeImage === 0 ? undefined : "lazy"}
+                  onLoad={() => setImageLoaded(true)}
+                  className="object-contain transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{ opacity: imageLoaded ? 1 : 0 }}
+                />
 
-              {/* Workflow badge */}
-              <span
-                className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider"
-                style={{
-                  background: isCustom ? "rgba(124,58,237,0.85)" : "rgba(44,31,20,0.75)",
-                  color: "#FAF7F2",
-                  backdropFilter: "blur(4px)",
-                }}
-              >
-                {isCustom ? "Custom" : "Standard"}
-              </span>
-            </div>
+                {/* Workflow badge */}
+                <span
+                  className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                  style={{
+                    background: isCustom ? "rgba(124,58,237,0.92)" : "rgba(44,31,20,0.8)",
+                    color: "#FAF7F2",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  {isCustom ? "Custom" : "Standard"}
+                </span>
 
-            {/* ── BOTTOM: Scrollable config panel ── */}
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="flex flex-col gap-5 p-5">
-                {/* Name & price */}
+                {/* Close button */}
+                <button
+                  ref={closeButtonRef}
+                  onClick={onClose}
+                  className="absolute top-4 right-4 z-10 flex items-center justify-center w-9 h-9 rounded-full focus:outline-none focus-visible:ring-2 transition-colors duration-150"
+                  style={{ background: "rgba(44,31,20,0.55)", color: "#FAF7F2" }}
+                  aria-label="Close quick view"
+                >
+                  <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                    <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                  </svg>
+                </button>
+
+                {/* Prev / Next — only shown when a gallery is available */}
+                {hasGallery && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => goToImage(activeImage - 1)}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-transform duration-150 hover:scale-105 focus:outline-none focus-visible:ring-2"
+                      style={{ background: "rgba(250,247,242,0.92)", color: "#2C1F14" }}
+                      aria-label="Previous image"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M9 2.5L4.5 7 9 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => goToImage(activeImage + 1)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-transform duration-150 hover:scale-105 focus:outline-none focus-visible:ring-2"
+                      style={{ background: "rgba(250,247,242,0.92)", color: "#2C1F14" }}
+                      aria-label="Next image"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M5 2.5L9.5 7 5 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+
+                    {/* Page indicator */}
+                    <span
+                      className="absolute bottom-4 left-4 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+                      style={{ background: "rgba(250,247,242,0.9)", color: "#6B5744" }}
+                    >
+                      Page {String(activeImage + 1).padStart(2, "0")}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnail strip — only shown when a gallery is available */}
+              {hasGallery && (
+                <div className="flex gap-2.5 px-6 sm:px-9 pt-4">
+                  {gallery.map((src, i) => (
+                    <button
+                      key={src + i}
+                      type="button"
+                      onClick={() => goToImage(i)}
+                      className="relative w-16 h-12 flex-shrink-0 overflow-hidden rounded-xl transition-all duration-150"
+                      style={{
+                        outline: activeImage === i ? "2px solid #B5926A" : "2px solid transparent",
+                        outlineOffset: "1px",
+                      }}
+                      aria-label={`View image ${i + 1}`}
+                      aria-current={activeImage === i}
+                    >
+                      <Image
+                        src={src}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        quality={60}
+                        loading="lazy"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* ── CONTENT: editorial product panel ── */}
+              <div className="flex flex-col gap-8 px-6 sm:px-9 py-8">
+
+                {/* Name & description */}
                 <div>
+                  {(product.collectionLabel || product.subcategory) && (
+                    <p
+                      className="text-xs font-semibold uppercase tracking-wider mb-1.5"
+                      style={{ color: "#9C8873" }}
+                    >
+                      {product.collectionLabel ?? product.subcategory!.replace(/-/g, " ")}
+                    </p>
+                  )}
                   <h2
-                    className="text-[22px] font-semibold leading-snug mb-0.5"
+                    className="text-[28px] sm:text-[32px] font-bold leading-[1.15] mb-2"
                     style={{ fontFamily: "'Playfair Display', serif", color: "#2C1F14" }}
                   >
                     {product.name}
                   </h2>
                   {product.description && (
-                    <p className="text-[13px] leading-relaxed" style={{ color: "#6B5744" }}>
+                    <p className="text-sm leading-relaxed" style={{ color: "#6B5744" }}>
                       {product.description}
                     </p>
                   )}
                 </div>
 
                 {/* Quality badges */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2.5">
                   {QUALITY_BADGES.map(({ label, icon }) => (
                     <span
                       key={label}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
                       style={{ background: "rgba(44,31,20,0.07)", color: "#6B5744" }}
                     >
                       {icon}
@@ -277,97 +418,115 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                 <hr style={{ borderColor: "rgba(44,31,20,0.1)" }} />
 
                 {/* Measurements */}
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#2C1F14" }}>
+                <div className="flex flex-col gap-4">
+                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#2C1F14" }}>
                     Measurements
                   </p>
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="block text-xs mb-1.5" style={{ color: "#6B5744" }}>Width</label>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold mb-2" style={{ color: "#2C1F14" }}>
+                        Width (ft)
+                      </label>
                       <input
                         type="number"
-                        min="0"
+                        min={0}
                         value={width}
                         onChange={e => setWidth(e.target.value)}
-                        placeholder="0"
-                        className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none transition-colors duration-150 focus:ring-2"
-                        style={{
-                          borderColor: "rgba(44,31,20,0.2)",
-                          backgroundColor: "#fff",
-                          color: "#2C1F14",
-                        }}
+                        placeholder="Enter width"
+                        className="w-full rounded-2xl border px-4 py-3.5 text-[15px] outline-none transition-colors duration-150"
+                        style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
                         onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
-                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.2)")}
+                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
                       />
                     </div>
-                    <div className="flex-1">
-                      <label className="block text-xs mb-1.5" style={{ color: "#6B5744" }}>Height</label>
+
+                    <div>
+                      <label className="block text-xs font-semibold mb-2" style={{ color: "#2C1F14" }}>
+                        Height (ft)
+                      </label>
                       <input
                         type="number"
-                        min="0"
+                        min={0}
                         value={height}
                         onChange={e => setHeight(e.target.value)}
-                        placeholder="0"
-                        className="w-full rounded-xl border px-3 py-2.5 text-sm outline-none transition-colors duration-150"
-                        style={{
-                          borderColor: "rgba(44,31,20,0.2)",
-                          backgroundColor: "#fff",
-                          color: "#2C1F14",
-                        }}
+                        placeholder="Enter height"
+                        className="w-full rounded-2xl border px-4 py-3.5 text-[15px] outline-none transition-colors duration-150"
+                        style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
                         onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
-                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.2)")}
+                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
                       />
                     </div>
-                    <div className="w-24">
-                      <label className="block text-xs mb-1.5" style={{ color: "#6B5744" }}>Unit</label>
-                      <select
-                        value={unit}
-                        onChange={e => setUnit(e.target.value as Unit)}
-                        className="w-full rounded-xl border px-2 py-2.5 text-sm outline-none appearance-none text-center cursor-pointer"
-                        style={{
-                          borderColor: "rgba(44,31,20,0.2)",
-                          backgroundColor: "#fff",
-                          color: "#2C1F14",
-                        }}
-                      >
-                        <option value="ft">ft</option>
-                        <option value="in">in</option>
-                        <option value="cm">cm</option>
-                      </select>
-                    </div>
                   </div>
+
+                  {/* Coverage Area */}
+                  <div
+                    className="rounded-2xl px-4 py-3"
+                    style={{ background: "rgba(44,31,20,0.05)" }}
+                  >
+                    <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
+                      Coverage Area
+                    </p>
+                    <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
+                      {coverageAreaSqFt != null ? `${coverageAreaSqFt.toFixed(1)} sq ft` : "—"}
+                    </p>
+                  </div>
+
+                  {minAreaApplied && (
+                    <div
+                      className="flex items-start gap-2.5 px-4 py-3 rounded-2xl text-xs leading-relaxed"
+                      style={{ background: "rgba(181,146,106,0.16)", color: "#6B5744" }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5">
+                        <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2"/>
+                        <path d="M7 6.2v3.3M7 4.3v.1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                      </svg>
+                      <span>
+                        This estimate has been calculated using the minimum billable area of{" "}
+                        {MIN_BILLABLE_AREA_SQFT} sq ft.
+                      </span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Material selector */}
+                {/* Material selector — premium selectable cards */}
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#2C1F14" }}>
+                  <p className="text-xs font-bold uppercase tracking-wider mb-3.5" style={{ color: "#2C1F14" }}>
                     Material
                   </p>
-                  <div className="flex flex-col gap-2">
-                    {MATERIALS.map(mat => {
+                  <div className="flex flex-col gap-2.5">
+                    {WALLPAPER_MATERIALS.map(({ name: mat, description }) => {
                       const active = selectedMaterial === mat;
                       return (
                         <button
                           key={mat}
                           type="button"
                           onClick={() => setSelectedMaterial(mat)}
-                          className="w-full text-left px-4 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2"
+                          className="w-full text-left px-5 py-4 rounded-2xl transition-all duration-150 focus:outline-none focus-visible:ring-2"
                           style={{
-                            borderColor: active ? "#B5926A" : "rgba(44,31,20,0.15)",
-                            backgroundColor: active ? "rgba(181,146,106,0.12)" : "transparent",
-                            color: active ? "#2C1F14" : "#6B5744",
+                            border: active ? "1.5px solid #B5926A" : "1.5px solid rgba(44,31,20,0.14)",
+                            backgroundColor: active ? "#F3E8D8" : "transparent",
                           }}
                           aria-pressed={active}
                         >
-                          <span className="flex items-center gap-2">
+                          <span className="flex items-start gap-3">
                             <span
-                              className="w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-all duration-150"
-                              style={{
-                                borderColor: active ? "#B5926A" : "rgba(44,31,20,0.25)",
-                                backgroundColor: active ? "#B5926A" : "transparent",
-                              }}
-                            />
-                            {mat}
+                              className="w-4 h-4 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-150"
+                              style={{ borderColor: active ? "#8A6A45" : "rgba(44,31,20,0.25)" }}
+                            >
+                              {active && (
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#8A6A45" }} />
+                              )}
+                            </span>
+                            <span className="flex flex-col gap-0.5">
+                              <span className="text-[15px] font-semibold" style={{ color: "#2C1F14" }}>{mat}</span>
+                              <span
+                                className="text-[13px] font-normal leading-snug"
+                                style={{ color: "#8A7660" }}
+                              >
+                                {description}
+                              </span>
+                            </span>
                           </span>
                         </button>
                       );
@@ -377,14 +536,14 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
 
                 {/* Quantity */}
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "#2C1F14" }}>
+                  <p className="text-xs font-bold uppercase tracking-wider mb-3.5" style={{ color: "#2C1F14" }}>
                     Quantity
                   </p>
-                  <div className="inline-flex items-center rounded-xl border overflow-hidden" style={{ borderColor: "rgba(44,31,20,0.2)" }}>
+                  <div className="inline-flex items-center rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(44,31,20,0.2)" }}>
                     <button
                       type="button"
                       onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="w-10 h-10 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
+                      className="w-11 h-11 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
                       style={{ color: "#2C1F14" }}
                       onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(181,146,106,0.12)")}
                       onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -393,7 +552,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                       −
                     </button>
                     <span
-                      className="w-12 h-10 flex items-center justify-center text-sm font-semibold border-x"
+                      className="w-14 h-11 flex items-center justify-center text-sm font-semibold border-x"
                       style={{ color: "#2C1F14", borderColor: "rgba(44,31,20,0.2)" }}
                     >
                       {quantity}
@@ -401,7 +560,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                     <button
                       type="button"
                       onClick={() => setQuantity(q => q + 1)}
-                      className="w-10 h-10 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
+                      className="w-11 h-11 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
                       style={{ color: "#2C1F14" }}
                       onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(181,146,106,0.12)")}
                       onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -412,49 +571,75 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   </div>
                 </div>
 
-                {/* CTA */}
-                <button
-                  type="button"
-                  onClick={handlePrimaryCTA}
-                  disabled={addedFeedback}
-                  className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 mt-auto"
-                  style={{
-                    background: addedFeedback
-                      ? "#4CAF50"
-                      : isCustom
-                      ? "linear-gradient(135deg, #7C3AED 0%, #B5926A 100%)"
-                      : "#2C1F14",
-                    color: "#FAF7F2",
-                    opacity: addedFeedback ? 1 : undefined,
-                  }}
-                  onMouseEnter={e => { if (!addedFeedback) e.currentTarget.style.opacity = "0.9"; }}
-                  onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
-                >
-                  {addedFeedback ? (
-                    <>
-                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                        <path d="M2 7.5l4 4 7-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Added to Project
-                    </>
-                  ) : isCustom ? (
-                    <>
-                      <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                        <path d="M7.5 1v13M1 7.5h13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
-                      </svg>
-                      Add to Project
-                    </>
-                  ) : (
-                    <>
-                      {/* WhatsApp icon */}
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z" fill="currentColor" fillOpacity=".2"/>
-                        <path d="M5.5 5.5c.2-.3.6-.3.8 0l.8 1.2c.1.2.1.5-.1.7l-.3.3c.3.6.8 1.1 1.4 1.4l.3-.3c.2-.2.5-.2.7-.1l1.2.8c.3.2.3.6 0 .8l-.5.5c-.3.3-.7.4-1 .3-1.5-.5-2.7-1.7-3.2-3.2-.1-.3 0-.7.3-1l.6-.4z" fill="currentColor"/>
-                      </svg>
-                      Enquire on WhatsApp
-                    </>
-                  )}
-                </button>
+                <hr style={{ borderColor: "rgba(44,31,20,0.1)" }} />
+
+                {/* Disclaimer, Estimated Total, and the dominant primary CTA */}
+                <div className="flex flex-col gap-4">
+                  <p className="text-xs leading-relaxed" style={{ color: "#9C8873" }}>
+                    {ESTIMATE_DISCLAIMER}
+                  </p>
+
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "#6B5744" }}>
+                      Estimated Total
+                    </span>
+                    <span
+                      className="text-2xl font-bold"
+                      style={{ fontFamily: "'Playfair Display', serif", color: "#2C1F14" }}
+                    >
+                      {estimatedTotal != null ? currencyFormatter.format(estimatedTotal) : "—"}
+                    </span>
+                  </div>
+
+                  {/* CTA */}
+                  <button
+                    type="button"
+                    onClick={handlePrimaryCTA}
+                    disabled={addedFeedback}
+                    className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                    style={{
+                      background: addedFeedback
+                        ? "#4CAF50"
+                        : isCustom
+                        ? "linear-gradient(135deg, #7C3AED 0%, #B5926A 100%)"
+                        : "#2C1F14",
+                      color: "#FAF7F2",
+                    }}
+                    onMouseEnter={e => { if (!addedFeedback) e.currentTarget.style.opacity = "0.9"; }}
+                    onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                  >
+                    <span className="flex items-center gap-2.5 text-[15px] font-semibold">
+                      {addedFeedback ? (
+                        <>
+                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                            <path d="M2 7.5l4 4 7-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          Added to Project
+                        </>
+                      ) : isCustom ? (
+                        <>
+                          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                            <path d="M7.5 1v13M1 7.5h13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                          </svg>
+                          Add to Project
+                        </>
+                      ) : (
+                        <>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path fillRule="evenodd" clipRule="evenodd" d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z" fill="currentColor" fillOpacity=".2"/>
+                            <path d="M5.5 5.5c.2-.3.6-.3.8 0l.8 1.2c.1.2.1.5-.1.7l-.3.3c.3.6.8 1.1 1.4 1.4l.3-.3c.2-.2.5-.2.7-.1l1.2.8c.3.2.3.6 0 .8l-.5.5c-.3.3-.7.4-1 .3-1.5-.5-2.7-1.7-3.2-3.2-.1-.3 0-.7.3-1l.6-.4z" fill="currentColor"/>
+                          </svg>
+                          Enquire on WhatsApp
+                        </>
+                      )}
+                    </span>
+                    {!addedFeedback && (
+                      <span className="text-[11.5px] font-normal" style={{ color: "rgba(250,247,242,0.75)" }}>
+                        {isCustom ? "Get started with your custom project" : "Chat with us for pricing & installation"}
+                      </span>
+                    )}
+                  </button>
+                </div>
 
               </div>
             </div>

@@ -22,6 +22,9 @@ export function CollectionCard({ product, workflow, index = 0 }: CollectionCardP
 
   // ── Quick View state (only addition) ──
   const [modalOpen, setModalOpen] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  // First row loads eagerly for a premium first-paint; the rest lazy-load.
+  const isAboveFold = index < 4;
 
   return (
     <>
@@ -54,13 +57,21 @@ export function CollectionCard({ product, workflow, index = 0 }: CollectionCardP
             aria-hidden="true"
           />
 
-          {/* Product image */}
+          {/* Product image — responsive, lazy-loaded, capped quality (full-res reserved for Quick View) */}
           <Image
             src={product.image}
             alt={product.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            quality={78}
+            loading={isAboveFold ? undefined : "lazy"}
+            priority={isAboveFold}
+            onLoad={() => setImageLoaded(true)}
             className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+            style={{
+              opacity: imageLoaded ? 1 : 0,
+              transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
+            }}
             onError={() => {
               // Gracefully falls back to gradient if image 404s
             }}
