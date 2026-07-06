@@ -25,9 +25,7 @@ import {
   getCollectionBySlug,
 } from "@/lib/collections";
 import {
-  CollectionHero,
-  CollectionFilters,
-  CollectionGrid,
+  CollectionExplorer,
   CollectionPagination,
 } from "@/components/Collection";
 
@@ -76,33 +74,19 @@ export default async function CollectionPage({
   // Unknown slug → 404
   if (!collection) notFound();
 
-  const { products, subcategories, workflow, productCount } = collection;
+  const { productCount } = collection;
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* ── 1. Hero (title, description, product count, subcategory chips) ── */}
-      <CollectionHero collection={collection} />
+      {/* ── Hero + Filters + Grid ── */}
+      {/* CollectionExplorer owns the filtering state (including, for
+          collections like Wallpapers, the Hero's chip selection) and
+          renders all three together — see its file for why. */}
+      <CollectionExplorer collection={collection} />
 
-      {/* ── Main content ── */}
-      <div className="container-site py-10 md:py-14">
-        {/* ── 2. Filters (search, sort, category) — UI only ── */}
-        <section aria-label="Filter and sort products" className="mb-8">
-          <CollectionFilters
-            subcategories={subcategories}
-            productCount={products.length}
-          />
-        </section>
-
-        {/* Divider */}
-        <hr className="border-neutral-200 mb-8" />
-
-        {/* ── 3. Product grid ── */}
-        <section aria-label={`${collection.title} products`}>
-          <CollectionGrid products={products} workflow={workflow} />
-        </section>
-
-        {/* ── 4. Pagination — UI only ── */}
-        <div className="mt-10">
+      {/* ── Pagination — UI only ── */}
+      <div className="container-site">
+        <div className="mt-10 pb-10 md:pb-14">
           <CollectionPagination
             totalItems={productCount}
             itemsPerPage={12}

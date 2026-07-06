@@ -218,7 +218,7 @@ const contactLinks = [
   },
   {
     label: "Instagram",
-    href: "https://instagram.com/wonderwallz",
+    href: "https://instagram.com/wonderwallz_kolkata",
     icon: <InstagramIcon />,
     display: "@wonderwallz",
     external: true,

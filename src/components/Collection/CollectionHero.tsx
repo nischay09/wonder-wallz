@@ -6,14 +6,27 @@ import type { Collection } from "@/lib/collections";
 
 interface CollectionHeroProps {
   collection: Collection;
+  /**
+   * Currently active subcategory slug ("all" = no filter). Only relevant
+   * when `onCategoryChange` is provided.
+   */
+  activeCategory?: string;
+  /**
+   * When provided, subcategory chips switch from navigation links to
+   * in-place filter buttons that call this instead of routing away.
+   * This is how a collection opts into "hero chips are the only nav"
+   * (see `Collection.unifiedCategoryNav`).
+   */
+  onCategoryChange?: (slug: string) => void;
 }
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
 
-export function CollectionHero({ collection }: CollectionHeroProps) {
+export function CollectionHero({ collection, activeCategory, onCategoryChange }: CollectionHeroProps) {
   const { title, heroDescription, productCount, subcategories, workflow, placeholderGradient } = collection;
 
   const isCustom = workflow === "custom";
+  const isFilterMode = typeof onCategoryChange === "function";
 
   return (
     <section
@@ -147,29 +160,67 @@ export function CollectionHero({ collection }: CollectionHeroProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: EASE_BRAND, delay: 0.25 }}
               className="flex flex-wrap gap-2"
-              role="list"
-              aria-label={`${title} subcategories`}
+              role={isFilterMode ? "group" : "list"}
+              aria-label={isFilterMode ? `Filter ${title} by category` : `${title} subcategories`}
             >
-              {subcategories.map((sub, i) => (
+              {isFilterMode && (
                 <motion.div
-                  key={sub.id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{
-                    duration: 0.3,
-                    ease: EASE_BRAND,
-                    delay: 0.28 + i * 0.04,
-                  }}
-                  role="listitem"
+                  transition={{ duration: 0.3, ease: EASE_BRAND, delay: 0.28 }}
                 >
-                  <Link
-                    href={sub.href}
-                    className="inline-block px-4 py-1.5 bg-white/70 hover:bg-white backdrop-blur-sm border border-white/50 hover:border-white rounded-pill text-sm font-medium text-neutral-800 hover:text-neutral-900 transition-all duration-200 shadow-sm hover:shadow-md"
+                  <button
+                    type="button"
+                    onClick={() => onCategoryChange?.("all")}
+                    aria-pressed={activeCategory === "all" || !activeCategory}
+                    className={`inline-block px-4 py-1.5 backdrop-blur-sm rounded-pill text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md ${
+                      activeCategory === "all" || !activeCategory
+                        ? "bg-neutral-900 text-white border border-neutral-900"
+                        : "bg-white/70 hover:bg-white border border-white/50 hover:border-white text-neutral-800 hover:text-neutral-900"
+                    }`}
                   >
-                    {sub.title}
-                  </Link>
+                    All
+                  </button>
                 </motion.div>
-              ))}
+              )}
+
+              {subcategories.map((sub, i) => {
+                const isActive = isFilterMode && activeCategory === sub.slug;
+                const chipClassName = `inline-block px-4 py-1.5 backdrop-blur-sm rounded-pill text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md ${
+                  isActive
+                    ? "bg-neutral-900 text-white border border-neutral-900"
+                    : "bg-white/70 hover:bg-white border border-white/50 hover:border-white text-neutral-800 hover:text-neutral-900"
+                }`;
+
+                return (
+                  <motion.div
+                    key={sub.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      duration: 0.3,
+                      ease: EASE_BRAND,
+                      delay: 0.28 + (i + 1) * 0.04,
+                    }}
+                    role={isFilterMode ? undefined : "listitem"}
+                  >
+                    {isFilterMode ? (
+                      <button
+                        type="button"
+                        onClick={() => onCategoryChange?.(sub.slug)}
+                        aria-pressed={isActive}
+                        className={chipClassName}
+                      >
+                        {sub.title}
+                      </button>
+                    ) : (
+                      <Link href={sub.href} className={chipClassName}>
+                        {sub.title}
+                      </Link>
+                    )}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           )}
         </div>

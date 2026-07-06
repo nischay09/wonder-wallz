@@ -181,7 +181,7 @@ export function Navbar() {
           >
             {/* ── Nav Shell ── */}
             <motion.nav
-              className="flex items-center justify-between px-3 py-2"
+              className="grid grid-cols-[auto_1fr_auto] items-center px-3 py-2"
               animate={{
                 borderRadius: "9999px",
                 background: scrolled
@@ -232,7 +232,7 @@ export function Navbar() {
               </motion.div>
 
               {/* ── Desktop Nav Links ── */}
-              <ul className="hidden lg:flex items-center gap-0.5 mx-3" role="list">
+              <ul className="hidden lg:flex items-center justify-center gap-0.5 mx-3 min-w-0" role="list">
 
                 {/* Home */}
                 <li className="relative">
@@ -416,7 +416,7 @@ export function Navbar() {
               </ul>
 
               {/* ── Right Icon Group ── */}
-              <div className="flex items-center gap-1.5 pr-0.5">
+              <div className="flex items-center gap-1.5 pr-0.5 shrink-0 justify-self-end">
                 <CircleIconBtn aria-label="Search" onClick={openSearch}>
                   <Search size={16} />
                 </CircleIconBtn>

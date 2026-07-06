@@ -407,7 +407,7 @@ export default function ContactPage() {
                 Follow us for inspiration, project showcases and new arrivals.
               </p>
               <a
-                href="https://www.instagram.com/wonderwallz"
+                href="https://www.instagram.com/wonderwallz_kolkata"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-sm font-medium transition-colors"

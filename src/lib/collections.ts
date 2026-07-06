@@ -154,6 +154,22 @@ export interface Collection {
   subcategories?: CollectionSubcategory[];
   /** Sample products seeded for the grid (replace with API/CMS later) */
   products: CollectionProduct[];
+  /**
+   * When true, the Hero's subcategory chips become the ONLY category
+   * navigation: they filter the grid in place instead of linking to a
+   * (non-existent) subcategory route, and the duplicate category-chip row
+   * inside CollectionFilters is not rendered.
+   *
+   * Off by default so collections that haven't been migrated yet (Blinds,
+   * Curtains, Flooring, etc.) keep their existing behaviour.
+   */
+  unifiedCategoryNav?: boolean;
+  /**
+   * When true, hides the sort dropdown in CollectionFilters — for
+   * collections where every item follows an identical purchasing workflow,
+   * so "sorting" has no meaningful effect (e.g. Wallpapers).
+   */
+  hideSortOptions?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -355,6 +371,10 @@ export const collections: Collection[] = [
       sub("wallpapers", "amazing-wall", "Amazing Wall"),
     ],
     products: generateWallpaperDesigns(WALLPAPER_COLLECTIONS),
+    // Hero chips are the only category nav for wallpapers, and every design
+    // follows the same custom-print workflow, so sorting is meaningless.
+    unifiedCategoryNav: true,
+    hideSortOptions: true,
   },
 
   // ── BLINDS ─────────────────────────────────────────────────────────────────

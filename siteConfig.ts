@@ -228,7 +228,7 @@ export type SocialLink = {
 
 export const socialLinks: SocialLink[] = [
   { platform: "twitter",   href: "https://twitter.com/WonderWallz",             label: "Follow Wonder Wallz on X (Twitter)" },
-  { platform: "instagram", href: "https://instagram.com/wonderwallz",           label: "Follow Wonder Wallz on Instagram"   },
+  { platform: "instagram", href: "https://instagram.com/wonderwallz_kolkata",           label: "Follow Wonder Wallz on Instagram"   },
   { platform: "pinterest", href: "https://pinterest.com/wonderwallz",           label: "Follow Wonder Wallz on Pinterest"   },
   { platform: "github",    href: "https://github.com/wonderwallz",              label: "Wonder Wallz on GitHub"             },
   { platform: "discord",   href: "https://discord.gg/wonderwallz",              label: "Join the Wonder Wallz Discord"      },
