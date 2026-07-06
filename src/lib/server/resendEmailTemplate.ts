@@ -109,10 +109,15 @@ export async function sendProjectEnquiryEmail(
     });
 
     if (error) {
-      return { success: false, error: error.message };
+      console.error("Resend send failed:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
     }
     return { success: true };
   } catch (err) {
+    console.error("Resend exception:", err);
     return {
       success: false,
       error: err instanceof Error ? err.message : "Failed to send email via Resend.",
