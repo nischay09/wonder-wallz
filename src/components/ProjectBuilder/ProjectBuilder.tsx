@@ -12,6 +12,11 @@
  *     ProjectRequestCard    ← one design request (product, material, images, dims, notes)
  *       ImageUploader       ← multi-image upload + preview + removal
  *     ProjectSummary        ← live breakdown by product type
+ *
+ * NOTE: only change from the previous iteration is the sendProjectEnquiry()
+ * call below now also passes `requests`, so emailService.ts can convert the
+ * raw File[] images into base64 attachments for the /api/project route.
+ * No other logic in this component has changed.
  */
 
 import { useEffect, useState } from "react";
@@ -97,7 +102,7 @@ export default function ProjectBuilder() {
     setErrorMessage('');
 
     const payload = buildProjectEnquiryPayload(customer, requests);
-    const result = await sendProjectEnquiry(payload);
+    const result = await sendProjectEnquiry(payload, requests);
 
     if (result.success) {
       setStatus('success');
