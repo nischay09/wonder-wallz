@@ -3,46 +3,44 @@ import React from "react";
 /**
  * Wonder Wallz — Badge Component
  *
- * Brand palette:
- *   Purple  #7B2FBE
- *   Teal    #00B5A3
- *   Orange  #F7941D
+ * Uses design tokens from globals.css / tailwind.config.ts — no hardcoded hex.
+ * Brand triad (purple/teal/orange) maps onto the available semantic tokens:
+ *   primary  → brand primary (was purple)
+ *   accent   → brand accent  (was teal / orange)
  *
- * Variants: purple | teal | orange | green | red | gray | outline
+ * Variants: primary | accent | success | error | neutral | outline
  * Sizes:    sm | md
  * dot:      boolean — prepends an animated status dot
  */
 
 const base =
-  "inline-flex items-center gap-1.5 font-semibold rounded-full leading-none";
+  "inline-flex items-center gap-1.5 font-semibold rounded-pill leading-none";
 
 const variants = {
-  purple:  "bg-[#7B2FBE]/12 text-[#7B2FBE]",
-  teal:    "bg-[#00B5A3]/15 text-[#007A70]",
-  orange:  "bg-[#F7941D]/15 text-[#B85E00]",
-  green:   "bg-[#D1FAE5] text-[#065F46]",
-  red:     "bg-[#FEE2E2] text-[#991B1B]",
-  gray:    "bg-[#F5F5F4] text-[#57534E]",
-  outline: "border-2 border-[#7B2FBE]/40 text-[#7B2FBE] bg-transparent",
+  primary:  "bg-subtle text-primary",
+  accent:   "bg-subtle text-accent",
+  success:  "bg-subtle text-success",
+  error:    "bg-subtle text-error",
+  neutral:  "bg-neutral-100 text-text-secondary",
+  outline:  "border-2 border-primary text-primary bg-transparent",
 };
 
 const sizes = {
-  sm: "px-2 py-0.5 text-[10px] tracking-wider uppercase",
-  md: "px-3 py-1 text-[11px] tracking-wider uppercase",
+  sm: "px-2 py-0.5 text-2xs tracking-wider uppercase",
+  md: "px-3 py-1 text-xs tracking-wider uppercase",
 };
 
 const dotColors = {
-  purple:  "bg-[#7B2FBE]",
-  teal:    "bg-[#00B5A3]",
-  orange:  "bg-[#F7941D]",
-  green:   "bg-[#059669]",
-  red:     "bg-[#DC2626]",
-  gray:    "bg-[#78716C]",
-  outline: "bg-[#7B2FBE]",
+  primary: "bg-primary",
+  accent:  "bg-accent",
+  success: "bg-success",
+  error:   "bg-error",
+  neutral: "bg-text-secondary",
+  outline: "bg-primary",
 };
 
 export function Badge({
-  variant = "purple",
+  variant = "primary",
   size = "md",
   dot = false,
   pulse = false,

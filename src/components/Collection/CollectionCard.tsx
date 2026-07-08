@@ -12,11 +12,13 @@ interface CollectionCardProps {
   workflow: WorkflowType;
   /** Stagger delay index for entrance animation */
   index?: number;
+  /** Slug of the parent Collection (from products.ts) this design belongs to. */
+  collectionSlug: string;
 }
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
 
-export function CollectionCard({ product, workflow, index = 0 }: CollectionCardProps) {
+export function CollectionCard({ product, workflow, index = 0, collectionSlug }: CollectionCardProps) {
   const isCustom = workflow === "custom";
   const ctaLabel = getWorkflowCTA(workflow);
 
@@ -82,8 +84,8 @@ export function CollectionCard({ product, workflow, index = 0 }: CollectionCardP
             <span
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-pill text-xs font-semibold backdrop-blur-sm ${
                 isCustom
-                  ? "bg-purple-500/90 text-white"
-                  : "bg-blue-500/90 text-white"
+                  ? "bg-[#d48c43] text-white" 
+                  : "bg-primary text-white"
               }`}
             >
               {isCustom ? (
@@ -150,7 +152,7 @@ export function CollectionCard({ product, workflow, index = 0 }: CollectionCardP
             onClick={e => { e.stopPropagation(); setModalOpen(true); }}
             className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
               isCustom
-                ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white"
+                ? "bg-gradient-to-r from-[#3E2C22] to-[#D48C43] text-white"
                 : "bg-neutral-900 text-white"
             }`}
             aria-label={`${ctaLabel} — ${product.name}`}
@@ -175,6 +177,7 @@ export function CollectionCard({ product, workflow, index = 0 }: CollectionCardP
         workflow={workflow}
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
+        collectionSlug={collectionSlug}
       />
     </>
   );

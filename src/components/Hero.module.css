@@ -1,35 +1,29 @@
 /**
- * Hero.module.css
- * Styles extracted verbatim from the original wonder_wallz_hero.html.
- * No visual changes — only scoped to this component instead of living
- * in a standalone <style> block.
+ * Hero.module.css — v2 (visual redesign)
  *
- * NOTE: this component uses 'Cormorant Garamond' (headline/serif accents)
- * and 'Inter' (body). Make sure these are loaded globally (e.g. via
- * next/font/google in app/layout.tsx) — they are NOT loaded inside this
- * module since CSS Modules shouldn't reach outside their own scope for
- * <link> tags. If Cormorant Garamond is not already loaded elsewhere in
- * the app, add it alongside the existing Fraunces/Inter font setup.
+ * Structural rules (grid, breakpoints, load-in stagger, mobile
+ * full-bleed-photo pattern) are preserved from the original file.
+ * What changed:
+ *  - Token palette refined: warmer, more restrained brass instead of
+ *    a brighter yellow-gold; removed unused blue/purple/orange tokens.
+ *  - Five floating glass stat-cards (.gb / .gb1-5) replaced with a
+ *    crossfading slideshow (.slide) + a single floating label
+ *    (.slideLabel) + a minimal tick-based slide indicator (.slideTicks).
+ *  - Everything else (layout, animation delays, responsive rules,
+ *    reduced-motion handling) kept structurally identical.
  */
 
-/* ── TOKENS — scoped to the hero root instead of :root to avoid leaking
-   into the rest of the app / colliding with global design tokens ── */
 .heroRoot {
   --ivory: #f8f4ee;
   --ivory-deep: #ede6d8;
   --ink: #1c1410;
   --ink-muted: #6b5b4e;
   --ink-faint: #a8977f;
-  --gold: #c9a84c;
-  --gold-light: #e8c97a;
-  --gold-pale: rgba(201, 168, 76, 0.12);
-  --blue: #2d7ff9;
-  --purple: #7a3df0;
-  --orange: #ff8a00;
+  --gold: #a9784f;
+  --gold-light: #d4b483;
+  --gold-pale: rgba(169, 120, 79, 0.12);
   --wa-green: #25d366;
   --wa-dark: #1da851;
-  --glass-bg: rgba(252, 248, 241, 0.92);
-  --glass-border: rgba(201, 168, 76, 0.3);
   --shadow-warm: rgba(28, 20, 16, 0.18);
 
   font-family: 'Inter', sans-serif;
@@ -57,7 +51,6 @@
   background: var(--ivory);
 }
 
-/* Subtle vertical rule separating columns */
 .heroContent::after {
   content: '';
   position: absolute;
@@ -68,13 +61,12 @@
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(201, 168, 76, 0.25) 30%,
-    rgba(201, 168, 76, 0.25) 70%,
+    rgba(169, 120, 79, 0.25) 30%,
+    rgba(169, 120, 79, 0.25) 70%,
     transparent
   );
 }
 
-/* Load-in animations */
 .heroContent > * {
   opacity: 0;
   animation: rise 0.9s cubic-bezier(0.22, 0.9, 0.32, 1) forwards;
@@ -109,7 +101,6 @@
   }
 }
 
-/* Eyebrow */
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -128,7 +119,6 @@
   flex-shrink: 0;
 }
 
-/* H1 Headline — Cormorant for luxury serif weight */
 .headline {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2.8rem, 4vw, 4.2rem);
@@ -143,7 +133,6 @@
   font-weight: 400;
   color: var(--ink);
 }
-/* Gold underline beneath "Masterpieces" */
 .accentWord {
   position: relative;
   display: inline-block;
@@ -159,16 +148,14 @@
   border-radius: 1px;
 }
 
-/* Subheadline */
 .subheadline {
   font-size: 1rem;
   line-height: 1.78;
   color: var(--ink-muted);
-  max-width: 430px;
+  max-width: 440px;
   margin-bottom: 2.5rem;
 }
 
-/* Trust grid — four ticks in a 2×2 grid */
 .trustGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -190,7 +177,7 @@
   height: 18px;
   border-radius: 50%;
   background: var(--gold-pale);
-  border: 1px solid rgba(201, 168, 76, 0.35);
+  border: 1px solid rgba(169, 120, 79, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,7 +188,6 @@
   height: 9px;
 }
 
-/* Social proof row */
 .socialProof {
   display: flex;
   align-items: center;
@@ -209,7 +195,7 @@
   margin-bottom: 2.5rem;
   padding: 16px 20px;
   background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  border: 1px solid rgba(169, 120, 79, 0.2);
   border-radius: 12px;
   backdrop-filter: blur(6px);
   max-width: 420px;
@@ -219,7 +205,7 @@
   flex: 1;
 }
 .spStat + .spStat {
-  border-left: 1px solid rgba(201, 168, 76, 0.2);
+  border-left: 1px solid rgba(169, 120, 79, 0.2);
   padding-left: 20px;
 }
 .spNumber {
@@ -251,7 +237,6 @@
   fill: var(--gold);
 }
 
-/* CTA group */
 .ctaGroup {
   display: flex;
   align-items: center;
@@ -259,7 +244,6 @@
   flex-wrap: wrap;
 }
 
-/* Primary CTA — dark rich button */
 .ctaPrimary {
   display: inline-flex;
   align-items: center;
@@ -291,7 +275,6 @@
   flex-shrink: 0;
 }
 
-/* WhatsApp CTA */
 .ctaWhatsapp {
   display: inline-flex;
   align-items: center;
@@ -315,7 +298,6 @@
   flex-shrink: 0;
 }
 
-/* Secondary ghost CTA */
 .ctaSecondary {
   display: inline-flex;
   align-items: center;
@@ -344,13 +326,13 @@
   transform: translateX(3px);
 }
 
-/* ── RIGHT COLUMN — PHOTO ── */
+/* ── RIGHT COLUMN — CINEMATIC SLIDESHOW ── */
 .heroVisual {
   position: relative;
   overflow: hidden;
+  background: var(--ink);
 }
 
-/* Vignette: left-side fade to ivory so it blends with left column */
 .heroVisual::before {
   content: '';
   position: absolute;
@@ -364,7 +346,6 @@
   z-index: 2;
   pointer-events: none;
 }
-/* Warm amber tint layer for premium look */
 .heroVisual::after {
   content: '';
   position: absolute;
@@ -373,110 +354,75 @@
     180deg,
     rgba(28, 20, 16, 0.04) 0%,
     transparent 40%,
-    rgba(28, 20, 16, 0.15) 100%
+    rgba(28, 20, 16, 0.2) 100%
   );
   z-index: 2;
   pointer-events: none;
 }
 
-/* ── GLASSMORPHISM BADGE CARDS ── */
-.gb {
+/* Each slide is absolutely stacked; only opacity is animated so the
+   crossfade is purely a compositor-level transition (cheap, smooth). */
+.slide {
+  position: absolute;
+  inset: 0;
+  transition: opacity 1.4s ease-in-out;
+}
+
+/* Single floating label — replaces the old five-card cluster */
+.slideLabel {
   position: absolute;
   z-index: 10;
-  background: var(--glass-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  box-shadow: 0 12px 32px rgba(28, 20, 16, 0.16), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
-  padding: 10px 14px;
-  white-space: nowrap;
-  animation: gbFloat 8s ease-in-out infinite;
-}
-@keyframes gbFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-.gbLabel {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  display: block;
-  margin-bottom: 2px;
-}
-.gbValue {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--ink);
-  line-height: 1;
-  display: block;
-}
-.gbSub {
-  font-size: 10px;
-  color: var(--ink-muted);
-  margin-top: 1px;
-  display: block;
-}
-
-/* Badge position classes */
-.gb1 {
-  top: 14%;
-  left: 5%;
-  animation-delay: 0s;
-}
-.gb2 {
-  top: 14%;
-  right: 6%;
-  animation-delay: 0.6s;
-}
-.gb3 {
-  top: 48%;
-  right: 6%;
-  animation-delay: 1.2s;
-}
-.gb4 {
-  bottom: 18%;
-  left: 5%;
-  animation-delay: 1.8s;
-}
-.gb5 {
-  bottom: 18%;
-  right: 6%;
-  animation-delay: 0.9s;
-}
-
-/* Rating badge special */
-.gbRating .gbStars {
+  left: 6%;
+  top: 10%;
   display: flex;
-  gap: 2px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(28, 20, 16, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 180, 131, 0.35);
+  border-radius: 3px;
+  padding: 14px 20px;
 }
-.gbRating .gbStars svg {
-  width: 10px;
-  height: 10px;
-  fill: var(--gold);
+.slideLabelRule {
+  width: 22px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+  border-radius: 1px;
 }
-.gbRating .gbValue {
-  font-size: 1.5rem;
+.slideLabelText {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: #f4ead9;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* HP badge accent line */
-.gbHp::before {
-  content: '';
-  display: block;
-  width: 20px;
+/* Minimal tick-based slide indicator (not numbered markers — a plain
+   sequence cue, echoing an editorial contact-sheet strip) */
+.slideTicks {
+  position: absolute;
+  z-index: 10;
+  right: 6%;
+  bottom: 22%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  align-items: flex-end;
+}
+.slideTick {
+  width: 14px;
   height: 2px;
-  background: var(--gold);
+  background: rgba(244, 234, 217, 0.35);
   border-radius: 1px;
-  margin-bottom: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+.slideTickActive {
+  width: 26px;
+  background: var(--gold-light);
 }
 
 /* ── BRAND MARK on photo ── */
@@ -488,7 +434,7 @@
   z-index: 10;
   background: rgba(28, 20, 16, 0.72);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(201, 168, 76, 0.3);
+  border: 1px solid rgba(212, 180, 131, 0.3);
   border-radius: 40px;
   padding: 7px 18px;
   display: flex;
@@ -517,13 +463,14 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(232, 201, 122, 0.9);
+  color: rgba(212, 180, 131, 0.9);
 }
 
 /* ── MOBILE ──
-   Photo becomes a full-bleed background behind the content instead of
-   a separate stacked block: .heroVisual is laid absolute under
-   .heroContent, which goes transparent and gets a scrim for readability. */
+   Photo becomes a full-bleed background behind the content, exactly
+   as in the original hero. Slideshow keeps crossfading; the floating
+   label and tick indicator are hidden (same treatment the old .gb
+   cards received) to keep the mobile view uncluttered and legible. */
 @media (max-width: 900px) {
   .hero {
     grid-template-columns: 1fr;
@@ -533,7 +480,6 @@
     margin-bottom: 0;
     position: relative;
   }
-  /* Soft, deliberate hand-off into whatever section follows */
   .hero::after {
     content: '';
     position: absolute;
@@ -548,7 +494,6 @@
     z-index: 4;
   }
 
-  /* Photo fills the entire hero, content sits on top of it */
   .heroVisual {
     position: absolute;
     inset: 0;
@@ -560,9 +505,6 @@
     overflow: hidden;
   }
 
-  /* Scrim: dark at the bottom (where the text/CTAs sit) fading to a
-     lighter wash near the top, so the photo still reads as a photo
-     up top but the copy stays legible lower down. */
   .heroVisual::before {
     background: linear-gradient(
       180deg,
@@ -590,7 +532,6 @@
     display: none;
   }
 
-  /* Text/elements recolored for legibility over the dark scrim */
   .eyebrow {
     color: var(--gold-light);
   }
@@ -609,11 +550,11 @@
   }
   .trustCheck {
     background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(232, 201, 122, 0.5);
+    border-color: rgba(212, 180, 131, 0.5);
   }
   .socialProof {
     background: rgba(28, 20, 16, 0.45);
-    border-color: rgba(232, 201, 122, 0.25);
+    border-color: rgba(212, 180, 131, 0.25);
   }
   .spNumber {
     color: #fff;
@@ -622,9 +563,10 @@
     color: rgba(255, 255, 255, 0.65);
   }
   .spStat + .spStat {
-    border-left-color: rgba(232, 201, 122, 0.25);
+    border-left-color: rgba(212, 180, 131, 0.25);
   }
-  .gb {
+  .slideLabel,
+  .slideTicks {
     display: none;
   }
   .brandMark {
@@ -673,7 +615,7 @@
     background: rgba(248, 244, 238, 0.14);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(232, 201, 122, 0.55);
+    border: 1px solid rgba(212, 180, 131, 0.55);
     border-radius: 14px;
     color: #fff;
     font-weight: 600;
@@ -681,7 +623,7 @@
   }
   .ctaSecondary:active {
     background: rgba(248, 244, 238, 0.24);
-    border-color: rgba(232, 201, 122, 0.85);
+    border-color: rgba(212, 180, 131, 0.85);
     transform: translateY(1px) scale(0.99);
   }
 }
@@ -717,15 +659,23 @@
   .headline {
     font-size: clamp(2.4rem, 3.5vw, 3.4rem);
   }
+  .slideLabel {
+    padding: 11px 16px;
+  }
+  .slideLabelText {
+    font-size: 1rem;
+  }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .heroContent > *,
-  .gb,
   .brandMarkDot {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
+  }
+  .slide {
+    transition: none !important;
   }
 }

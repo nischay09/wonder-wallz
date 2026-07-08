@@ -7,11 +7,12 @@ import type { CollectionProduct, WorkflowType } from "@/lib/collections";
 interface CollectionGridProps {
   products: CollectionProduct[];
   workflow: WorkflowType;
+  collectionSlug: string;
 }
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
 
-export function CollectionGrid({ products, workflow }: CollectionGridProps) {
+export function CollectionGrid({ products, workflow, collectionSlug }: CollectionGridProps) {
   if (products.length === 0) {
     return (
       <motion.div
@@ -58,7 +59,12 @@ export function CollectionGrid({ products, workflow }: CollectionGridProps) {
     >
       {products.map((product, i) => (
         <div key={product.id} role="listitem">
-          <CollectionCard product={product} workflow={workflow} index={i} />
+          <CollectionCard
+            product={product}
+            workflow={workflow}
+            index={i}
+            collectionSlug={collectionSlug}
+          />
         </div>
       ))}
     </motion.div>

@@ -23,6 +23,18 @@
 
 export type WorkflowType = "custom" | "standard";
 
+/**
+ * Image aspect ratio for Quick View's preview panel.
+ *
+ * "landscape" (16 / 10) is the default and matches the ratio used by every
+ * collection today. Set "portrait" or "square" on a per-collection basis
+ * when that collection's source images are shot/printed in a different
+ * ratio, so Quick View can size its preview panel to fit them without
+ * leaving empty letterbox space. Use "custom" + `customAspectRatio` for any
+ * ratio outside the three presets (e.g. a poster-style "2 / 3").
+ */
+export type ImageAspectRatio = "portrait" | "square" | "landscape" | "custom";
+
 export interface CollectionSubcategory {
   /** Stable unique id, e.g. "wallpapers-religion" */
   id: string;
@@ -68,6 +80,17 @@ export interface CollectionProduct {
   collectionLabel?: string;
   /** For wallpaper designs: the design/image number within its collection folder. */
   designNumber?: number;
+  /**
+   * Aspect ratio to use for this product's image inside Quick View.
+   * Defaults to "landscape" (16 / 10) when omitted — the historical, still
+   * globally-unchanged default for every other collection.
+   */
+  aspectRatio?: ImageAspectRatio;
+  /**
+   * Required when `aspectRatio` is "custom". Any valid CSS `aspect-ratio`
+   * value, e.g. "2 / 3" or "0.75".
+   */
+  customAspectRatio?: string;
 }
 
 // ─── Wallpaper materials ────────────────────────────────────────────────────
@@ -246,6 +269,15 @@ interface WallpaperCollectionConfig {
    * duplicates, etc). Numbers outside the start/end range are ignored.
    */
   exclude?: number[];
+  /**
+   * Overrides the Quick View preview aspect ratio for every design in this
+   * folder. Defaults to "landscape" (16 / 10) when omitted, matching every
+   * other collection today — set this only for folders whose source images
+   * use a different ratio (e.g. "portrait" for tall/poster-style designs).
+   */
+  aspectRatio?: ImageAspectRatio;
+  /** Required when `aspectRatio` is "custom". Any valid CSS aspect-ratio value. */
+  customAspectRatio?: string;
 }
 
 const DEFAULT_WALLPAPER_GRADIENT: [string, string] = ["#F3E8D5", "#D6C4AE"];
@@ -260,53 +292,61 @@ const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
     // Example: skip specific files that exist on disk but shouldn't show up
     // in the catalogue (e.g. a test upload or a duplicate). Remove/edit as
     // needed — leave as `[]` or omit entirely if nothing needs skipping.
-    exclude: [],
+    exclude: [], // No exclusions for Wonder Collection
   },
   {
     slug: "religion",
     title: "Religion",
     folder: "Religion",
-    start: 1,
-    end: 60,
-    gradient: ["#F0E4D0", "#C9A876"],
+    start: 10,
+    end: 117,
+    gradient: ["#F0E4D0", "#C9A876"], 
   },
   {
     slug: "kids",
     title: "Kids Collection",
     folder: "KIDS Collection",
-    start: 1,
-    end: 40,
+    start: 7,
+    end: 69,
     gradient: ["#E6F0F5", "#B8D4E3"],
+    // This folder's source images are taller/narrower than every other
+    // wallpaper collection — set to "portrait" so Quick View sizes its
+    // preview panel to fit them instead of showing letterboxed empty space.
+    // Swap to whichever collection actually needs it; use "square" or
+    // "custom" (+ customAspectRatio) for other non-16/10 ratios.
+    aspectRatio: "portrait",
   },
   {
     slug: "art",
     title: "Art Collection",
     folder: "art",
-    start: 1,
-    end: 40,
+    start: 5,
+    end: 54,
     gradient: ["#EFE3E8", "#C9A9B8"],
   },
   {
     slug: "wall-murals",
     title: "Wall Murals",
     folder: "Wall mural",
-    start: 1,
-    end: 100,
+    start: 9,
+    end: 105,
   },
   {
     slug: "3d-wall-murals",
     title: "3D Wall Murals",
     folder: "3D wall mural",
-    start: 1,
-    end: 40,
+    start: 6,
+    end: 49,
     gradient: ["#E4E9EE", "#B3C0CC"],
   },
   {
     slug: "amazing-wall",
     title: "Amazing Wall",
     folder: "Amazing Wall",
-    start: 1,
-    end: 40,
+    start: 5,
+    end: 44,
+    aspectRatio: "custom",
+    customAspectRatio: "3/4", // Example of a custom aspect ratio for this collection
   },
 ];
 
@@ -337,6 +377,8 @@ function generateWallpaperDesigns(configs: WallpaperCollectionConfig[]): Collect
           subcategory: cfg.slug,
           collectionLabel: cfg.title,
           designNumber,
+          aspectRatio: cfg.aspectRatio,
+          customAspectRatio: cfg.customAspectRatio,
         };
         return product;
       });

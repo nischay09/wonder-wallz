@@ -62,7 +62,11 @@ export function CollectionExplorer({ collection }: CollectionExplorerProps) {
 
         {/* ── Product grid ── */}
         <section aria-label={`${collection.title} products`}>
-          <CollectionGrid products={visibleProducts} workflow={workflow} />
+          <CollectionGrid
+            products={visibleProducts}
+            workflow={workflow}
+            collectionSlug={collection.slug}
+          />
         </section>
       </div>
     </>

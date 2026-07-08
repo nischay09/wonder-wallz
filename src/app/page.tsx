@@ -33,6 +33,7 @@ import FAQSection from "@/components/FAQSection";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
 import WallTransformations from "@/components/WallTransformations/WallTransformations";
 import SocialProof from "@/components/SocialProof/SocialProof";
+import TrustStrip from "@/components/TrustStrip";
 import { Suspense } from "react";
 import { SectionScrollHandler } from "@/components/SectionScrollHandler";
 
@@ -163,7 +164,22 @@ export default function HomePage() {
         {/*
          * Native React component — no longer an iframe embed.
          */}
+         
         <Hero />
+        {/* ─────────────── 2. PREMIUM TRUST STRIP ─────────────── */}
+        {/*
+         * Continuous scrolling trust banner reinforcing Wonder Wallz's
+         * craftsmanship, product quality and nationwide service.
+         *
+         * Highlights key brand strengths including premium materials,
+         * HP Latex printing, custom sizing, eco-friendly inks,
+         * installation support and Pan India delivery.
+         *
+         * Designed to immediately build credibility after the Hero,
+         * creating confidence before visitors explore categories,
+         * featured collections and the custom project workflow.
+         */}
+          <TrustStrip />
         {/* ──────── 2. WONDER WALLZ TRUST ─────────────────────────────── */}
        {/*
         * Premium trust-building section combining brand highlights,

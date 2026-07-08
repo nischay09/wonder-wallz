@@ -3,7 +3,7 @@
  *
  * Server-side, isolated Cloudinary logic. Nothing outside this file knows
  * how Cloudinary's unsigned upload API works. Used only from the
- * /api/project route handler — never imported into client components.
+ * /api/order route handler — never imported into client components.
  */
 
 const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!;

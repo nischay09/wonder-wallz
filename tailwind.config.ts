@@ -10,79 +10,68 @@ const config: Config = {
   darkMode: "class",
   theme: {
     extend: {
-      // ─── Wonder Wallz Brand Colors ───────────────────────────────────────
+      // ─── Wonder Wallz Semantic Colors ────────────────────────────────────
+      // All colors resolve to CSS variables defined in globals.css so
+      // light/dark mode swap automatically without changing class names.
       colors: {
-        // Electric Blue — primary action, links, highlights
-        blue: {
-          50:  "#eef5fe",
-          100: "#d5e8fd",
-          200: "#acd0fb",
-          300: "#74aff8",
-          400: "#3d89f5",
-          500: "#2D7FF9", // ← Brand anchor
-          600: "#1a65e0",
-          700: "#1450bc",
-          800: "#1241a0",
-          900: "#0d2e72",
-          950: "#091d4e",
+        // Core semantic tokens — use these in components
+        primary: {
+          DEFAULT: "var(--primary)",
+          hover:   "var(--primary-hover)",
+          active:  "var(--primary-active)",
+        },
+        accent: {
+          DEFAULT: "var(--accent)",
+          hover:   "var(--accent-hover)",
+          active:  "var(--accent-active)",
+        },
+        background: "var(--background)",
+        surface: {
+          DEFAULT: "var(--surface)",
+          raised:  "var(--surface-raised)",
+          overlay: "var(--surface-overlay)",
+        },
+        border: {
+          DEFAULT: "var(--border)",
+          subtle:  "var(--border-subtle)",
+          strong:  "var(--border-strong)",
+          brand:   "var(--border-brand)",
+        },
+        foreground: "var(--foreground)",
+        muted: "var(--muted)",
+        success: "var(--success)",
+        error: "var(--error)",
+
+        // Text roles
+        text: {
+          primary:   "var(--text-primary)",
+          secondary: "var(--text-secondary)",
+          tertiary:  "var(--text-tertiary)",
+          disabled:  "var(--text-disabled)",
+          inverse:   "var(--text-inverse)",
+          brand:     "var(--text-brand)",
+          accent:    "var(--text-accent)",
         },
 
-        // Royal Purple — secondary, gradients, accents
-        purple: {
-          50:  "#f3edfe",
-          100: "#e2d5fc",
-          200: "#c7aff9",
-          300: "#a87ef4",
-          400: "#9157f3",
-          500: "#7A3DF0", // ← Brand anchor
-          600: "#6828d6",
-          700: "#551fb3",
-          800: "#451a93",
-          900: "#321270",
-          950: "#1f0a4d",
-        },
-
-        // Vibrant Orange — CTA, badges, energy accents
-        orange: {
-          50:  "#fff6ea",
-          100: "#feeace",
-          200: "#fdd49d",
-          300: "#fcb95c",
-          400: "#fc9c21",
-          500: "#FF8A00", // ← Brand anchor
-          600: "#e07200",
-          700: "#b85900",
-          800: "#934600",
-          900: "#6b3300",
-          950: "#3d1c00",
-        },
-
-        // Neutral — backgrounds, text, borders
+        // Neutral scale — foundation token for backgrounds, borders,
+        // and text hierarchy that needs a step between semantic tokens
         neutral: {
-          0:    "#ffffff",
-          50:   "#f8f8fb",
-          100:  "#f0f0f7",
-          200:  "#e1e1ee",
-          300:  "#c8c8de",
-          400:  "#9898b8",
-          500:  "#6e6e96",
-          600:  "#52527a",
-          700:  "#3d3d60",
-          800:  "#28284a",
-          900:  "#171730",
-          950:  "#0d0d1e",
-          1000: "#060610",
-        },
-
-        // Semantic aliases
-        brand: {
-          primary:   "#2D7FF9",
-          secondary: "#7A3DF0",
-          accent:    "#FF8A00",
+          0:    "var(--color-neutral-0)",
+          50:   "var(--color-neutral-50)",
+          100:  "var(--color-neutral-100)",
+          200:  "var(--color-neutral-200)",
+          300:  "var(--color-neutral-300)",
+          400:  "var(--color-neutral-400)",
+          500:  "var(--color-neutral-500)",
+          600:  "var(--color-neutral-600)",
+          700:  "var(--color-neutral-700)",
+          800:  "var(--color-neutral-800)",
+          900:  "var(--color-neutral-900)",
+          950:  "var(--color-neutral-950)",
         },
       },
 
-      // ─── Typography ──────────────────────────────────────────────────────
+      // ─── Typography (unchanged) ────────────────────────────────────────
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
         body:    ["var(--font-body)", "system-ui", "sans-serif"],
@@ -128,7 +117,7 @@ const config: Config = {
         caps:     "0.12em",
       },
 
-      // ─── Spacing ─────────────────────────────────────────────────────────
+      // ─── Spacing (unchanged) ────────────────────────────────────────────
       spacing: {
         "4.5":  "1.125rem",
         "13":   "3.25rem",
@@ -150,13 +139,13 @@ const config: Config = {
         "160":  "40rem",
       },
 
-      // ─── Border Radius ───────────────────────────────────────────────────
+      // ─── Border Radius — foundation token, subtle/premium scale ─────────
       borderRadius: {
-        "xs":  "0.125rem",
-        "sm":  "0.25rem",
-        "md":  "0.5rem",
-        "lg":  "0.75rem",
-        "xl":  "1rem",
+        "xs":  "var(--radius-xs)",
+        "sm":  "var(--radius-sm)",
+        "md":  "var(--radius-md)",
+        "lg":  "var(--radius-lg)",
+        "xl":  "var(--radius-xl)",
         "2xl": "1.25rem",
         "3xl": "1.5rem",
         "4xl": "2rem",
@@ -164,31 +153,15 @@ const config: Config = {
         "pill": "9999px",
       },
 
-      // ─── Box Shadow ──────────────────────────────────────────────────────
+      // ─── Box Shadow — subtle, warm-tinted elevation (no glows) ──────────
       boxShadow: {
-        "glow-blue":   "0 0 24px 0 rgba(45, 127, 249, 0.35)",
-        "glow-purple": "0 0 24px 0 rgba(122, 61, 240, 0.35)",
-        "glow-orange": "0 0 24px 0 rgba(255, 138, 0, 0.40)",
-        "card":        "0 2px 12px 0 rgba(13, 13, 30, 0.08), 0 1px 3px 0 rgba(13, 13, 30, 0.06)",
-        "card-hover":  "0 8px 32px 0 rgba(13, 13, 30, 0.12), 0 2px 8px 0 rgba(13, 13, 30, 0.08)",
-        "card-dark":   "0 2px 12px 0 rgba(0, 0, 0, 0.40), 0 1px 3px 0 rgba(0, 0, 0, 0.30)",
-        "elevated":    "0 16px 48px 0 rgba(13, 13, 30, 0.18)",
-        "inner-light": "inset 0 1px 0 0 rgba(255, 255, 255, 0.08)",
+        "card":        "var(--shadow-card)",
+        "card-hover":  "var(--shadow-card-hover)",
+        "elevated":    "var(--shadow-elevated)",
+        "focus-ring":  "var(--shadow-focus-ring)",
       },
 
-      // ─── Gradients ───────────────────────────────────────────────────────
-      backgroundImage: {
-        "gradient-brand":        "linear-gradient(135deg, #2D7FF9 0%, #7A3DF0 100%)",
-        "gradient-brand-warm":   "linear-gradient(135deg, #7A3DF0 0%, #FF8A00 100%)",
-        "gradient-brand-full":   "linear-gradient(135deg, #2D7FF9 0%, #7A3DF0 50%, #FF8A00 100%)",
-        "gradient-blue-subtle":  "linear-gradient(135deg, rgba(45,127,249,0.12) 0%, rgba(122,61,240,0.08) 100%)",
-        "gradient-mesh":         "radial-gradient(at 20% 30%, rgba(45,127,249,0.18) 0, transparent 50%), radial-gradient(at 80% 20%, rgba(122,61,240,0.14) 0, transparent 50%), radial-gradient(at 60% 80%, rgba(255,138,0,0.10) 0, transparent 50%)",
-        "gradient-card-border":  "linear-gradient(135deg, rgba(45,127,249,0.4) 0%, rgba(122,61,240,0.4) 100%)",
-        "gradient-dark-bg":      "linear-gradient(180deg, #0d0d1e 0%, #171730 100%)",
-        "gradient-noise":        "url('/noise.svg')",
-      },
-
-      // ─── Transitions ─────────────────────────────────────────────────────
+      // ─── Transitions (unchanged) ─────────────────────────────────────────
       transitionDuration: {
         "0":   "0ms",
         "75":  "75ms",
@@ -209,7 +182,7 @@ const config: Config = {
         "snap":    "cubic-bezier(0.5, 0, 0.1, 1)",
       },
 
-      // ─── Breakpoints ─────────────────────────────────────────────────────
+      // ─── Breakpoints (unchanged) ─────────────────────────────────────────
       screens: {
         "xs":   "480px",
         "sm":   "640px",
@@ -220,7 +193,7 @@ const config: Config = {
         "3xl":  "1920px",
       },
 
-      // ─── Z-Index ─────────────────────────────────────────────────────────
+      // ─── Z-Index (unchanged) ─────────────────────────────────────────────
       zIndex: {
         "below":    "-1",
         "base":     "0",
@@ -234,7 +207,7 @@ const config: Config = {
         "top":      "9999",
       },
 
-      // ─── Animations ──────────────────────────────────────────────────────
+      // ─── Animations (unchanged) ──────────────────────────────────────────
       keyframes: {
         "fade-in": {
           "0%":   { opacity: "0" },

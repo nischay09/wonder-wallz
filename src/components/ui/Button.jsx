@@ -3,12 +3,12 @@ import React from "react";
 /**
  * Wonder Wallz — Button Component
  *
- * Brand palette:
- *   Purple  #7B2FBE  (logo purple / primary CTA)
- *   Teal    #00B5A3  (logo teal / secondary)
- *   Orange  #F7941D  (logo orange / accent)
+ * Uses design tokens from globals.css / tailwind.config.ts — no hardcoded hex.
+ * Brand triad (purple/teal/orange) maps onto the available semantic tokens:
+ *   primary → brand primary (was purple)
+ *   accent  → brand accent  (was teal / orange)
  *
- * Variants: primary | teal | orange | ghost | danger
+ * Variants: primary | accent | ghost | danger
  * Sizes:    sm | md | lg
  */
 
@@ -17,15 +17,13 @@ const base =
 
 const variants = {
   primary:
-    "bg-[#7B2FBE] text-white hover:bg-[#6A28A8] active:scale-[0.97] focus-visible:ring-[#7B2FBE] shadow-md hover:shadow-[0_8px_24px_rgba(123,47,190,0.35)]",
-  teal:
-    "bg-[#00B5A3] text-white hover:bg-[#009E8E] active:scale-[0.97] focus-visible:ring-[#00B5A3] shadow-md hover:shadow-[0_8px_24px_rgba(0,181,163,0.35)]",
-  orange:
-    "bg-[#F7941D] text-white hover:bg-[#E07F0A] active:scale-[0.97] focus-visible:ring-[#F7941D] shadow-md hover:shadow-[0_8px_24px_rgba(247,148,29,0.35)]",
+    "bg-primary text-text-inverse hover:bg-primary-hover active:bg-primary-active active:scale-[0.97] focus-visible:ring-primary shadow-card hover:shadow-card-hover",
+  accent:
+    "bg-accent text-text-inverse hover:bg-accent-hover active:bg-accent-active active:scale-[0.97] focus-visible:ring-accent shadow-card hover:shadow-card-hover",
   ghost:
-    "bg-transparent text-[#7B2FBE] border-2 border-[#7B2FBE] hover:bg-[#7B2FBE]/10 active:scale-[0.97] focus-visible:ring-[#7B2FBE]",
+    "bg-transparent text-primary border-2 border-primary hover:bg-subtle active:scale-[0.97] focus-visible:ring-primary",
   danger:
-    "bg-[#EF4444] text-white hover:bg-[#DC2626] active:scale-[0.97] focus-visible:ring-[#EF4444] shadow-md",
+    "bg-error text-text-inverse hover:opacity-90 active:scale-[0.97] focus-visible:ring-error shadow-card",
 };
 
 const sizes = {

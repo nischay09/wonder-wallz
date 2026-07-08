@@ -136,9 +136,22 @@ export function getMaterialsForProduct(product: Product): Material[] {
   return MATERIALS[product] ?? [];
 }
 
-/** Look up a specific material by product + material id. */
+/**
+ * Look up a specific material by product + material id.
+ *
+ * Accepts either the canonical `id` (e.g. "wallpaper-textured") or the
+ * display `name` (e.g. "Textured"). This is because some callers — e.g.
+ * the Quick View material selector, which is driven by `collections.ts`'s
+ * `WALLPAPER_MATERIALS` — only have the display name available, not the
+ * materials.ts id. Matching on both keeps this file the single source of
+ * truth for rates without requiring every caller to know/convert ids.
+ */
 export function getMaterialById(product: Product, materialId: string): Material | undefined {
-  return getMaterialsForProduct(product).find((m) => m.id === materialId);
+  const materials = getMaterialsForProduct(product);
+  return (
+    materials.find((m) => m.id === materialId) ??
+    materials.find((m) => m.name.toLowerCase() === materialId.toLowerCase())
+  );
 }
 
 /** The default (first-listed) material for a given product type. */

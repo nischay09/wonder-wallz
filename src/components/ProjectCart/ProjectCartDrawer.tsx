@@ -10,7 +10,7 @@
  * Out of scope: WhatsApp, Project Builder, backend, checkout.
  */
 
-import { useEffect, useCallback } from "react";
+import { Fragment, useEffect, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,9 +20,11 @@ import {
   selectEstimatedTotal,
   selectCartWorkflow,
   type CartItem,
-  type CartWorkflow,
 } from "@/store/projectCart";
 import { getDisplayPrice } from "@/lib/pricing";
+import { CustomerInfoModal } from "./CustomerInfoModal";
+import { sendCartOrder } from "@/lib/orderEmailService";
+import type { CustomerDetails } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -382,22 +384,48 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
   const workflow = useProjectCart(selectCartWorkflow);
   const clearCart = useProjectCart((s) => s.clearCart);
 
-  // ── Task 5: Review Project ────────────────────────────────────────────────
-  const handleReviewProject = useCallback(() => {
-    switch (workflow as CartWorkflow) {
-      case "standard":
-        console.log("STANDARD FLOW");
-        break;
-      case "custom":
-        console.log("CUSTOM FLOW");
-        break;
-      case "mixed":
-        console.log("MIXED FLOW");
-        break;
-      default:
-        break;
-    }
-  }, [workflow]);
+  // ── Place Order ──────────────────────────────────────────────────────────
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
+
+  const handlePlaceOrderClick = useCallback(() => {
+    setOrderError(null);
+    setIsCustomerModalOpen(true);
+  }, []);
+
+  const handleCustomerSubmit = useCallback(
+    async (customer: CustomerDetails) => {
+      setIsPlacingOrder(true);
+      setOrderError(null);
+
+      const result = await sendCartOrder(items, {
+        name: customer.name,
+        phone: customer.phone,
+        email: customer.email,
+        city: customer.city || undefined,
+      });
+
+      setIsPlacingOrder(false);
+
+      if (!result.success) {
+        setOrderError(result.error ?? "Failed to place your order. Please try again.");
+        return;
+      }
+
+      setIsCustomerModalOpen(false);
+      setOrderPlaced(true);
+      clearCart();
+    },
+    [items, clearCart]
+  );
+
+  useEffect(() => {
+    if (!orderPlaced) return;
+    const timer = setTimeout(() => setOrderPlaced(false), 3500);
+    return () => clearTimeout(timer);
+  }, [orderPlaced]);
 
   const isEmpty = items.length === 0;
   const hasMixedPricing = workflow === "mixed" || workflow === "custom";
@@ -425,7 +453,7 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <Fragment key="cart-drawer-content">
           {/* ----------------------------------------------------------------
               Backdrop
           ---------------------------------------------------------------- */}
@@ -559,13 +587,13 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
                   Final pricing will be confirmed before production.
                 </p>
 
-                {/* Primary CTA — Task 5: Review Project */}
+                {/* Primary CTA — Place Order */}
                 <button
                   type="button"
-                  onClick={handleReviewProject}
+                  onClick={handlePlaceOrderClick}
                   className="mb-3 w-full rounded-full bg-[#2C2017] py-3.5 font-['DM_Sans'] text-[15px] font-semibold text-[#FAF7F3] shadow-[0_4px_20px_rgba(44,32,23,0.28)] transition-all duration-200 hover:bg-[#3D2E1A] hover:shadow-[0_6px_28px_rgba(44,32,23,0.34)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60 active:scale-[0.98]"
                 >
-                  Review Project
+                  Place Order
                 </button>
 
                 {/* Secondary CTA */}
@@ -579,7 +607,31 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
               </footer>
             )}
           </motion.div>
-        </>
+        </Fragment>
+      )}
+
+      {/* Place Order — customer info modal (isolated from Review Project flow) */}
+      <CustomerInfoModal
+        key="customer-info-modal"
+        isOpen={isCustomerModalOpen}
+        onClose={() => setIsCustomerModalOpen(false)}
+        onSubmit={handleCustomerSubmit}
+        isSubmitting={isPlacingOrder}
+        submitError={orderError}
+      />
+
+      {/* Lightweight order-placed confirmation */}
+      {orderPlaced && (
+        <motion.div
+          key="order-toast"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3 }}
+          className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-full bg-[#2C2017] px-6 py-3 font-['DM_Sans'] text-[14px] font-medium text-[#FAF7F3] shadow-[0_8px_32px_rgba(44,32,23,0.3)]"
+        >
+          Order placed! We&apos;ll be in touch shortly.
+        </motion.div>
       )}
     </AnimatePresence>
   );

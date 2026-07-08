@@ -15,7 +15,7 @@
  *
  * NOTE: only change from the previous iteration is the sendProjectEnquiry()
  * call below now also passes `requests`, so emailService.ts can convert the
- * raw File[] images into base64 attachments for the /api/project route.
+ * raw File[] images into base64 attachments for the /api/order route.
  * No other logic in this component has changed.
  */
 
@@ -89,6 +89,7 @@ export default function ProjectBuilder() {
 
   /** Validate, send via the email service, and only reset the form on success. */
   async function handleSubmit() {
+    console.log('Reached');
     // Guard against duplicate submissions (e.g. rapid double-clicks) —
     // the button is also disabled while sending, but this makes the
     // protection explicit regardless of click timing.

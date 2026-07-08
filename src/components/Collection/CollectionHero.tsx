@@ -96,21 +96,21 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange }:
             transition={{ duration: 0.4, ease: EASE_BRAND, delay: 0.05 }}
             className="mb-4"
           >
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-semibold tracking-wider uppercase border ${
+              isCustom
+                ? "bg-[#D48C43]/15 text-[#B56E28] border-[#D48C43]/30"
+                : "bg-primary/10 text-primary border-primary/20"
+            }`}
+          >
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-semibold tracking-wider uppercase ${
-                isCustom
-                  ? "bg-purple-100 text-purple-700"
-                  : "bg-blue-100 text-blue-700"
+              className={`inline-block w-1.5 h-1.5 rounded-full ${
+                isCustom ? "bg-[#D48C43]" : "bg-primary"
               }`}
-            >
-              <span
-                className={`inline-block w-1.5 h-1.5 rounded-full ${
-                  isCustom ? "bg-purple-500" : "bg-blue-500"
-                }`}
-                aria-hidden="true"
-              />
-              {isCustom ? "Customisable" : "Standard"}
-            </span>
+              aria-hidden="true"
+            />
+            {isCustom ? "Customisable" : "Standard"}
+          </span>
           </motion.div>
 
           {/* Title */}

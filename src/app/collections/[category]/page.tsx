@@ -24,10 +24,8 @@ import {
   collections,
   getCollectionBySlug,
 } from "@/lib/collections";
-import {
-  CollectionExplorer,
-  CollectionPagination,
-} from "@/components/Collection";
+import { CollectionPagination } from "@/components/Collection";
+import { CollectionExplorer } from "@/components/Collection/CollectionExplorer";
 
 // ─── Static params ────────────────────────────────────────────────────────────
 
@@ -78,10 +76,10 @@ export default async function CollectionPage({
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* ── Hero + Filters + Grid ── */}
-      {/* CollectionExplorer owns the filtering state (including, for
-          collections like Wallpapers, the Hero's chip selection) and
-          renders all three together — see its file for why. */}
+      {/* ── CollectionExplorer renders Hero + Filters + Grid together ── */}
+      {/* (Hero lives inside CollectionExplorer so its category chips can
+          share `activeCategory` state with the filters for collections
+          with `unifiedCategoryNav` — see CollectionExplorer.tsx.) */}
       <CollectionExplorer collection={collection} />
 
       {/* ── Pagination — UI only ── */}

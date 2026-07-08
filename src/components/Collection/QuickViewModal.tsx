@@ -7,6 +7,11 @@ import type { CollectionProduct, WorkflowType, WallpaperMaterial } from "@/lib/c
 import { WALLPAPER_MATERIALS } from "@/lib/collections";
 import { useProjectCart } from "@/store/projectCart";
 import type { LinearUnit } from "@/lib/pricing";
+import { getProductBySlug } from "@/lib/products";
+// Reuse the exact same unit conversion + formatting utilities as the
+// Project Builder — do not re-implement unit math here.
+import { UNITS, type Unit } from "@/lib/types";
+import { toSquareFeet, formatCurrency as formatEstimatorCurrency } from "@/lib/estimator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,11 +24,39 @@ interface QuickViewModalProps {
   onClose: () => void;
   /** Called after a successful addItem so the parent can open the drawer. */
   onAddedToCart?: () => void;
+  /** Slug of the parent Collection (from products.ts) this design belongs to. */
+  collectionSlug: string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
+
+// ─── Image aspect ratio ─────────────────────────────────────────────────────
+//
+// Quick View's preview panel defaults to the historical 16 / 10 landscape
+// ratio used by every collection. A product can override this via its
+// `aspectRatio` (+ `customAspectRatio`) field in collections.ts when its
+// source images use a different ratio — this keeps the change scoped to
+// that collection only, with no effect on anyone else's layout or styling.
+const ASPECT_RATIO_PRESETS: Record<Exclude<NonNullable<CollectionProduct["aspectRatio"]>, "custom">, { ratio: string; maxHeight: string }> = {
+  landscape: { ratio: "16 / 10", maxHeight: "56vh" },
+  square: { ratio: "1 / 1", maxHeight: "70vh" },
+  portrait: { ratio: "3 / 4", maxHeight: "78vh" },
+};
+
+const DEFAULT_ASPECT = ASPECT_RATIO_PRESETS.landscape;
+
+function getPreviewAspectConfig(product: CollectionProduct): { ratio: string; maxHeight: string } {
+  if (!product.aspectRatio) return DEFAULT_ASPECT;
+  if (product.aspectRatio === "custom") {
+    return {
+      ratio: product.customAspectRatio ?? DEFAULT_ASPECT.ratio,
+      maxHeight: "78vh",
+    };
+  }
+  return ASPECT_RATIO_PRESETS[product.aspectRatio] ?? DEFAULT_ASPECT;
+}
 
 // ─── Business rules ─────────────────────────────────────────────────────────
 //
@@ -93,10 +126,12 @@ const QUALITY_BADGES = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCart }: QuickViewModalProps) {
+export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCart, collectionSlug }: QuickViewModalProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<Material>(WALLPAPER_MATERIALS[0].name);
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
+  // Same Unit type + default as Project Builder ('ft').
+  const [unit, setUnit] = useState<Unit>("ft");
   const [quantity, setQuantity] = useState(1);
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -128,6 +163,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
       setSelectedMaterial(WALLPAPER_MATERIALS[0].name);
       setWidth("");
       setHeight("");
+      setUnit("ft");
       setQuantity(1);
       setAddedFeedback(false);
       setImageLoaded(false);
@@ -164,15 +200,33 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
 
   // ── Measurement math — customers enter both width and height; there is no
   // media width or roll length restriction here. ─────────────────────────────
-  const widthNum = parseFloat(width) || 0;
-  const heightNum = parseFloat(height) || 0;
+  const widthNum = parseFloat(width);
+  const heightNum = parseFloat(height);
   const widthEntered = width.trim() !== "";
   const heightEntered = height.trim() !== "";
 
+  // ── Validation — width/height must be entered, numeric, and > 0. ──────────
+  const widthError = !widthEntered
+    ? "Please enter a width."
+    : Number.isNaN(widthNum) || widthNum <= 0
+    ? "Enter a width greater than 0."
+    : null;
+
+  const heightError = !heightEntered
+    ? "Please enter a height."
+    : Number.isNaN(heightNum) || heightNum <= 0
+    ? "Enter a height greater than 0."
+    : null;
+
+  const dimensionsValid = !widthError && !heightError;
+
+  // Reuse the exact same ft/in/cm → sq ft conversion used in Project Builder
+  // (toSquareFeet from lib/estimator) instead of assuming everything is fed
+  // in as feet.
   const coverageAreaSqFt = useMemo(() => {
-    if (widthNum <= 0 || heightNum <= 0) return null;
-    return widthNum * heightNum;
-  }, [widthNum, heightNum]);
+    if (!dimensionsValid) return null;
+    return toSquareFeet(widthNum, heightNum, unit);
+  }, [dimensionsValid, widthNum, heightNum, unit]);
 
   const minAreaApplied = coverageAreaSqFt != null && coverageAreaSqFt < MIN_BILLABLE_AREA_SQFT;
 
@@ -189,23 +243,34 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
 
   const buildWhatsAppMessage = () => {
     const name = product?.name ?? "this product";
-    const msg = `Hi Wonder Wallz, I'm interested in ${name}. Width: ${width || "__"} ft, Height: ${height || "__"} ft. Material: ${selectedMaterial} Quantity: ${quantity} Please share pricing.`;
-    return `https://wa.me/919999999999?text=${encodeURIComponent(msg)}`;
+    const msg = `Hi Wonder Wallz, I'm interested in ${name}. Width: ${width || "__"} ${unit}, Height: ${height || "__"} ${unit}. Material: ${selectedMaterial} Quantity: ${quantity} Please share pricing.`;
+    return `https://wa.me/9883100377?text=${encodeURIComponent(msg)}`;
   };
 
   // ── Task 1: Add To Project ──────────────────────────────────────────────────
   const handleAddToProject = useCallback(() => {
-    if (!product || !widthEntered || !heightEntered) return;
+    if (!product || !dimensionsValid) return;
+
+    const canonicalProduct = getProductBySlug(collectionSlug);
+    if (!canonicalProduct) {
+      // Should never happen — every collection slug maps 1:1 to products.ts.
+      console.error(`QuickViewModal: no canonical Product found for slug "${collectionSlug}"`);
+      return;
+    }
 
     addItem({
       id: crypto.randomUUID(),
-      // CollectionProduct is compatible with Product; cast to satisfy the store
-      product: product as unknown as Parameters<typeof addItem>[0]["product"],
+      product: canonicalProduct,
       width: widthNum,
       height: heightNum,
-      unit: "ft" as LinearUnit,
+      // Save whichever unit the customer actually selected (ft/in/cm),
+      // instead of always assuming feet.
+      unit: unit as LinearUnit,
       material: selectedMaterial,
       quantity,
+      designNumber: product.designNumber,
+      collectionLabel: product.collectionLabel,
+      designImage: product.highResImage ?? product.image,
     });
 
     // Brief "Added ✓" feedback, then notify parent to open the drawer
@@ -215,9 +280,10 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
       onClose();
       onAddedToCart?.();
     }, 800);
-  }, [product, addItem, widthNum, heightNum, widthEntered, heightEntered, selectedMaterial, quantity, onClose, onAddedToCart]);
+  }, [product, addItem, widthNum, heightNum, dimensionsValid, unit, selectedMaterial, quantity, onClose, onAddedToCart, collectionSlug]);
 
   const handlePrimaryCTA = () => {
+    if (!dimensionsValid) return;
     if (isCustom) {
       // Custom → Add to Project (goes to Project Builder via the cart)
       handleAddToProject();
@@ -228,6 +294,8 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
   };
 
   if (!product) return null;
+
+  const previewAspect = getPreviewAspectConfig(product);
 
   return (
     <AnimatePresence>
@@ -264,8 +332,8 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
               <div
                 className="relative w-full flex-shrink-0 overflow-hidden"
                 style={{
-                  aspectRatio: "16 / 10",
-                  maxHeight: "56vh",
+                  aspectRatio: previewAspect.ratio,
+                  maxHeight: previewAspect.maxHeight,
                   background: `linear-gradient(135deg, ${product.placeholderGradient[0]} 0%, ${product.placeholderGradient[1]} 100%)`,
                 }}
               >
@@ -287,7 +355,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                 <span
                   className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
                   style={{
-                    background: isCustom ? "rgba(124,58,237,0.92)" : "rgba(44,31,20,0.8)",
+                    background: isCustom ? "#D48C43" : "rgba(44,31,20,0.8)",
                     color: "#FAF7F2",
                     backdropFilter: "blur(4px)",
                   }}
@@ -426,7 +494,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold mb-2" style={{ color: "#2C1F14" }}>
-                        Width (ft)
+                        Width
                       </label>
                       <input
                         type="number"
@@ -434,16 +502,26 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         value={width}
                         onChange={e => setWidth(e.target.value)}
                         placeholder="Enter width"
+                        aria-invalid={!!widthError}
                         className="w-full rounded-2xl border px-4 py-3.5 text-[15px] outline-none transition-colors duration-150"
-                        style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
+                        style={{
+                          borderColor: widthError ? "#C0392B" : "rgba(44,31,20,0.18)",
+                          backgroundColor: "#fff",
+                          color: "#2C1F14",
+                        }}
                         onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
-                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
+                        onBlur={e => (e.currentTarget.style.borderColor = widthError ? "#C0392B" : "rgba(44,31,20,0.18)")}
                       />
+                      {widthError && (
+                        <p className="mt-1.5 text-xs" style={{ color: "#C0392B" }}>
+                          {widthError}
+                        </p>
+                      )}
                     </div>
 
                     <div>
                       <label className="block text-xs font-semibold mb-2" style={{ color: "#2C1F14" }}>
-                        Height (ft)
+                        Height
                       </label>
                       <input
                         type="number"
@@ -451,25 +529,68 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         value={height}
                         onChange={e => setHeight(e.target.value)}
                         placeholder="Enter height"
+                        aria-invalid={!!heightError}
                         className="w-full rounded-2xl border px-4 py-3.5 text-[15px] outline-none transition-colors duration-150"
-                        style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
+                        style={{
+                          borderColor: heightError ? "#C0392B" : "rgba(44,31,20,0.18)",
+                          backgroundColor: "#fff",
+                          color: "#2C1F14",
+                        }}
                         onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
-                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
+                        onBlur={e => (e.currentTarget.style.borderColor = heightError ? "#C0392B" : "rgba(44,31,20,0.18)")}
                       />
+                      {heightError && (
+                        <p className="mt-1.5 text-xs" style={{ color: "#C0392B" }}>
+                          {heightError}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  {/* Coverage Area */}
+                  {/* Unit — same UNITS list + Unit type as Project Builder.
+                      One selector drives both width and height. */}
+                  <div>
+                    <label className="block text-xs font-semibold mb-2" style={{ color: "#2C1F14" }}>
+                      Units
+                    </label>
+                    <select
+                      value={unit}
+                      onChange={e => setUnit(e.target.value as Unit)}
+                      aria-label="Measurement unit"
+                      className="w-full sm:w-32 rounded-2xl border px-4 py-3.5 text-[15px] outline-none transition-colors duration-150"
+                      style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
+                      onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
+                      onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
+                    >
+                      {UNITS.map(u => (
+                        <option key={u.value} value={u.value}>
+                          {u.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Coverage Area + Rate — premium live summary */}
                   <div
-                    className="rounded-2xl px-4 py-3"
+                    className="rounded-2xl px-4 py-3 grid grid-cols-2 gap-3"
                     style={{ background: "rgba(44,31,20,0.05)" }}
                   >
-                    <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
-                      Coverage Area
-                    </p>
-                    <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
-                      {coverageAreaSqFt != null ? `${coverageAreaSqFt.toFixed(1)} sq ft` : "—"}
-                    </p>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
+                        Area
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
+                        {coverageAreaSqFt != null ? `${coverageAreaSqFt.toFixed(2)} sq ft` : "—"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
+                        Rate
+                      </p>
+                      <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
+                        {formatEstimatorCurrency(MATERIAL_RATE_PER_SQFT[selectedMaterial])} / sq ft
+                      </p>
+                    </div>
                   </div>
 
                   {minAreaApplied && (
@@ -595,13 +716,13 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   <button
                     type="button"
                     onClick={handlePrimaryCTA}
-                    disabled={addedFeedback}
+                    disabled={addedFeedback || !dimensionsValid}
                     className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     style={{
                       background: addedFeedback
                         ? "#4CAF50"
                         : isCustom
-                        ? "linear-gradient(135deg, #7C3AED 0%, #B5926A 100%)"
+                        ? "linear-gradient(90deg, #3E2C22 0%, #D48C43 100%)"
                         : "#2C1F14",
                       color: "#FAF7F2",
                     }}

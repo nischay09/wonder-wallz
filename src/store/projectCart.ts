@@ -23,7 +23,10 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Product } from "@/lib/products";
-import { calculateEstimatedPrice } from "@/lib/pricing";
+import {
+  calculateEstimatedPrice,
+  calculateMaterialEstimatedPrice,
+} from "@/lib/pricing";
 import type { LinearUnit } from "@/lib/pricing";
 
 // ---------------------------------------------------------------------------
@@ -62,6 +65,15 @@ export interface CartItem {
    * Multiply by `quantity` to get the line total.
    */
   estimatedPrice?: number;
+  /**
+   * Design-specific presentation info that has no home on the canonical
+   * `Product` (which represents the whole product line, not one design).
+   * Purely additive — pricing, thumbnail, and workflow logic never read
+   * these; they only read `product`.
+   */
+  designNumber?: number;
+  collectionLabel?: string;
+  designImage?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -191,14 +203,33 @@ function isCustomItem(
 /**
  * Recomputes the `estimatedPrice` for a fully-formed CartItem.
  * Returns `undefined` (not `null`) for localStorage-serialisation safety.
+ *
+ * Tries the material-priced path first (Wallpaper, Custom Glass Film,
+ * Canvas Print — rate looked up from `materials.ts` via the selected
+ * `material`). Falls back to the existing `product.price` / `pricingMode`
+ * path for every other product (Blinds, Curtains, Flooring, etc.), whose
+ * behaviour is unchanged.
  */
 function computeEstimatedPrice(
   product: Product,
   width: number,
   height: number,
-  unit: LinearUnit
+  unit: LinearUnit,
+  material: string
 ): number | undefined {
-  const result = calculateEstimatedPrice(product, width, height, unit);
+  const materialResult = calculateMaterialEstimatedPrice(
+    product,
+    material,
+    width,
+    height,
+    unit
+  );
+
+  const result =
+    materialResult !== null
+      ? materialResult
+      : calculateEstimatedPrice(product, width, height, unit);
+
   return result === null ? undefined : result;
 }
 
@@ -223,7 +254,8 @@ export const useProjectCart = create<CartStore>()(
           item.product,
           item.width,
           item.height,
-          item.unit
+          item.unit,
+          item.material
         );
 
         const newItem: CartItem = { ...item, estimatedPrice };
@@ -254,14 +286,16 @@ export const useProjectCart = create<CartStore>()(
               "product" in updates ||
               "width" in updates ||
               "height" in updates ||
-              "unit" in updates;
+              "unit" in updates ||
+              "material" in updates;
 
             if (priceAffectingKeysChanged) {
               merged.estimatedPrice = computeEstimatedPrice(
                 merged.product,
                 merged.width,
                 merged.height,
-                merged.unit
+                merged.unit,
+                merged.material
               );
             }
 

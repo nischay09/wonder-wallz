@@ -3,7 +3,7 @@
  *
  * Fully isolated Resend integration. Builds a clean HTML email for Wonder
  * Wallz project enquiries and sends it. Nothing outside this file knows
- * Resend's API shape — only the /api/project route handler calls this.
+ * Resend's API shape — only the /api/order route handler calls this.
  */
 
 import { Resend } from "resend";

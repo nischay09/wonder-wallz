@@ -13,6 +13,8 @@
  */
 
 import type { Product } from "./products";
+import { getMaterialById, getMinBillableArea } from "./materials";
+import type { Product as MaterialProductKind } from "./types";
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -229,6 +231,78 @@ export function calculateEstimatedPrice(
   const _exhaustive: never = mode;
   void _exhaustive;
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// 3b. Material-priced products (Wallpaper, Custom Glass Film, Canvas Print)
+// ---------------------------------------------------------------------------
+//
+// A small number of products are NOT priced via `product.price` /
+// `pricingMode` at all — their rates live per-material in
+// `src/lib/materials.ts` (single source of truth for rate + minimum
+// billable area). This section is purely additive: it does not change
+// `calculateEstimatedPrice`, `getDisplayPrice`, or any product in
+// `products.ts`. Products that already price via `product.price` are
+// completely unaffected.
+
+/**
+ * Maps a `products.ts` product `slug` to the corresponding `materials.ts`
+ * product key. Centralised here so call sites never need to compare slug
+ * strings directly.
+ *
+ * Only products that are priced via `materials.ts` appear here. Any slug
+ * not present is not a material-priced product.
+ */
+export const MATERIAL_PRODUCT_MAP: Partial<Record<string, MaterialProductKind>> = {
+  wallpapers: "Wallpaper",
+  "glass-films": "Custom Glass Film",
+  "canvas-prints": "Canvas Print",
+};
+
+/**
+ * Estimated price for a material-priced product (Wallpaper, Custom Glass
+ * Film, Canvas Print), using the rate of the selected material and the
+ * product's minimum billable area — both sourced from `materials.ts`.
+ *
+ * Returns `null` when:
+ *   - `product.slug` does not map to a material-priced product, or
+ *   - `materialId` does not match a known material for that product.
+ *
+ * Callers should fall back to `calculateEstimatedPrice` (product.price /
+ * pricingMode path) when this returns `null`.
+ *
+ * @param product    The product being priced (only `slug` is used to
+ *                    resolve the materials.ts product key).
+ * @param materialId  The selected `CartItem.material` id, e.g. "wallpaper-non-woven".
+ * @param width       Horizontal dimension of the installation area.
+ * @param height      Vertical dimension of the installation area.
+ * @param unit        Linear unit of the supplied dimensions.
+ * @returns Estimated price in INR rounded to 2 decimal places, or `null`.
+ */
+export function calculateMaterialEstimatedPrice(
+  product: Product,
+  materialId: string,
+  width: number,
+  height: number,
+  unit: LinearUnit
+): number | null {
+  const materialProductKind = MATERIAL_PRODUCT_MAP[product.slug];
+  if (!materialProductKind) {
+    return null;
+  }
+
+  const material = getMaterialById(materialProductKind, materialId);
+  if (!material) {
+    return null;
+  }
+
+  // Reuse the existing, single area-conversion implementation.
+  const area = calculateArea(width, height, unit);
+
+  // Apply the existing minimum billable area floor for this product.
+  const billableArea = Math.max(area, getMinBillableArea(materialProductKind));
+
+  return Math.round(billableArea * material.rate * 100) / 100;
 }
 
 // ---------------------------------------------------------------------------

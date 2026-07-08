@@ -3,8 +3,9 @@ import React, { forwardRef } from "react";
 /**
  * Wonder Wallz — Input Component
  *
- * Brand focus ring: teal #00B5A3
- * Error state:      red  #EF4444
+ * Uses design tokens from globals.css / tailwind.config.ts — no hardcoded hex.
+ * Brand focus ring: accent token
+ * Error state:      error token
  *
  * Props:
  *   label   — string label rendered above
@@ -30,16 +31,16 @@ export const Input = forwardRef(function Input(
   const hasError = Boolean(error);
 
   const inputClass = [
-    "w-full rounded-xl border bg-white font-normal text-[#1C1917]",
-    "placeholder:text-[#A8A29E] transition-colors duration-150",
+    "w-full rounded-xl border bg-surface font-normal text-text-primary",
+    "placeholder:text-text-tertiary transition-colors duration-150",
     "focus:outline-none focus:ring-2 focus:ring-offset-0",
     hasError
-      ? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/25"
-      : "border-[#E7E5E4] focus:border-[#00B5A3] focus:ring-[#00B5A3]/20",
+      ? "border-error focus:border-error focus:ring-error"
+      : "border-border focus:border-accent focus:ring-accent",
     prefix ? "pl-10" : "",
     suffix ? "pr-10" : "",
     sizeMap[size],
-    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#FAFAF9]",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-subtle",
     className,
   ]
     .filter(Boolean)
@@ -50,7 +51,7 @@ export const Input = forwardRef(function Input(
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-semibold text-[#1C1917] select-none"
+          className="text-sm font-semibold text-text-primary select-none"
         >
           {label}
         </label>
@@ -58,13 +59,13 @@ export const Input = forwardRef(function Input(
 
       <div className="relative flex items-center">
         {prefix && (
-          <span className="absolute left-3 text-[#A8A29E] pointer-events-none flex items-center">
+          <span className="absolute left-3 text-text-tertiary pointer-events-none flex items-center">
             {prefix}
           </span>
         )}
         <input ref={ref} id={inputId} className={inputClass} {...props} />
         {suffix && (
-          <span className="absolute right-3 text-[#A8A29E] pointer-events-none flex items-center">
+          <span className="absolute right-3 text-text-tertiary pointer-events-none flex items-center">
             {suffix}
           </span>
         )}
@@ -73,7 +74,7 @@ export const Input = forwardRef(function Input(
       {(error || hint) && (
         <p
           className={`text-xs leading-snug ${
-            hasError ? "text-[#EF4444]" : "text-[#78716C]"
+            hasError ? "text-error" : "text-text-secondary"
           }`}
         >
           {error || hint}

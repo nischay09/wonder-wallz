@@ -3,8 +3,9 @@ import React, { forwardRef } from "react";
 /**
  * Wonder Wallz — Select Component
  *
- * Brand focus ring: teal #00B5A3
- * Error state:      red  #EF4444
+ * Uses design tokens from globals.css / tailwind.config.ts — no hardcoded hex.
+ * Brand focus ring: accent token
+ * Error state:      error token
  *
  * Props:
  *   label       — string label rendered above
@@ -46,14 +47,14 @@ export const Select = forwardRef(function Select(
   const grouped = isGrouped(options);
 
   const selectClass = [
-    "w-full rounded-xl border bg-white font-normal text-[#1C1917] appearance-none cursor-pointer",
+    "w-full rounded-xl border bg-surface font-normal text-text-primary appearance-none cursor-pointer",
     "transition-colors duration-150",
     "focus:outline-none focus:ring-2 focus:ring-offset-0",
     hasError
-      ? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]/25"
-      : "border-[#E7E5E4] focus:border-[#00B5A3] focus:ring-[#00B5A3]/20",
+      ? "border-error focus:border-error focus:ring-error"
+      : "border-border focus:border-accent focus:ring-accent",
     sizeMap[size],
-    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#FAFAF9]",
+    "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-subtle",
     className,
   ]
     .filter(Boolean)
@@ -64,7 +65,7 @@ export const Select = forwardRef(function Select(
       {label && (
         <label
           htmlFor={inputId}
-          className="text-sm font-semibold text-[#1C1917] select-none"
+          className="text-sm font-semibold text-text-primary select-none"
         >
           {label}
         </label>
@@ -95,10 +96,10 @@ export const Select = forwardRef(function Select(
               ))}
         </select>
 
-        {/* Custom chevron — teal to match brand */}
+        {/* Custom chevron — accent to match brand */}
         <span className="pointer-events-none absolute right-3 flex items-center">
           <svg
-            className="w-4 h-4 text-[#00B5A3]"
+            className="w-4 h-4 text-accent"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -116,7 +117,7 @@ export const Select = forwardRef(function Select(
       {(error || hint) && (
         <p
           className={`text-xs leading-snug ${
-            hasError ? "text-[#EF4444]" : "text-[#78716C]"
+            hasError ? "text-error" : "text-text-secondary"
           }`}
         >
           {error || hint}
