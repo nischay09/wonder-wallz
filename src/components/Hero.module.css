@@ -524,8 +524,12 @@
     background: transparent;
     min-height: 100vh;
     justify-content: flex-end;
-    padding: calc(env(safe-area-inset-top) + 2rem) 1.5rem
-      calc(env(safe-area-inset-bottom) + 2.5rem);
+    /* --navbar-height is the height of the site's fixed/floating mobile
+       navbar. Set it from the layout that renders the navbar (default
+       here covers a ~72px pill navbar + safe area); override it via
+       inline style or a wrapping class if your navbar differs. */
+    padding: calc(env(safe-area-inset-top) + var(--navbar-height, 88px))
+      1.5rem calc(env(safe-area-inset-bottom) + 2.5rem);
     order: initial;
   }
   .heroContent::after {
@@ -630,7 +634,8 @@
 
 @media (max-width: 600px) {
   .heroContent {
-    padding: 3.75rem 1.25rem 1.25rem;
+    padding: calc(env(safe-area-inset-top) + var(--navbar-height, 88px)) 1.25rem
+      calc(env(safe-area-inset-bottom) + 1.25rem);
   }
   .headline {
     font-size: 2.4rem;
