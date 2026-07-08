@@ -8,11 +8,12 @@ interface TestimonialCardProps {
 }
 
 /**
- * Pure presentational card. Receives a single testimonial and renders it.
- * No data fetching, no animation logic — that lives in Testimonials.tsx.
+ * Pure presentational card. Deliberately omits any location or project
+ * reference — role is a generic identity (e.g. "Verified Homeowner"),
+ * never tied to a specific project image shown elsewhere on the page.
  */
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
-  const { name, city, rating, review, productUsed } = testimonial;
+  const { name, role, rating, review, productUsed } = testimonial;
 
   return (
     <figure
@@ -25,12 +26,8 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
         aria-hidden="true"
       />
 
-      <blockquote className="font-serif text-lg leading-relaxed text-[#2B2521] sm:text-xl">
-        “{review}”
-      </blockquote>
-
       <div
-        className="mt-6 flex items-center gap-1"
+        className="mb-4 flex items-center gap-1"
         role="img"
         aria-label={`Rated ${rating} out of 5 stars`}
       >
@@ -48,10 +45,14 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
         ))}
       </div>
 
+      <blockquote className="font-serif text-lg leading-relaxed text-[#2B2521] sm:text-xl">
+        “{review}”
+      </blockquote>
+
       <figcaption className="mt-6 flex items-center justify-between gap-4 border-t border-[#E7DFCF] pt-5">
         <div>
           <p className="font-medium text-[#2B2521]">{name}</p>
-          <p className="text-sm text-[#7A7264]">{city}</p>
+          <p className="text-sm text-[#7A7264]">{role}</p>
         </div>
         <p className="text-right text-xs uppercase tracking-wide text-[#9C8B61]">
           {productUsed}

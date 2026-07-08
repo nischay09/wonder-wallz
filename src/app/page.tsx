@@ -31,11 +31,11 @@ import Hero from "@/components/Hero";
 import ShopByProduct from "@/components/ShopByProduct";
 import FAQSection from "@/components/FAQSection";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
-import WallTransformations from "@/components/WallTransformations/WallTransformations";
 import SocialProof from "@/components/SocialProof/SocialProof";
 import TrustStrip from "@/components/TrustStrip";
 import { Suspense } from "react";
 import { SectionScrollHandler } from "@/components/SectionScrollHandler";
+import CompletedProjects from "@/components/CompletedProjects/CompletedProjects";
 
 
 
@@ -164,7 +164,6 @@ export default function HomePage() {
         {/*
          * Native React component — no longer an iframe embed.
          */}
-         
         <Hero />
         {/* ─────────────── 2. PREMIUM TRUST STRIP ─────────────── */}
         {/*
@@ -225,7 +224,7 @@ export default function HomePage() {
          * - Serve as a reusable portfolio component across the website
          */}
         <section id="wall-transformations" className="scroll-mt-28">
-          <WallTransformations />   
+          <CompletedProjects />   
         </section>   
         {/* ──────── 5. SOCIAL PROOF ───────────────────────────────────────── */}
         {/*
