@@ -58,7 +58,7 @@ export function CollectionGrid({ products, workflow, collectionSlug }: Collectio
       aria-label="Product grid"
     >
       {products.map((product, i) => (
-        <div key={product.id} role="listitem">
+        <div key={product.id} role="listitem" className="h-full">
           <CollectionCard
             product={product}
             workflow={workflow}

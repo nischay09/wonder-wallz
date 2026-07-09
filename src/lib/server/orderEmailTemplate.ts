@@ -27,8 +27,10 @@ export interface OrderCustomer {
 }
 
 export interface OrderLineItem {
-  designId: string;
+  /** Customer-facing collection name, e.g. "Wonder Art Mural". */
   collection: string;
+  /** Customer-facing design identifier, e.g. "#37". Never an internal id. */
+  design: string;
   product: string;
   material: string;
   width: string;
@@ -51,8 +53,8 @@ function renderItemRow(item: OrderLineItem, index: number): string {
     <div style="border:1px solid #E5DEC9;border-radius:12px;padding:16px 20px;margin-bottom:16px;background:#FFFDF7;">
       <h3 style="margin:0 0 10px;font-size:15px;color:#2B2620;">Item ${index + 1}: ${escapeHtml(item.product)}</h3>
       <table style="width:100%;font-size:13px;color:#4A4436;border-collapse:collapse;">
-        <tr><td style="padding:2px 0;width:170px;color:#8A7F6A;">Wallpaper Design ID</td><td>${escapeHtml(item.designId)}</td></tr>
-        <tr><td style="padding:2px 0;color:#8A7F6A;">Collection</td><td>${escapeHtml(item.collection)}</td></tr>
+        <tr><td style="padding:2px 0;width:170px;color:#8A7F6A;">Collection</td><td>${escapeHtml(item.collection)}</td></tr>
+        <tr><td style="padding:2px 0;color:#8A7F6A;">Design</td><td>${escapeHtml(item.design)}</td></tr>
         <tr><td style="padding:2px 0;color:#8A7F6A;">Material</td><td>${escapeHtml(item.material)}</td></tr>
         <tr><td style="padding:2px 0;color:#8A7F6A;">Dimensions</td><td>${escapeHtml(item.width)} × ${escapeHtml(item.height)} ${escapeHtml(item.unit)}</td></tr>
         <tr><td style="padding:2px 0;color:#8A7F6A;">Area</td><td>${escapeHtml(item.coverageArea)}</td></tr>

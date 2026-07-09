@@ -312,7 +312,7 @@ export function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 4 }}
                         transition={{ duration: 0.18, ease: "easeOut" }}
-                        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[600px] rounded-2xl p-5 grid grid-cols-2 gap-2"
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[640px] rounded-2xl p-5 flex flex-wrap justify-center gap-2"
                         style={{
                           background: "rgba(250,247,242,0.98)",
                           backdropFilter: "blur(24px)",
@@ -320,11 +320,27 @@ export function Navbar() {
                           boxShadow: "0 16px 48px rgba(40,30,10,0.14)",
                         }}
                       >
+                        {/*
+                          Flexbox instead of CSS Grid on purpose: with 7 items a
+                          fixed 2-col grid strands the 7th item alone on its own
+                          row with a big empty gap beside it. A fixed-column grid
+                          can't self-balance an odd count without special-casing
+                          "is this the last item" and adding a col-span/centering
+                          override to it.
+
+                          Flex-wrap + justify-center avoids that: every card gets
+                          the same fixed width/height (w-[190px] h-[76px],
+                          flex-none), so rows wrap naturally at 3-up, and
+                          whatever is left on the final row is centered by
+                          justify-content instead of sitting flush-left with
+                          empty space beside it. The single `gap-2` keeps row
+                          and column spacing identical everywhere.
+                        */}
                         {products.map((product) => (
                           <Link
                             key={product.id}
                             href={product.href}
-                            className="flex items-start gap-3 p-3 rounded-xl transition-colors group"
+                            className="flex items-start gap-3 p-3 rounded-xl transition-colors group flex-none w-[190px] h-[76px]"
                             style={{ borderRadius: "12px" }}
                             onMouseEnter={e => (e.currentTarget.style.background = "#F4ECDA")}
                             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
@@ -335,11 +351,11 @@ export function Navbar() {
                                 background: `linear-gradient(135deg, ${product.placeholderGradient[0]}, ${product.placeholderGradient[1]})`,
                               }}
                             />
-                            <div>
-                              <p className="text-[13.5px] font-semibold" style={{ color: INK, fontFamily: SERIF }}>
+                            <div className="min-w-0">
+                              <p className="text-[13.5px] font-semibold truncate" style={{ color: INK, fontFamily: SERIF }}>
                                 {product.title}
                               </p>
-                              <p className="text-[12px] mt-0.5" style={{ color: INK_SOFT }}>
+                              <p className="text-[12px] mt-0.5 line-clamp-2" style={{ color: INK_SOFT }}>
                                 {product.description}
                               </p>
                             </div>

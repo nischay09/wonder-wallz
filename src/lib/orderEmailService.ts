@@ -29,8 +29,20 @@ export interface OrderCustomerData {
 
 /** One cart line item, flattened into the fields the order email needs. */
 export interface OrderLineItemData {
-  designId: string;
+  /**
+   * Customer-facing collection name, e.g. "Wonder Art Mural" or
+   * "Wonder Collection". Falls back to the product title for
+   * non-wallpaper products (Blinds, Curtains, etc.), which have no
+   * per-design collection concept.
+   */
   collection: string;
+  /**
+   * Customer-facing design identifier, e.g. "#37". Derived from the
+   * numeric `designNumber` already stored on the cart item — never an
+   * internal id or abbreviation like "WAM037". Falls back to the
+   * product title for products with no per-design numbering.
+   */
+  design: string;
   product: string;
   material: string;
   width: number;      // was string
@@ -76,10 +88,16 @@ export function buildOrderPayload(
   customer: OrderCustomerData
 ): OrderPayload {
   const orderItems: OrderLineItemData[] = items.map((item) => ({
-    // ⚠ adjust field name if different on your CartItem["product"] type
-    designId: item.product.id ?? "—",
-    // ⚠ adjust field name if different on your CartItem["product"] type
-    collection: (item.product as unknown as { collection?: string }).collection ?? "—",
+    // Customer-facing collection name (e.g. "Wonder Art Mural"). This is
+    // populated on the cart item at add-time from the design's
+    // CollectionProduct.collectionLabel — never derived from an internal
+    // product id or abbreviation.
+    collection: item.collectionLabel ?? item.product.title,
+    // Customer-facing design identifier (e.g. "#37"). The numeric
+    // designNumber is the single source of truth — no separate code
+    // string (e.g. "WAM037") is ever stored or displayed.
+    design:
+      item.designNumber !== undefined ? `#${item.designNumber}` : item.product.title,
     product: item.product.title,
     material: item.material ?? "—",
     width: item.width,

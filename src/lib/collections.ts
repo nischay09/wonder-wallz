@@ -78,7 +78,16 @@ export interface CollectionProduct {
    * customers see "{collectionLabel} / Design {designNumber}" only.
    */
   collectionLabel?: string;
-  /** For wallpaper designs: the design/image number within its collection folder. */
+  /**
+   * Customer-facing design number for this design, always starting at 1
+   * within its collection — regardless of what the underlying image
+   * filename on disk happens to start at (e.g. a folder whose first file
+   * is `3.webp` still shows as "Design 1"). Computed once at generation
+   * time from the raw filename and the collection's `start`; nothing
+   * downstream (cards, Quick View, cart, Project Builder, order emails)
+   * ever sees the raw filename number, so there is no separate "raw"
+   * field to keep in sync — this is the single source of truth.
+   */
   designNumber?: number;
   /**
    * Aspect ratio to use for this product's image inside Quick View.
@@ -255,7 +264,13 @@ interface WallpaperCollectionConfig {
   title: string;
   /** Public folder name under /public (exact casing/spacing as on disk), e.g. "Wonder". */
   folder: string;
-  /** Lowest numbered file in this folder. */
+  /**
+   * Lowest numbered file in this folder. Also doubles as the "startIndex"
+   * used to compute each design's customer-facing `designNumber` (which
+   * always begins at 1 for customers, regardless of what this raw file
+   * number is — e.g. `start: 3` means the file `3.webp` is shown as
+   * "Design 1").
+   */
   start: number;
   /** Highest numbered file in this folder. */
   end: number;
@@ -348,13 +363,31 @@ const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
     aspectRatio: "custom",
     customAspectRatio: "3/4", // Example of a custom aspect ratio for this collection
   },
+  {
+    slug: "wonder-art-mural",
+    title: "Wonder Art Mural",
+    // ⚠ Update `folder` to match the exact casing/spacing of the real
+    // directory under /public once the design images are uploaded.
+    folder: "Wonder Art Mural",
+    // ⚠ Placeholder range — update `start`/`end` to match the actual
+    // lowest/highest numbered file once real images are added, same as
+    // every other wallpaper folder above.
+    start: 3,
+    end: 42,
+    gradient: ["#EFE3D2", "#C9AE87"],
+  },
 ];
 
 /**
  * Generates one CollectionProduct per design (start..end inclusive) for
  * every configured wallpaper folder. No design names are invented —
- * customers only ever see "{title}" + "Design {n}"; the id (e.g.
- * "wonder-15") is for routing/architecture only.
+ * customers only ever see "{title}" + "Design {designNumber}", where
+ * `designNumber` always starts at 1 for every collection regardless of
+ * what the actual file numbering on disk happens to start at (e.g. a
+ * folder whose first file is `3.webp` still shows as "Design 1"). The
+ * raw filename number is only ever used locally, right here, to build
+ * the image path and the internal `id` — it is never carried forward
+ * onto the product, so there's no second "raw" number to keep in sync.
  */
 function generateWallpaperDesigns(configs: WallpaperCollectionConfig[]): CollectionProduct[] {
   return configs.flatMap((cfg) => {
@@ -364,11 +397,17 @@ function generateWallpaperDesigns(configs: WallpaperCollectionConfig[]): Collect
     const designCount = cfg.end - cfg.start + 1;
 
     return Array.from({ length: designCount }, (_, i) => cfg.start + i)
-      .filter((designNumber) => !excluded.has(designNumber))
-      .map((designNumber) => {
-        const imagePath = `/${cfg.folder}/${designNumber}.${ext}`;
+      .filter((fileNumber) => !excluded.has(fileNumber))
+      .map((fileNumber) => {
+        const imagePath = `/${cfg.folder}/${fileNumber}.${ext}`;
+        // Customer-facing number: always starts at 1 within this
+        // collection. `cfg.start` is the folder's lowest actual filename
+        // and doubles as the startIndex offset — no separate field is
+        // needed since it's already the single source of truth for
+        // where this folder's numbering begins.
+        const designNumber = fileNumber - cfg.start + 1;
         const product: CollectionProduct = {
-          id: `${cfg.slug}-${designNumber}`,
+          id: `${cfg.slug}-${fileNumber}`, // unchanged: still keyed off the real filename
           name: `Design ${designNumber}`,
           description: `${cfg.title} design, custom-printed to your exact wall size.`,
           image: imagePath,
@@ -411,6 +450,7 @@ export const collections: Collection[] = [
       sub("wallpapers", "wall-murals", "Wall Murals"),
       sub("wallpapers", "3d-wall-murals", "3D Wall Murals"),
       sub("wallpapers", "amazing-wall", "Amazing Wall"),
+      sub("wallpapers", "wonder-art-mural", "Wonder Art Mural"),
     ],
     products: generateWallpaperDesigns(WALLPAPER_COLLECTIONS),
     // Hero chips are the only category nav for wallpapers, and every design

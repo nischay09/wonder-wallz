@@ -197,6 +197,7 @@ export const products: Product[] = [
       buildSubcategory("wallpapers", "kids", "Kids"),
       buildSubcategory("wallpapers", "wall-murals", "Wall Murals"),
       buildSubcategory("wallpapers", "3d-wall-murals", "3D Wall Murals"),
+      buildSubcategory("wallpapers", "wonder-art-mural", "Wonder Art Mural"),
     ],
     // --- new fields ---
     pricingMode: "quote",

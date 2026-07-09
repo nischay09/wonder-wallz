@@ -10,6 +10,7 @@ const folders = [
   "public/Wall mural",
   "public/3D wall mural",
   "public/Amazing Wall",
+  "public/Wonder Art Mural",
 ];
 
 async function convertFolder(folder) {

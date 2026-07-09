@@ -393,7 +393,7 @@ export default function FAQSection() {
                   process—no obligation.
                 </p>
                 <motion.a
-                  href="https://wa.me/919999999999"
+                  href="https://wa.me/919883100377"
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={prefersReducedMotion ? undefined : { y: -2 }}

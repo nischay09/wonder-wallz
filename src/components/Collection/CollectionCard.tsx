@@ -38,7 +38,7 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
           ease: EASE_BRAND,
           delay: Math.min(index * 0.06, 0.4),
         }}
-        className="group card card-hover flex flex-col overflow-hidden rounded-3xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 cursor-pointer"
+        className="group card card-hover h-full flex flex-col overflow-hidden rounded-3xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 cursor-pointer"
         aria-label={product.name}
         onClick={() => setModalOpen(true)}
         role="button"
@@ -126,16 +126,16 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
 
         {/* ── Content ── */}
         <div className="flex flex-col flex-1 p-5">
-          {/* Subcategory label */}
-          {product.subcategory && (
-            <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5">
-              {product.subcategory.replace(/-/g, " ")}
-            </p>
-          )}
+          {/* Subcategory label — always rendered to reserve consistent height,
+              even when a product has no subcategory (prevents title/button drift) */}
+          <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5 min-h-[1rem]">
+            {product.subcategory ? product.subcategory.replace(/-/g, " ") : "\u00A0"}
+          </p>
 
-          {/* Product name */}
+          {/* Product name — fixed 2-line height reserved regardless of actual
+              line count, so 1-line and 2-line titles occupy the same space */}
           <h3
-            className="font-semibold text-neutral-900 text-base leading-snug mb-2 line-clamp-2"
+            className="font-semibold text-neutral-900 text-base leading-snug mb-2 line-clamp-2 min-h-[2.5rem]"
             style={{ fontFamily: "var(--font-playfair, serif)" }}
           >
             {product.name}

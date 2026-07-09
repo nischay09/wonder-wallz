@@ -230,7 +230,7 @@ const stores = [
     name: "Wonder Wallz – Custom Design Showroom",
     detail: "Wallpapers, Wall Murals, Custom Glass Films & Canvas Prints",
     address: "157C, Lenin Sarani Rd, near Jyoti Cinema, Esplanade, Chandni Chawk, Bowbazar, Kolkata, West Bengal 700013",
-    mapHref: "https://maps.google.com/?q=157C+Lenin+Sarani+Rd+Jyoti+Cinema+Esplanade+Chandni+Chawk+Bowbazar+Kolkata+West+Bengal+700013",
+    mapHref: "https://maps.app.goo.gl/cd2vAJranxtLJHjc9",
   },
   {
     name: "Wonder Wallz – Interior Products Showroom",
@@ -258,9 +258,9 @@ const contactLinks = [
   },
   {
     label: "Email",
-    href: "mailto:hello@wonderwallz.in",
+    href: "mailto:thewonderwallz@gmail.com",
     icon: <EmailIcon />,
-    display: "hello@wonderwallz.in",
+    display: "thewonderwallz@gmail.com",
   },
   {
     label: "WhatsApp",

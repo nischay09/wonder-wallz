@@ -71,6 +71,11 @@ export interface CartItem {
    * Purely additive — pricing, thumbnail, and workflow logic never read
    * these; they only read `product`.
    */
+  /**
+   * Customer-facing design number (always starts at 1 within its
+   * collection — see `CollectionProduct.designNumber` in
+   * lib/collections.ts). Never the raw on-disk file number.
+   */
   designNumber?: number;
   collectionLabel?: string;
   designImage?: string;
