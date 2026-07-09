@@ -108,22 +108,32 @@ function AnimatedCounter({
   const [display, setDisplay] = useState(0);
 
   useEffect(() => {
-    if (!isInView) return;
-    let raf: number;
-    let start: number | undefined;
+  if (!isInView) return;
 
-    const tick = (ts: number) => {
-      if (!start) start = ts;
-      const progress = Math.min((ts - start) / (duration * 1000), 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplay(Math.round(eased * value));
-      if (progress < 1) raf = requestAnimationFrame(tick);
-    };
+  let raf: number;
+  let start: number | undefined;
 
-    raf = requestAnimationFrame(tick);
-    return () => raf && cancelAnimationFrame(raf);
-  }, [isInView, value, duration]);
+  const tick = (ts: number) => {
+    if (!start) start = ts;
 
+    const progress = Math.min((ts - start) / (duration * 1000), 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+
+    setDisplay(Math.round(eased * value));
+
+    if (progress < 1) {
+      raf = requestAnimationFrame(tick);
+    }
+  };
+
+  raf = requestAnimationFrame(tick);
+
+  return () => {
+    if (raf !== undefined) {
+      cancelAnimationFrame(raf);
+    }
+  };
+}, [isInView, value, duration]);
   return (
     <span ref={ref}>
       {display.toLocaleString("en-IN")}
