@@ -340,7 +340,7 @@ export default function WonderWallzTrust() {
             Ready to transform your walls?
           </p>
           <a
-            href="https://wa.me/91XXXXXXXXXX"
+            href="https://wa.me/919883100377"
             aria-label="Start your Wonder Wallz order on WhatsApp"
             rel="noopener noreferrer"
             target="_blank"
