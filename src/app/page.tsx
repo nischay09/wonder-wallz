@@ -28,7 +28,7 @@ import type { Metadata } from "next";
 
 // ── React component imports ──────────────────────────────────────────────────
 import Hero from "@/components/Hero";
-import ShopByProduct from "@/components/ShopByProduct";
+import CustomDesignCTA from "@/components/CustomDesignCTA";
 import FAQSection from "@/components/FAQSection";
 import WonderWallzTrust from "@/components/WonderWallzTrust";
 import SocialProof from "@/components/SocialProof/SocialProof";
@@ -36,6 +36,7 @@ import TrustStrip from "@/components/TrustStrip";
 import { Suspense } from "react";
 import { SectionScrollHandler } from "@/components/SectionScrollHandler";
 import CompletedProjects from "@/components/CompletedProjects/CompletedProjects";
+import ShopByCategory from "@/components/ShopByCategory";
 
 
 
@@ -179,6 +180,20 @@ export default function HomePage() {
          * featured collections and the custom project workflow.
          */}
           <TrustStrip />
+          {/* ─────────────── 3. SHOP BY CATEGORY ─────────────── */}
+          {/*
+           * Primary product discovery section introducing Wonder Wallz's
+           * complete range of interior décor solutions.
+           *
+           * Provides quick navigation to each major product category,
+           * allowing visitors to explore wallpapers, blinds, curtains,
+          * flooring, glass films, canvas prints and upholstery.
+           *
+           * Designed as the first conversion-focused section after the Hero,
+           * encouraging users to begin browsing products while maintaining
+           * a premium, editorial shopping experience.
+           */}
+          <ShopByCategory />
         {/* ──────── 2. WONDER WALLZ TRUST ─────────────────────────────── */}
        {/*
         * Premium trust-building section combining brand highlights,
@@ -192,18 +207,19 @@ export default function HomePage() {
         * installations, testimonials and final conversion CTAs.
         */}
          <WonderWallzTrust />
-        
-        {/* ──────── 3. SHOP BY PRODUCT ───────────────────────────────── */}
-        {/*
-        * Primary product discovery hub.
-        *
-        * Introduces every product category offered by Wonder Wallz and
-        * serves as the main navigation into the shopping experience.
-        *
-        * Powered by src/lib/products.ts as the single source of truth
-        * for product data across the navbar, homepage and future pages.
-        */}
-        <ShopByProduct />
+         {/* ─────────────── 6. CUSTOM DESIGN CTA ─────────────── */}
+         {/*
+          * Premium call-to-action inviting customers to create
+          * completely bespoke wallpaper designs.
+          *
+          * Highlights Wonder Wallz's ability to transform personal
+          * artwork, reference images and creative ideas into
+          * print-ready wall murals tailored to exact wall dimensions.
+          *
+          * Designed as the primary conversion point before customer
+          * testimonials and the final enquiry section.
+          */}
+         <CustomDesignCTA />         
 
         {/* ──────── 4. WALL TRANSFORMATIONS ─────────────────────────────── */}
         {/*

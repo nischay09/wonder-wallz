@@ -1,14 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
-import ProjectCard from "./ProjectCard";
+import FocusCards from "./FocusCards";
 import { projects } from "@/lib/projects";
 
 export default function CompletedProjects() {
+  const featuredProjects = projects.slice(0, 5);
+
   return (
     <section
-      aria-labelledby="completed-projects-heading"
-      className="relative w-full py-20 md:py-28 overflow-hidden"
+      aria-labelledby="our-work-heading"
+      className="relative w-full py-10 md:py-14 overflow-hidden"
       style={{ background: "#FAF7F2" }}
     >
       {/* Subtle background texture blob — retained from prior section */}
@@ -24,7 +27,7 @@ export default function CompletedProjects() {
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
         {/* Section header */}
-        <div className="mb-12 md:mb-16 text-center">
+        <div className="mb-7 md:mb-8 text-center">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -36,19 +39,19 @@ export default function CompletedProjects() {
             Our Work
           </motion.p>
           <motion.h2
-            id="completed-projects-heading"
+            id="our-work-heading"
             initial={{ opacity: 0, y: 14 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.55, delay: 0.07 }}
-            className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-5 leading-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-semibold mb-4 leading-tight"
             style={{
               color: "#2C1F14",
               fontFamily: "'Playfair Display', Georgia, serif",
               letterSpacing: "-0.02em",
             }}
           >
-            Completed Projects
+            Our Work
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -63,11 +66,25 @@ export default function CompletedProjects() {
           </motion.p>
         </div>
 
-        {/* Editorial masonry gallery */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 sm:auto-rows-[1fr]">
-          {projects.map((project, i) => (
-            <ProjectCard key={project.id} project={project} priority={i === 0} />
-          ))}
+        {/* Focus Cards gallery — compact, premium, no permanent labels */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <FocusCards projects={featuredProjects} />
+        </motion.div>
+
+        {/* Bottom CTA */}
+        <div className="mt-8 md:mt-10 text-center">
+          <Link
+            href="/collections"
+            className="inline-flex items-center gap-2 text-sm sm:text-base font-semibold tracking-wide transition-colors duration-200 hover:opacity-80"
+            style={{ color: "#B5926A" }}
+          >
+            Explore Collections →
+          </Link>
         </div>
       </div>
     </section>

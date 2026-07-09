@@ -110,6 +110,53 @@ const WonderWallzLogo: FC<{ className?: string }> = ({ className }) => (
   </div>
 );
 
+// ─── Mobile Accordion Section ─────────────────────────────────────────────────
+// Native <details>/<summary> gives us expand/collapse, keyboard support, and
+// screen-reader semantics for free — no extra state management needed.
+
+const MobileAccordionSection: FC<{
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}> = ({ title, children, defaultOpen }) => (
+  <details
+    className="group border-b border-white/10 [&::-webkit-details-marker]:hidden"
+    open={defaultOpen}
+  >
+    <summary
+      className="flex items-center justify-between gap-3 py-3.5 cursor-pointer select-none list-none text-xs font-semibold tracking-[0.16em] uppercase text-amber-400 min-h-[44px]"
+    >
+      <span>{title}</span>
+      <ChevronDownIcon className="w-4 h-4 shrink-0 text-stone-500 transition-transform duration-200 group-open:rotate-180" />
+    </summary>
+    <div className="pb-4">{children}</div>
+  </details>
+);
+
+// ─── Mobile Contact Row ────────────────────────────────────────────────────────
+// Large, touch-friendly row (min 44px target) for phone/email/social contact.
+
+const MobileContactRow: FC<{
+  href: string;
+  external?: boolean;
+  icon: React.ReactNode;
+  label: string;
+  display: string;
+}> = ({ href, external, icon, label, display }) => (
+  <a
+    href={href}
+    target={external ? "_blank" : undefined}
+    rel={external ? "noopener noreferrer" : undefined}
+    aria-label={label}
+    className="flex items-center gap-3 py-3 min-h-[44px] border-b border-white/5 last:border-b-0 text-stone-300 active:bg-white/5 rounded-lg transition-colors duration-150 -mx-1 px-1"
+  >
+    <span className="flex-shrink-0 w-9 h-9 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-amber-400">
+      {icon}
+    </span>
+    <span className="text-sm truncate">{display}</span>
+  </a>
+);
+
 // ─── Icons ─────────────────────────────────────────────────────────────────────
 
 const PhoneIcon = () => (
@@ -140,6 +187,12 @@ const MapPinIcon = () => (
   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+  </svg>
+);
+
+const ChevronDownIcon: FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
   </svg>
 );
 
@@ -254,8 +307,8 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
       {/* Top border accent */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
 
-      {/* Main footer grid */}
-      <div className="relative max-w-7xl mx-auto px-6 lg:px-10 pt-16 pb-10">
+      {/* Main footer grid — desktop/tablet (lg and up), unchanged from before */}
+      <div className="relative max-w-7xl mx-auto hidden lg:block px-6 lg:px-10 pt-16 pb-10">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -426,6 +479,167 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
               <span>in Kolkata, India</span>
             </p>
           </div>
+        </motion.div>
+      </div>
+
+      {/* ═══ Mobile footer (below lg) — compact, accordion-based layout ═══════ */}
+      <div className="relative max-w-7xl mx-auto lg:hidden px-5 pt-8 pb-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-40px" }}
+        >
+          {/* ── Brand + Primary CTAs ──────────────────────────────────────── */}
+          <motion.div variants={columnVariants} className="mb-5">
+            <WonderWallzLogo className="mb-3" />
+
+            <p className="text-[11px] font-semibold tracking-[0.14em] uppercase text-amber-500/80 mb-4">
+              Premium Wallpapers &amp; Interior Solutions
+            </p>
+
+            {/* Primary CTAs: WhatsApp + Call, directly under the brand */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <a
+                href="https://wa.me/919883100377"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat with us on WhatsApp"
+                className="flex items-center justify-center gap-2 min-h-[46px] rounded-xl bg-amber-500 text-[#1a1408] text-sm font-semibold active:bg-amber-400 transition-colors duration-150"
+              >
+                <WhatsAppIcon />
+                WhatsApp
+              </a>
+              <a
+                href="tel:+919883100377"
+                aria-label="Call us"
+                className="flex items-center justify-center gap-2 min-h-[46px] rounded-xl border border-white/15 text-white text-sm font-semibold active:bg-white/10 transition-colors duration-150"
+              >
+                <PhoneIcon />
+                Call Us
+              </a>
+            </div>
+          </motion.div>
+
+          {/* ── Accordion Sections ────────────────────────────────────────── */}
+          <motion.div variants={columnVariants} className="border-t border-white/10">
+            <MobileAccordionSection title="Products">
+              <nav aria-label="Product links" className="flex flex-col">
+                {products.map((item) => (
+                  <FooterLink key={item.id} href={item.href}>
+                    <span className="py-1.5 block">{item.title}</span>
+                  </FooterLink>
+                ))}
+              </nav>
+            </MobileAccordionSection>
+
+            <MobileAccordionSection title="Company">
+              <nav aria-label="Company links" className="flex flex-col">
+                {company.map((item) => (
+                  <FooterLink
+                    key={item.label}
+                    href={item.href}
+                    onClick={
+                      item.sectionId
+                        ? () => scrollToSection(item.sectionId!)
+                        : undefined
+                    }
+                  >
+                    <span className="py-1.5 block">{item.label}</span>
+                  </FooterLink>
+                ))}
+              </nav>
+            </MobileAccordionSection>
+
+            <MobileAccordionSection title="Legal">
+              <nav aria-label="Legal links" className="flex flex-col">
+                {legal.map((item) => (
+                  <FooterLink key={item.label} href={item.href}>
+                    <span className="py-1.5 block">{item.label}</span>
+                  </FooterLink>
+                ))}
+              </nav>
+            </MobileAccordionSection>
+
+            <MobileAccordionSection title="Visit Our Showrooms">
+              <div className="flex flex-col divide-y divide-white/5">
+                {stores.map((store) => (
+                  <div
+                    key={store.name}
+                    className="flex items-center justify-between gap-3 py-3 min-h-[44px]"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-stone-200 truncate">
+                        {store.name.replace("Wonder Wallz – ", "")}
+                      </p>
+                      <p className="text-xs text-stone-500 truncate">{store.detail}</p>
+                    </div>
+                    <a
+                      href={store.mapHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-amber-400 active:text-amber-300"
+                    >
+                      Get Directions <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </MobileAccordionSection>
+          </motion.div>
+
+          {/* ── Contact (large, touch-friendly rows) ──────────────────────── */}
+          <motion.div variants={columnVariants} className="mt-6">
+            <FooterHeading>Contact</FooterHeading>
+            <div className="flex flex-col">
+              {contactLinks
+                .filter(
+                  (item) => item.label !== "WhatsApp" && item.label !== "Custom Projects"
+                )
+                .map((item) => (
+                  <MobileContactRow
+                    key={item.label}
+                    href={item.href}
+                    external={item.external}
+                    icon={item.icon}
+                    label={item.label}
+                    display={item.display}
+                  />
+                ))}
+            </div>
+          </motion.div>
+
+          {/* ── Trust Badges (compact, wrapping pills) ─────────────────────── */}
+          <motion.div
+            variants={trustRowVariants}
+            className="mt-6 pt-5 border-t border-white/10"
+          >
+            <div className="flex flex-wrap gap-2">
+              {trustPillars.map((pillar) => (
+                <span
+                  key={pillar.label}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-medium tracking-[0.08em] uppercase text-stone-400"
+                >
+                  <span className="text-amber-400/70" aria-hidden="true">
+                    {pillar.icon}
+                  </span>
+                  {pillar.label}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* ── Copyright (compact) ─────────────────────────────────────────── */}
+          <motion.div variants={copyrightVariants} className="mt-6 pt-5 border-t border-white/5">
+            <div className="flex flex-col items-center gap-2 text-xs text-stone-600 text-center">
+              <p>© 2026 Wonder Wallz. All Rights Reserved.</p>
+              <p className="flex items-center gap-1.5">
+                <span>Crafted with</span>
+                <span className="text-amber-500/70">♥</span>
+                <span>in Kolkata, India</span>
+              </p>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </footer>
