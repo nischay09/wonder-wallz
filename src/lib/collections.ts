@@ -299,6 +299,28 @@ const DEFAULT_WALLPAPER_GRADIENT: [string, string] = ["#F3E8D5", "#D6C4AE"];
 
 const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
   {
+    slug: "wonder-art-mural",
+    title: "Wonder Art Mural",
+    // ⚠ Update `folder` to match the exact casing/spacing of the real
+    // directory under /public once the design images are uploaded.
+    folder: "Wonder Art Mural",
+    // ⚠ Placeholder range — update `start`/`end` to match the actual
+    // lowest/highest numbered file once real images are added, same as
+    // every other wallpaper folder above.
+    start: 3,
+    end: 42,
+    gradient: ["#EFE3D2", "#C9AE87"],
+  },
+  {
+    slug: "amazing-wall",
+    title: "Amazing Wall",
+    folder: "Amazing Wall",
+    start: 5,
+    end: 44,
+    aspectRatio: "custom",
+    customAspectRatio: "3/4", // Example of a custom aspect ratio for this collection
+  },
+  {
     slug: "wonder-collection",
     title: "Wonder Collection",
     folder: "Wonder",
@@ -308,6 +330,29 @@ const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
     // in the catalogue (e.g. a test upload or a duplicate). Remove/edit as
     // needed — leave as `[]` or omit entirely if nothing needs skipping.
     exclude: [], // No exclusions for Wonder Collection
+  },
+  {
+    slug: "wall-murals",
+    title: "Wall Murals",
+    folder: "Wall mural",
+    start: 9,
+    end: 105,
+  },
+  {
+    slug: "3d-wall-murals",
+    title: "3D Wall Murals",
+    folder: "3D wall mural",
+    start: 6,
+    end: 49,
+    gradient: ["#E4E9EE", "#B3C0CC"],
+  },
+  {
+    slug: "art",
+    title: "Art Collection",
+    folder: "art",
+    start: 5,
+    end: 54,
+    gradient: ["#EFE3E8", "#C9A9B8"],
   },
   {
     slug: "religion",
@@ -330,51 +375,6 @@ const WALLPAPER_COLLECTIONS: WallpaperCollectionConfig[] = [
     // Swap to whichever collection actually needs it; use "square" or
     // "custom" (+ customAspectRatio) for other non-16/10 ratios.
     aspectRatio: "portrait",
-  },
-  {
-    slug: "art",
-    title: "Art Collection",
-    folder: "art",
-    start: 5,
-    end: 54,
-    gradient: ["#EFE3E8", "#C9A9B8"],
-  },
-  {
-    slug: "wall-murals",
-    title: "Wall Murals",
-    folder: "Wall mural",
-    start: 9,
-    end: 105,
-  },
-  {
-    slug: "3d-wall-murals",
-    title: "3D Wall Murals",
-    folder: "3D wall mural",
-    start: 6,
-    end: 49,
-    gradient: ["#E4E9EE", "#B3C0CC"],
-  },
-  {
-    slug: "amazing-wall",
-    title: "Amazing Wall",
-    folder: "Amazing Wall",
-    start: 5,
-    end: 44,
-    aspectRatio: "custom",
-    customAspectRatio: "3/4", // Example of a custom aspect ratio for this collection
-  },
-  {
-    slug: "wonder-art-mural",
-    title: "Wonder Art Mural",
-    // ⚠ Update `folder` to match the exact casing/spacing of the real
-    // directory under /public once the design images are uploaded.
-    folder: "Wonder Art Mural",
-    // ⚠ Placeholder range — update `start`/`end` to match the actual
-    // lowest/highest numbered file once real images are added, same as
-    // every other wallpaper folder above.
-    start: 3,
-    end: 42,
-    gradient: ["#EFE3D2", "#C9AE87"],
   },
 ];
 
@@ -443,14 +443,14 @@ export const collections: Collection[] = [
     workflow: "custom",
     featured: true,
     subcategories: [
+      sub("wallpapers", "wonder-art-mural", "Wonder Art Mural"),
+      sub("wallpapers", "amazing-wall", "Amazing Wall"),
       sub("wallpapers", "wonder-collection", "Wonder Collection"),
-      sub("wallpapers", "religion", "Religion"),
-      sub("wallpapers", "art", "Art Collection"),
-      sub("wallpapers", "kids", "Kids Collection"),
       sub("wallpapers", "wall-murals", "Wall Murals"),
       sub("wallpapers", "3d-wall-murals", "3D Wall Murals"),
-      sub("wallpapers", "amazing-wall", "Amazing Wall"),
-      sub("wallpapers", "wonder-art-mural", "Wonder Art Mural"),
+      sub("wallpapers", "art", "Art Collection"),
+      sub("wallpapers", "religion", "Religion"),
+      sub("wallpapers", "kids", "Kids Collection"),
     ],
     products: generateWallpaperDesigns(WALLPAPER_COLLECTIONS),
     // Hero chips are the only category nav for wallpapers, and every design

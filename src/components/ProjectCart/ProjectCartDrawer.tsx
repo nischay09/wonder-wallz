@@ -104,6 +104,55 @@ function formatTotal(total: number | null): string {
 }
 
 // ---------------------------------------------------------------------------
+// WhatsApp continuation
+// ---------------------------------------------------------------------------
+
+/**
+ * Wonder Wallz business WhatsApp number in E.164 format (no leading "+",
+ * no spaces/dashes) — the format wa.me expects.
+ *
+ * TODO: replace with the real business number before shipping.
+ */
+const WONDER_WALLZ_WHATSAPP_NUMBER = "919883100377";
+
+/** Minimal snapshot of a cart line-item, captured at submit-time — just
+ *  enough to build the WhatsApp message after the cart itself is cleared. */
+interface SubmittedLineItem {
+  collection: string;
+  design: string;
+}
+
+interface SubmittedOrder {
+  customerName?: string;
+  lineItems: SubmittedLineItem[];
+}
+
+function buildWhatsAppMessage(order: SubmittedOrder): string {
+  const greeting = order.customerName
+    ? `Hi, this is ${order.customerName}.`
+    : "Hi,";
+
+  const lines = order.lineItems.map((item) => `• ${item.collection} (${item.design})`);
+
+  const itemsBlock =
+    lines.length > 0
+      ? `Here are the design(s) I submitted:\n${lines.join("\n")}`
+      : "I just submitted a project request.";
+
+  return [
+    greeting,
+    "I just submitted a project request on the Wonder Wallz website.",
+    itemsBlock,
+    "Could we discuss installation, pricing, transport, or customization?",
+  ].join("\n\n");
+}
+
+function buildWhatsAppUrl(order: SubmittedOrder): string {
+  const text = encodeURIComponent(buildWhatsAppMessage(order));
+  return `https://wa.me/${WONDER_WALLZ_WHATSAPP_NUMBER}?text=${text}`;
+}
+
+// ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
 
@@ -166,6 +215,38 @@ function PlusIcon() {
   );
 }
 
+function CheckCircleIcon() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+      <circle cx="17" cy="17" r="16" stroke="#3E8E5A" strokeWidth="2" fill="#E9F5EC" />
+      <path
+        d="M10.5 17.5l4 4 9-9.5"
+        stroke="#3E8E5A"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function WhatsAppIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.876 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"
+        fill="currentColor"
+      />
+      <path
+        d="M12.02 2.5c-5.245 0-9.5 4.255-9.5 9.5 0 1.676.44 3.25 1.21 4.614L2.5 21.5l4.99-1.208a9.46 9.46 0 004.53 1.153h.004c5.245 0 9.5-4.255 9.5-9.5s-4.255-9.445-9.504-9.445z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // CartItemRow
 // ---------------------------------------------------------------------------
@@ -200,11 +281,14 @@ function CartItemRow({ item, index }: CartItemRowProps) {
       exit="exit"
       className="group relative flex gap-4 rounded-[16px] bg-white/60 p-4 shadow-[0_1px_3px_rgba(139,110,72,0.08),0_4px_16px_rgba(139,110,72,0.06)] backdrop-blur-sm"
     >
-      {/* Product image */}
+      {/* Product image — prefer the design-specific image captured at
+          add-time (same image shown on the Collection Card / Quick View)
+          over the generic product-line cover image. Only fall back to the
+          gradient placeholder when neither is available. */}
       <div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden rounded-[12px] bg-[#F3EDE4]">
-        {item.product.coverImage ? (
+        {(item.designImage ?? item.product.coverImage) ? (
           <Image
-            src={item.product.coverImage}
+            src={item.designImage ?? item.product.coverImage!}
             alt={item.product.title}
             fill
             sizes="88px"
@@ -375,6 +459,64 @@ function EmptyState({ onClose }: { onClose: () => void }) {
 }
 
 // ---------------------------------------------------------------------------
+// Success state (shown after the order email has been sent)
+// ---------------------------------------------------------------------------
+
+interface SuccessStateProps {
+  order: SubmittedOrder;
+  onContinueBrowsing: () => void;
+}
+
+function SuccessState({ order, onContinueBrowsing }: SuccessStateProps) {
+  const whatsappUrl = buildWhatsAppUrl(order);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }}
+      className="flex flex-1 flex-col items-center justify-center px-8 py-16 text-center"
+    >
+      <div
+        className="mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+        style={{
+          background: "linear-gradient(135deg, #E9F5EC 0%, #D8ECDE 100%)",
+          boxShadow: "0 8px 32px rgba(62,142,90,0.18)",
+        }}
+      >
+        <CheckCircleIcon />
+      </div>
+
+      <h3 className="mb-2 font-['Playfair_Display'] text-[22px] font-semibold text-[#2C2017]">
+        Project Submitted Successfully
+      </h3>
+      <p className="mb-8 max-w-[280px] font-['DM_Sans'] text-[14px] leading-relaxed text-[#8B6A48]">
+        Thank you{order.customerName ? `, ${order.customerName}` : ""}. Wonder
+        Wallz has received your project request and our team will be in
+        touch shortly.
+      </p>
+
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mb-3 inline-flex w-full max-w-[280px] items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 font-['DM_Sans'] text-[15px] font-semibold text-white shadow-[0_4px_20px_rgba(37,211,102,0.35)] transition-all duration-200 hover:bg-[#22C05E] hover:shadow-[0_6px_28px_rgba(37,211,102,0.42)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366]/60 active:scale-[0.98]"
+      >
+        <WhatsAppIcon />
+        Continue on WhatsApp
+      </a>
+
+      <button
+        type="button"
+        onClick={onContinueBrowsing}
+        className="font-['DM_Sans'] text-[13px] font-medium text-[#A08060] underline underline-offset-2 transition-colors hover:text-[#8B6A48] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+      >
+        Continue Browsing
+      </button>
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Drawer
 // ---------------------------------------------------------------------------
 
@@ -389,6 +531,12 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  // Snapshot of what was submitted, captured just before clearCart() wipes
+  // the live cart items — needed to build the WhatsApp message and greet
+  // the customer by name in the success state.
+  const [submittedOrder, setSubmittedOrder] = useState<SubmittedOrder | null>(
+    null
+  );
 
   const handlePlaceOrderClick = useCallback(() => {
     setOrderError(null);
@@ -414,6 +562,18 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
         return;
       }
 
+      // Capture the WhatsApp-relevant details before the cart is cleared.
+      setSubmittedOrder({
+        customerName: customer.name || undefined,
+        lineItems: items.map((item) => ({
+          collection: item.collectionLabel ?? item.product.title,
+          design:
+            item.designNumber !== undefined
+              ? `#${item.designNumber}`
+              : item.product.title,
+        })),
+      });
+
       setIsCustomerModalOpen(false);
       setOrderPlaced(true);
       clearCart();
@@ -421,11 +581,12 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
     [items, clearCart]
   );
 
-  useEffect(() => {
-    if (!orderPlaced) return;
-    const timer = setTimeout(() => setOrderPlaced(false), 3500);
-    return () => clearTimeout(timer);
-  }, [orderPlaced]);
+  /** "Continue Browsing" — dismiss the success state and close the cart. */
+  const handleContinueBrowsing = useCallback(() => {
+    setOrderPlaced(false);
+    setSubmittedOrder(null);
+    onClose();
+  }, [onClose]);
 
   const isEmpty = items.length === 0;
   const hasMixedPricing = workflow === "mixed" || workflow === "custom";
@@ -449,6 +610,16 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
       document.body.style.overflow = "";
     };
   }, [isOpen, handleKeyDown]);
+
+  // Reset the success state whenever the drawer is closed (via the X
+  // button, backdrop click, or ESC) so re-opening the cart doesn't show a
+  // stale confirmation for an order that's already been dealt with.
+  useEffect(() => {
+    if (!isOpen && orderPlaced) {
+      setOrderPlaced(false);
+      setSubmittedOrder(null);
+    }
+  }, [isOpen, orderPlaced]);
 
   return (
     <AnimatePresence>
@@ -534,7 +705,12 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
                 BODY
             ============================================================ */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              {isEmpty ? (
+              {orderPlaced && submittedOrder ? (
+                <SuccessState
+                  order={submittedOrder}
+                  onContinueBrowsing={handleContinueBrowsing}
+                />
+              ) : isEmpty ? (
                 <EmptyState onClose={onClose} />
               ) : (
                 <div className="space-y-3 px-4 py-4 sm:px-5">
@@ -560,7 +736,7 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
             {/* ============================================================
                 SUMMARY + FOOTER  (only when cart has items)
             ============================================================ */}
-            {!isEmpty && (
+            {!isEmpty && !(orderPlaced && submittedOrder) && (
               <footer className="shrink-0 border-t border-[#EDE4D8] bg-[#FAF7F3] px-5 pb-6 pt-4 shadow-[0_-8px_32px_rgba(201,169,110,0.06)]">
                 {/* Estimated Total */}
                 <div className="mb-3 flex items-baseline justify-between">
@@ -619,20 +795,6 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
         isSubmitting={isPlacingOrder}
         submitError={orderError}
       />
-
-      {/* Lightweight order-placed confirmation */}
-      {orderPlaced && (
-        <motion.div
-          key="order-toast"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3 }}
-          className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-full bg-[#2C2017] px-6 py-3 font-['DM_Sans'] text-[14px] font-medium text-[#FAF7F3] shadow-[0_8px_32px_rgba(44,32,23,0.3)]"
-        >
-          Order placed! We&apos;ll be in touch shortly.
-        </motion.div>
-      )}
     </AnimatePresence>
   );
 }

@@ -163,27 +163,6 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange }:
               role={isFilterMode ? "group" : "list"}
               aria-label={isFilterMode ? `Filter ${title} by category` : `${title} subcategories`}
             >
-              {isFilterMode && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, ease: EASE_BRAND, delay: 0.28 }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => onCategoryChange?.("all")}
-                    aria-pressed={activeCategory === "all" || !activeCategory}
-                    className={`inline-block px-4 py-1.5 backdrop-blur-sm rounded-pill text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md ${
-                      activeCategory === "all" || !activeCategory
-                        ? "bg-neutral-900 text-white border border-neutral-900"
-                        : "bg-white/70 hover:bg-white border border-white/50 hover:border-white text-neutral-800 hover:text-neutral-900"
-                    }`}
-                  >
-                    All
-                  </button>
-                </motion.div>
-              )}
-
               {subcategories.map((sub, i) => {
                 const isActive = isFilterMode && activeCategory === sub.slug;
                 const chipClassName = `inline-block px-4 py-1.5 backdrop-blur-sm rounded-pill text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md ${
@@ -200,7 +179,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange }:
                     transition={{
                       duration: 0.3,
                       ease: EASE_BRAND,
-                      delay: 0.28 + (i + 1) * 0.04,
+                      delay: 0.28 + i * 0.04,
                     }}
                     role={isFilterMode ? undefined : "listitem"}
                   >

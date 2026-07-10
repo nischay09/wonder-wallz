@@ -300,7 +300,8 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
   return (
     <AnimatePresence>
       {isOpen && (
-        // Backdrop
+        // Backdrop — fixed inset-0 with no padding so it fully covers the
+        // viewport on every breakpoint.
         <motion.div
           ref={overlayRef}
           onClick={handleOverlayClick}
@@ -308,19 +309,24 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center"
           style={{ backgroundColor: "rgba(44, 31, 20, 0.6)", backdropFilter: "blur(6px)" }}
           role="dialog"
           aria-modal="true"
           aria-label={`Quick view: ${product.collectionLabel ? `${product.collectionLabel} — ${product.name}` : product.name}`}
         >
-          {/* Modal panel */}
+
+          {/* ══════════════════════════════════════════════════════════════
+              MOBILE / TABLET (<1024px) — the original Quick View design:
+              single scrolling column, image on top, details underneath,
+              stacked measurement inputs, CTA at the bottom of the scroll.
+              ══════════════════════════════════════════════════════════════ */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 10 }}
             transition={{ duration: 0.35, ease: EASE_BRAND }}
-            className="relative w-full max-w-3xl max-h-[94vh] overflow-hidden rounded-[28px] shadow-2xl flex flex-col"
+            className="lg:hidden relative w-full max-w-3xl max-h-[94vh] overflow-hidden rounded-[28px] shadow-2xl flex flex-col m-3 sm:m-6"
             style={{ backgroundColor: "#FAF7F2" }}
           >
             <div className="flex-1 overflow-y-auto overscroll-contain">
@@ -365,7 +371,6 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
 
                 {/* Close button */}
                 <button
-                  ref={closeButtonRef}
                   onClick={onClose}
                   className="absolute top-4 right-4 z-10 flex items-center justify-center w-9 h-9 rounded-full focus:outline-none focus-visible:ring-2 transition-colors duration-150"
                   style={{ background: "rgba(44,31,20,0.55)", color: "#FAF7F2" }}
@@ -454,6 +459,14 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                       style={{ color: "#9C8873" }}
                     >
                       {product.collectionLabel ?? product.subcategory!.replace(/-/g, " ")}
+                    </p>
+                  )}
+                  {product.designNumber && (
+                    <p
+                      className="text-xs font-semibold uppercase tracking-wider mb-1.5"
+                      style={{ color: "#B5926A" }}
+                    >
+                      Design No. {product.designNumber}
                     </p>
                   )}
                   <h2
@@ -762,6 +775,478 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   </button>
                 </div>
 
+              </div>
+            </div>
+          </motion.div>
+
+          {/* ══════════════════════════════════════════════════════════════
+              DESKTOP (>=1024px) — immersive split layout: fixed image panel
+              (fills the entire left panel, never scrolls, no leftover
+              whitespace) + independently scrolling info panel on the right
+              with a pinned CTA.
+              ══════════════════════════════════════════════════════════════ */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 10 }}
+            transition={{ duration: 0.35, ease: EASE_BRAND }}
+            className="hidden lg:flex relative w-[95vw] max-w-[1500px] h-[92vh] overflow-hidden rounded-[28px] shadow-2xl flex-row"
+            style={{ backgroundColor: "#FAF7F2" }}
+          >
+            {/* Close button — floats above both columns so it's always
+                reachable regardless of which panel scrolls. */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-30 flex items-center justify-center w-9 h-9 rounded-full focus:outline-none focus-visible:ring-2 transition-colors duration-150"
+              style={{ background: "rgba(44,31,20,0.55)", color: "#FAF7F2" }}
+              aria-label="Close quick view"
+            >
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+                <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            {/* ── LEFT: PREVIEW — fixed, fills the entire panel height and
+                 width. object-contain guarantees every wallpaper — whatever
+                 its native aspect ratio — displays in full, uncropped and
+                 unstretched, centered within the panel. This panel never
+                 scrolls. */}
+            <div className="relative w-[68%] h-full flex-shrink-0 overflow-hidden">
+              <Image
+                key={gallery[activeImage]}
+                src={gallery[activeImage]}
+                alt={product.name}
+                fill
+                quality={95}
+                sizes="68vw"
+                priority={activeImage === 0}
+                loading={activeImage === 0 ? undefined : "lazy"}
+                onLoad={() => setImageLoaded(true)}
+                className="object-contain transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+              />
+
+              {/* Workflow badge */}
+              <span
+                className="absolute top-4 left-4 px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+                style={{
+                  background: isCustom ? "#D48C43" : "rgba(44,31,20,0.8)",
+                  color: "#FAF7F2",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                {isCustom ? "Custom" : "Standard"}
+              </span>
+
+              {/* Prev / Next — only shown when a gallery is available */}
+              {hasGallery && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => goToImage(activeImage - 1)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full transition-transform duration-150 hover:scale-105 focus:outline-none focus-visible:ring-2"
+                    style={{ background: "rgba(250,247,242,0.92)", color: "#2C1F14" }}
+                    aria-label="Previous image"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 14 14" fill="none">
+                      <path d="M9 2.5L4.5 7 9 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goToImage(activeImage + 1)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full transition-transform duration-150 hover:scale-105 focus:outline-none focus-visible:ring-2"
+                    style={{ background: "rgba(250,247,242,0.92)", color: "#2C1F14" }}
+                    aria-label="Next image"
+                  >
+                    <svg width="15" height="15" viewBox="0 0 14 14" fill="none">
+                      <path d="M5 2.5L9.5 7 5 11.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+
+                  {/* Page indicator */}
+                  <span
+                    className="absolute bottom-4 left-4 px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide"
+                    style={{ background: "rgba(250,247,242,0.9)", color: "#6B5744" }}
+                  >
+                    Page {String(activeImage + 1).padStart(2, "0")}
+                  </span>
+
+                  {/* Thumbnail strip — overlaid on the image so it never
+                      eats into panel height or leaves empty space below
+                      the image. */}
+                  <div className="absolute bottom-4 right-4 flex gap-2">
+                    {gallery.map((src, i) => (
+                      <button
+                        key={src + i}
+                        type="button"
+                        onClick={() => goToImage(i)}
+                        className="relative w-12 h-9 flex-shrink-0 overflow-hidden rounded-lg transition-all duration-150"
+                        style={{
+                          outline: activeImage === i ? "2px solid #B5926A" : "2px solid rgba(250,247,242,0.6)",
+                          outlineOffset: "1px",
+                        }}
+                        aria-label={`View image ${i + 1}`}
+                        aria-current={activeImage === i}
+                      >
+                        <Image
+                          src={src}
+                          alt=""
+                          fill
+                          sizes="48px"
+                          quality={60}
+                          loading="lazy"
+                          className="object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Divider between preview and info panel */}
+            <div
+              className="w-px h-full flex-shrink-0"
+              style={{ background: "rgba(44,31,20,0.1)" }}
+            />
+
+            {/* ── RIGHT: INFO PANEL — vertically organized, own scroll
+                 region, CTA pinned at the bottom so it never requires
+                 excessive scrolling to reach. The left panel above stays
+                 fixed regardless of how much this side scrolls. ── */}
+            <div className="relative flex flex-col w-[32%] h-full min-h-0">
+              <div className="flex-1 overflow-y-auto overscroll-contain px-7 pt-8 pb-4">
+                <div className="flex flex-col gap-6">
+
+                  {/* Collection + Design number + Name & description */}
+                  <div>
+                    {(product.collectionLabel || product.subcategory) && (
+                      <p
+                        className="text-[11px] font-bold uppercase tracking-[0.12em] mb-1.5"
+                        style={{ color: "#9C8873" }}
+                      >
+                        {product.collectionLabel ?? product.subcategory!.replace(/-/g, " ")}
+                      </p>
+                    )}
+                    {product.designNumber && (
+                      <p
+                        className="text-[11px] font-semibold uppercase tracking-[0.12em] mb-2.5"
+                        style={{ color: "#B5926A" }}
+                      >
+                        Design No. {product.designNumber}
+                      </p>
+                    )}
+                    <h2
+                      className="text-[26px] lg:text-[30px] font-bold leading-[1.1] mb-2.5"
+                      style={{ fontFamily: "'Playfair Display', serif", color: "#2C1F14" }}
+                    >
+                      {product.name}
+                    </h2>
+                    {product.description && (
+                      <p className="text-sm leading-relaxed" style={{ color: "#6B5744" }}>
+                        {product.description}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Quality badges (Features) */}
+                  <div className="flex flex-wrap gap-2">
+                    {QUALITY_BADGES.map(({ label, icon }) => (
+                      <span
+                        key={label}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                        style={{ background: "rgba(44,31,20,0.07)", color: "#6B5744" }}
+                      >
+                        {icon}
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+
+                  <hr style={{ borderColor: "rgba(44,31,20,0.1)" }} />
+
+                  {/* Measurements */}
+                  <div className="flex flex-col gap-3.5">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: "#2C1F14" }}>
+                      Measurements
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-3.5">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1.5" style={{ color: "#2C1F14" }}>
+                          Width
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={width}
+                          onChange={e => setWidth(e.target.value)}
+                          placeholder="Enter width"
+                          aria-invalid={!!widthError}
+                          className="w-full rounded-2xl border px-4 py-3 text-[15px] outline-none transition-colors duration-150"
+                          style={{
+                            borderColor: widthError ? "#C0392B" : "rgba(44,31,20,0.18)",
+                            backgroundColor: "#fff",
+                            color: "#2C1F14",
+                          }}
+                          onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
+                          onBlur={e => (e.currentTarget.style.borderColor = widthError ? "#C0392B" : "rgba(44,31,20,0.18)")}
+                        />
+                        {widthError && (
+                          <p className="mt-1.5 text-xs" style={{ color: "#C0392B" }}>
+                            {widthError}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold mb-1.5" style={{ color: "#2C1F14" }}>
+                          Height
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          value={height}
+                          onChange={e => setHeight(e.target.value)}
+                          placeholder="Enter height"
+                          aria-invalid={!!heightError}
+                          className="w-full rounded-2xl border px-4 py-3 text-[15px] outline-none transition-colors duration-150"
+                          style={{
+                            borderColor: heightError ? "#C0392B" : "rgba(44,31,20,0.18)",
+                            backgroundColor: "#fff",
+                            color: "#2C1F14",
+                          }}
+                          onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
+                          onBlur={e => (e.currentTarget.style.borderColor = heightError ? "#C0392B" : "rgba(44,31,20,0.18)")}
+                        />
+                        {heightError && (
+                          <p className="mt-1.5 text-xs" style={{ color: "#C0392B" }}>
+                            {heightError}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Unit — same UNITS list + Unit type as Project Builder.
+                        One selector drives both width and height. */}
+                    <div>
+                      <label className="block text-xs font-semibold mb-1.5" style={{ color: "#2C1F14" }}>
+                        Units
+                      </label>
+                      <select
+                        value={unit}
+                        onChange={e => setUnit(e.target.value as Unit)}
+                        aria-label="Measurement unit"
+                        className="w-full sm:w-32 rounded-2xl border px-4 py-3 text-[15px] outline-none transition-colors duration-150"
+                        style={{ borderColor: "rgba(44,31,20,0.18)", backgroundColor: "#fff", color: "#2C1F14" }}
+                        onFocus={e => (e.currentTarget.style.borderColor = "#B5926A")}
+                        onBlur={e => (e.currentTarget.style.borderColor = "rgba(44,31,20,0.18)")}
+                      >
+                        {UNITS.map(u => (
+                          <option key={u.value} value={u.value}>
+                            {u.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Coverage Area + Rate — premium live summary */}
+                    <div
+                      className="rounded-2xl px-4 py-3 grid grid-cols-2 gap-3"
+                      style={{ background: "rgba(44,31,20,0.05)" }}
+                    >
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
+                          Area
+                        </p>
+                        <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
+                          {coverageAreaSqFt != null ? `${coverageAreaSqFt.toFixed(2)} sq ft` : "—"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: "#6B5744" }}>
+                          Rate
+                        </p>
+                        <p className="text-sm font-semibold" style={{ color: "#2C1F14" }}>
+                          {formatEstimatorCurrency(MATERIAL_RATE_PER_SQFT[selectedMaterial])} / sq ft
+                        </p>
+                      </div>
+                    </div>
+
+                    {minAreaApplied && (
+                      <div
+                        className="flex items-start gap-2.5 px-4 py-3 rounded-2xl text-xs leading-relaxed"
+                        style={{ background: "rgba(181,146,106,0.16)", color: "#6B5744" }}
+                      >
+                        <svg width="15" height="15" viewBox="0 0 14 14" fill="none" className="flex-shrink-0 mt-0.5">
+                          <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2"/>
+                          <path d="M7 6.2v3.3M7 4.3v.1" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                        </svg>
+                        <span>
+                          This estimate has been calculated using the minimum billable area of{" "}
+                          {MIN_BILLABLE_AREA_SQFT} sq ft.
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Material selector — premium selectable cards */}
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.12em] mb-3" style={{ color: "#2C1F14" }}>
+                      Material
+                    </p>
+                    <div className="flex flex-col gap-2.5">
+                      {WALLPAPER_MATERIALS.map(({ name: mat, description }) => {
+                        const active = selectedMaterial === mat;
+                        return (
+                          <button
+                            key={mat}
+                            type="button"
+                            onClick={() => setSelectedMaterial(mat)}
+                            className="w-full text-left px-5 py-3.5 rounded-2xl transition-all duration-150 focus:outline-none focus-visible:ring-2"
+                            style={{
+                              border: active ? "1.5px solid #B5926A" : "1.5px solid rgba(44,31,20,0.14)",
+                              backgroundColor: active ? "#F3E8D8" : "transparent",
+                            }}
+                            aria-pressed={active}
+                          >
+                            <span className="flex items-start gap-3">
+                              <span
+                                className="w-4 h-4 mt-0.5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-150"
+                                style={{ borderColor: active ? "#8A6A45" : "rgba(44,31,20,0.25)" }}
+                              >
+                                {active && (
+                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: "#8A6A45" }} />
+                                )}
+                              </span>
+                              <span className="flex flex-col gap-0.5">
+                                <span className="text-[15px] font-semibold" style={{ color: "#2C1F14" }}>{mat}</span>
+                                <span
+                                  className="text-[13px] font-normal leading-snug"
+                                  style={{ color: "#8A7660" }}
+                                >
+                                  {description}
+                                </span>
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Quantity */}
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.12em] mb-3" style={{ color: "#2C1F14" }}>
+                      Quantity
+                    </p>
+                    <div className="inline-flex items-center rounded-2xl border overflow-hidden" style={{ borderColor: "rgba(44,31,20,0.2)" }}>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                        className="w-11 h-11 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
+                        style={{ color: "#2C1F14" }}
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(181,146,106,0.12)")}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <span
+                        className="w-14 h-11 flex items-center justify-center text-sm font-semibold border-x"
+                        style={{ color: "#2C1F14", borderColor: "rgba(44,31,20,0.2)" }}
+                      >
+                        {quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setQuantity(q => q + 1)}
+                        className="w-11 h-11 flex items-center justify-center text-lg font-medium transition-colors duration-150 focus:outline-none"
+                        style={{ color: "#2C1F14" }}
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = "rgba(181,146,106,0.12)")}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = "transparent")}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Disclaimer, Estimated Total, and the dominant primary CTA —
+                  pinned to the bottom of the info panel so it stays visible
+                  without excessive scrolling. */}
+              <div
+                className="flex-shrink-0 flex flex-col gap-3 px-7 pt-4 pb-6"
+                style={{ borderTop: "1px solid rgba(44,31,20,0.1)", backgroundColor: "#FAF7F2" }}
+              >
+                <p className="text-[11px] leading-relaxed" style={{ color: "#9C8873" }}>
+                  {ESTIMATE_DISCLAIMER}
+                </p>
+
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "#6B5744" }}>
+                    Estimated Total
+                  </span>
+                  <span
+                    className="text-2xl font-bold"
+                    style={{ fontFamily: "'Playfair Display', serif", color: "#2C1F14" }}
+                  >
+                    {estimatedTotal != null ? currencyFormatter.format(estimatedTotal) : "—"}
+                  </span>
+                </div>
+
+                {/* CTA */}
+                <button
+                  type="button"
+                  onClick={handlePrimaryCTA}
+                  disabled={addedFeedback || !dimensionsValid}
+                  className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                  style={{
+                    background: addedFeedback
+                      ? "#4CAF50"
+                      : isCustom
+                      ? "linear-gradient(90deg, #3E2C22 0%, #D48C43 100%)"
+                      : "#2C1F14",
+                    color: "#FAF7F2",
+                  }}
+                  onMouseEnter={e => { if (!addedFeedback) e.currentTarget.style.opacity = "0.9"; }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
+                >
+                  <span className="flex items-center gap-2.5 text-[15px] font-semibold">
+                    {addedFeedback ? (
+                      <>
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                          <path d="M2 7.5l4 4 7-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        Added to Project
+                      </>
+                    ) : isCustom ? (
+                      <>
+                        <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                          <path d="M7.5 1v13M1 7.5h13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                        </svg>
+                        Add to Project
+                      </>
+                    ) : (
+                      <>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path fillRule="evenodd" clipRule="evenodd" d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z" fill="currentColor" fillOpacity=".2"/>
+                          <path d="M5.5 5.5c.2-.3.6-.3.8 0l.8 1.2c.1.2.1.5-.1.7l-.3.3c.3.6.8 1.1 1.4 1.4l.3-.3c.2-.2.5-.2.7-.1l1.2.8c.3.2.3.6 0 .8l-.5.5c-.3.3-.7.4-1 .3-1.5-.5-2.7-1.7-3.2-3.2-.1-.3 0-.7.3-1l.6-.4z" fill="currentColor"/>
+                        </svg>
+                        Enquire on WhatsApp
+                      </>
+                    )}
+                  </span>
+                  {!addedFeedback && (
+                    <span className="text-[11.5px] font-normal" style={{ color: "rgba(250,247,242,0.75)" }}>
+                      {isCustom ? "Get started with your custom project" : "Chat with us for pricing & installation"}
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
           </motion.div>
