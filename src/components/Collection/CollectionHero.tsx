@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type { Collection } from "@/lib/collections";
+import { CustomerActions } from "@/components/Collection/CustomerActions";
 
 interface CollectionHeroProps {
   collection: Collection;
@@ -200,6 +201,18 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange }:
                   </motion.div>
                 );
               })}
+            </motion.div>
+          )}
+
+          {/* Customer action CTAs — driven entirely by collection.customerActions */}
+          {collection.customerActions && collection.customerActions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: EASE_BRAND, delay: 0.32 }}
+              className="mt-8"
+            >
+              <CustomerActions customerActions={collection.customerActions} collection={collection} />
             </motion.div>
           )}
         </div>

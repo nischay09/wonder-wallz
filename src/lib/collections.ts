@@ -24,6 +24,18 @@
 export type WorkflowType = "custom" | "standard";
 
 /**
+ * Customer-facing actions available on a collection (e.g. rendered as
+ * buttons/CTAs in the UI). This is distinct from `workflow`: see the
+ * `customerActions` field on `Collection` for an explanation of why these
+ * two concepts are kept separate.
+ */
+export type CustomerAction =
+  | "custom-project"
+  | "whatsapp"
+  | "home-catalogue"
+  | "visit-store";
+
+/**
  * Image aspect ratio for Quick View's preview panel.
  *
  * "landscape" (16 / 10) is the default and matches the ratio used by every
@@ -180,6 +192,25 @@ export interface Collection {
    *              request measurements, WhatsApp flow, installation
    */
   workflow: WorkflowType;
+  /**
+   * Which customer-facing action CTAs this collection supports (e.g. for
+   * rendering a set of contact/engagement buttons). Independent of
+   * `workflow` — see the type-level doc comment on `CustomerAction` and the
+   * module-level notes at the bottom of this file for why the two concepts
+   * are kept separate.
+   */
+  customerActions: CustomerAction[];
+  /**
+   * Whether this collection has an online catalogue and should render its
+   * CollectionCards grid on the collection page. When false, the page goes
+   * straight from the hero section into CustomerActions — used for
+   * categories that are enquiry/visit-only and have no browsable online
+   * catalogue yet.
+   *
+   * Defaults to `true` when omitted, so existing/future collections keep
+   * showing CollectionCards unless explicitly opted out here.
+   */
+  showCollectionCards?: boolean;
   /** Whether this collection appears in featured/homepage sections */
   featured: boolean;
   /** Optional nested subcategories shown as filter chips */
@@ -202,6 +233,15 @@ export interface Collection {
    * so "sorting" has no meaningful effect (e.g. Wallpapers).
    */
   hideSortOptions?: boolean;
+  /**
+   * Short, informational highlight strings shown via CollectionHighlights
+   * for collections without an online catalogue (showCollectionCards:
+   * false) — e.g. "Made-to-measure fit", "5 styles available". These are
+   * NOT products: no image, price, or CTA is attached to any entry. Purely
+   * decorative/informational chips shown between the hero and
+   * CustomerActions.
+   */
+  highlights?: string[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -441,6 +481,9 @@ export const collections: Collection[] = [
     placeholderGradient: ["#F3E8D5", "#D6C4AE"],
     productCount: 500,
     workflow: "custom",
+    customerActions: ["custom-project", "whatsapp", "home-catalogue", "visit-store"],
+    // Wallpapers has a full browsable online catalogue.
+    showCollectionCards: true,
     featured: true,
     subcategories: [
       sub("wallpapers", "wonder-art-mural", "Wonder Art Mural"),
@@ -473,6 +516,16 @@ export const collections: Collection[] = [
     placeholderGradient: ["#EEE9E0", "#D8CEC1"],
     productCount: 80,
     workflow: "standard",
+    customerActions: ["whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — page goes straight from hero to CustomerActions.
+    showCollectionCards: false,
+    highlights: [
+      "Made-to-measure fit",
+      "5 styles: roller, zebra, roman, venetian, vertical",
+      "Professional installation included",
+      "Blackout, sheer, and light-filtering fabrics",
+      "Motorisation available on request",
+    ],
     featured: true,
     subcategories: [
       sub("blinds", "roller", "Roller"),
@@ -512,6 +565,16 @@ export const collections: Collection[] = [
     placeholderGradient: ["#F7F1EA", "#DCCFC2"],
     productCount: 60,
     workflow: "standard",
+    customerActions: ["whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — page goes straight from hero to CustomerActions.
+    showCollectionCards: false,
+    highlights: [
+      "Tailored to your exact window size",
+      "Sheer, blackout, eyelet, and pleated styles",
+      "Premium linen, velvet, and silk fabrics",
+      "Free in-home measurement",
+      "Professional stitching and installation",
+    ],
     featured: false,
     subcategories: [
       sub("curtains", "sheer", "Sheer"),
@@ -550,6 +613,9 @@ export const collections: Collection[] = [
     placeholderGradient: ["#D7B899", "#8B6A4E"],
     productCount: 45,
     workflow: "standard",
+    customerActions: ["whatsapp", "home-catalogue", "visit-store"],
+    // Flooring has a full browsable online catalogue.
+    showCollectionCards: true,
     featured: true,
     subcategories: [
       sub("flooring", "spc", "SPC"),
@@ -585,6 +651,16 @@ export const collections: Collection[] = [
     placeholderGradient: ["#E7F2F8", "#C6DCE9"],
     productCount: 30,
     workflow: "custom",
+    customerActions: ["custom-project", "whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — page goes straight from hero to CustomerActions.
+    showCollectionCards: false,
+    highlights: [
+      "Frosted, etched, and custom-printed finishes",
+      "Precision-cut for doors, partitions, and windows",
+      "Adds privacy without blocking light",
+      "Custom branding and logo printing available",
+      "Residential and commercial applications",
+    ],
     featured: false,
     subcategories: [
       sub("glass-films", "frosted", "Frosted"),
@@ -619,6 +695,16 @@ export const collections: Collection[] = [
     placeholderGradient: ["#F4E7D2", "#D9B88F"],
     productCount: 120,
     workflow: "custom",
+    customerActions: ["custom-project", "whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — page goes straight from hero to CustomerActions.
+    showCollectionCards: false,
+    highlights: [
+      "Museum-grade canvas, gallery-stretched",
+      "Custom sizing for any wall",
+      "Colour-calibrated printing",
+      "Upload your own photos or artwork",
+      "Ready to hang out of the box",
+    ],
     featured: false,
     products: seedProducts(
       "canvas-prints",
@@ -649,6 +735,16 @@ export const collections: Collection[] = [
     placeholderGradient: ["#EFE4D7", "#C9B39A"],
     productCount: 35,
     workflow: "standard",
+    customerActions: ["whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — page goes straight from hero to CustomerActions.
+    showCollectionCards: false,
+    highlights: [
+      "Premium fabric range: bouclé, velvet, linen, chenille",
+      "Sofas, chairs, headboards, and feature walls",
+      "Coordinated installation through trusted craftsmen",
+      "Stain-resistant and performance fabrics available",
+      "Fabric samples available in-store",
+    ],
     featured: false,
     products: seedProducts(
       "upholstery",

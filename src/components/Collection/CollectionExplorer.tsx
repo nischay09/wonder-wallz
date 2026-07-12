@@ -21,16 +21,37 @@ import type { Collection, CollectionProduct } from "@/lib/collections";
 import { CollectionHero } from "./CollectionHero";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionGrid } from "./CollectionGrid";
+import { CollectionHighlights } from "./CollectionHighlights";
 
 interface CollectionExplorerProps {
   collection: Collection;
 }
 
-export function CollectionExplorer({ collection }: CollectionExplorerProps) {
-  const { products, subcategories, workflow, unifiedCategoryNav, hideSortOptions } = collection;
+/** Default subcategory shown on first load for the Wallpapers collection. */
+const WALLPAPERS_DEFAULT_CATEGORY = "wonder-art-mural";
 
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [visibleProducts, setVisibleProducts] = useState<CollectionProduct[]>(products);
+/** Resolve the initial active subcategory for a given collection. */
+function getDefaultCategory(collection: Collection): string {
+  if (collection.slug === "wallpapers") return WALLPAPERS_DEFAULT_CATEGORY;
+  return collection.subcategories?.[0]?.slug ?? "";
+}
+
+export function CollectionExplorer({ collection }: CollectionExplorerProps) {
+  const {
+    products,
+    subcategories,
+    workflow,
+    unifiedCategoryNav,
+    hideSortOptions,
+    showCollectionCards = true,
+    highlights,
+  } = collection;
+
+  const [activeCategory, setActiveCategory] = useState(() => getDefaultCategory(collection));
+  const [visibleProducts, setVisibleProducts] = useState<CollectionProduct[]>(() => {
+    const defaultCategory = getDefaultCategory(collection);
+    return defaultCategory ? products.filter((p) => p.subcategory === defaultCategory) : products;
+  });
 
   return (
     <>
@@ -44,30 +65,43 @@ export function CollectionExplorer({ collection }: CollectionExplorerProps) {
       />
 
       <div className="container-site py-10 md:py-14">
-        {/* ── Filters (search, sort, category) ── */}
-        <section aria-label="Filter and sort products" className="mb-8">
-          <CollectionFilters
-            products={products}
-            subcategories={subcategories}
-            activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
-            hideCategoryChips={unifiedCategoryNav}
-            hideSort={hideSortOptions}
-            onFilteredChange={setVisibleProducts}
-          />
-        </section>
+        {showCollectionCards ? (
+          <>
+            {/* ── Filters (search, sort, category) ── */}
+            <section aria-label="Filter and sort products" className="mb-8">
+              <CollectionFilters
+                products={products}
+                subcategories={subcategories}
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
+                hideCategoryChips={unifiedCategoryNav}
+                hideSort={hideSortOptions}
+                onFilteredChange={setVisibleProducts}
+              />
+            </section>
 
-        {/* Divider */}
-        <hr className="border-neutral-200 mb-8" />
+            {/* Divider */}
+            <hr className="border-neutral-200 mb-8" />
 
-        {/* ── Product grid ── */}
-        <section aria-label={`${collection.title} products`}>
-          <CollectionGrid
-            products={visibleProducts}
-            workflow={workflow}
-            collectionSlug={collection.slug}
+            {/* ── Product grid ── */}
+            <section aria-label={`${collection.title} products`}>
+              <CollectionGrid
+                products={visibleProducts}
+                workflow={workflow}
+                collectionSlug={collection.slug}
+              />
+            </section>
+          </>
+        ) : (
+          /* ── No online catalogue: informational highlights only ── */
+          /* CustomerActions (rendered by the parent page, not this
+             component) picks up immediately after this section — see
+             module doc comment above and collections.ts for context. */
+          <CollectionHighlights
+            highlights={highlights ?? []}
+            description={collection.description}
           />
-        </section>
+        )}
       </div>
     </>
   );

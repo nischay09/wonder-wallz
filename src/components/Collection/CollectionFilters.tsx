@@ -48,11 +48,9 @@ export function CollectionFilters({
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
-    let result = products;
-
-    if (activeCategory !== "all") {
-      result = result.filter((p) => p.subcategory === activeCategory);
-    }
+    let result = activeCategory
+      ? products.filter((p) => p.subcategory === activeCategory)
+      : products;
 
     const query = searchValue.trim().toLowerCase();
     if (query) {
@@ -184,20 +182,6 @@ export function CollectionFilters({
             role="group"
             aria-label="Filter by category"
           >
-            {/* "All" chip */}
-            <button
-              type="button"
-              onClick={() => onCategoryChange("all")}
-              className={`inline-flex items-center px-4 py-1.5 rounded-pill text-sm font-medium transition-all duration-200 ${
-                activeCategory === "all"
-                  ? "bg-neutral-900 text-white shadow-sm"
-                  : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
-              }`}
-              aria-pressed={activeCategory === "all"}
-            >
-              All
-            </button>
-
             {subcategories!.map((sub) => (
               <button
                 key={sub.id}
@@ -222,7 +206,7 @@ export function CollectionFilters({
         Showing{" "}
         <span className="font-semibold text-neutral-700">{filteredProducts.length}</span>{" "}
         {filteredProducts.length === 1 ? "product" : "products"}
-        {activeCategory !== "all" && subcategories && (
+        {activeCategory && subcategories && (
           <>
             {" "}in{" "}
             <span className="font-semibold text-neutral-700">

@@ -32,17 +32,21 @@ const sizes = {
   lg: "px-7 py-3.5 text-base",
 };
 
-export function Button({
-  variant = "primary",
-  size = "md",
-  children,
-  className = "",
-  loading = false,
-  icon,
-  ...props
-}) {
+export const Button = React.forwardRef(function Button(
+  {
+    variant = "primary",
+    size = "md",
+    children,
+    className = "",
+    loading = false,
+    icon,
+    ...props
+  },
+  ref
+) {
   return (
     <button
+      ref={ref}
       className={[base, variants[variant], sizes[size], className].join(" ")}
       disabled={loading || props.disabled}
       {...props}
@@ -73,6 +77,6 @@ export function Button({
       {children}
     </button>
   );
-}
+});
 
 export default Button;
