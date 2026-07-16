@@ -36,6 +36,7 @@
  */
 
 import type { Metadata } from "next";
+import type { ReactElement } from "react";
 import { notFound } from "next/navigation";
 import {
   collections,
@@ -57,7 +58,7 @@ import type { Collection } from "@/lib/collections";
 // product, add its slug + wrapper component here — no other changes needed.
 const LANDING_PAGES: Record<
   string,
-  (props: { collection: Collection }) => JSX.Element
+  (props: { collection: Collection }) =>ReactElement
 > = {
   flooring: FlooringLandingPage,
   "canvas-prints": CanvasLandingPage,

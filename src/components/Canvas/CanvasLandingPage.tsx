@@ -14,7 +14,7 @@
  *
  * "Start Custom Project" (hero + final CTA) navigates straight to the
  * existing Project Builder at /custom-design#start-project (with
- * ?product=canvas), via CustomProductLandingPage's default
+ * ?product=canvas-prints), via CustomProductLandingPage's default
  * onStartCustomProject handler — it does not open WhatsApp or a modal, and
  * does not create a new builder.
  *
@@ -35,9 +35,9 @@ export function CanvasLandingPage({ collection }: CanvasLandingPageProps) {
   return (
     <CustomProductLandingPage
       collection={collection}
-      modalCategory="canvas"
+      modalCategory="canvas-prints"
       // "Start Custom Project" navigates to the existing Project Builder at
-      // /custom-design#start-project (with ?product=canvas) via
+      // /custom-design#start-project (with ?product=canvas-prints) via
       // CustomProductLandingPage's default onStartCustomProject — no
       // override needed here.
       {...canvasLandingConfig}
