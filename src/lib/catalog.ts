@@ -160,6 +160,14 @@ export const exampleCatalog: CatalogCategory[] = [
     ],
   },
   {
+    // ── Flooring bridge note ───────────────────────────────────────────
+    // As of the Phase 1 flooring architecture (`src/lib/flooring/`),
+    // every `collectionSlug` under this category's series should match a
+    // collection slug registered in `flooring/registry.ts`
+    // (`FLOORING_COLLECTION_SLUGS`). `catalog.ts` still does not import
+    // from `flooring/` — that stays a one-way pointer resolved by
+    // whatever consumes this hierarchy — but the slugs are now real,
+    // typed placeholders rather than reserved names with no backing data.
     id: "flooring",
     slug: "flooring",
     title: "Flooring",

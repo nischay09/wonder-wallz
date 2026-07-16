@@ -8,17 +8,21 @@
  * page.tsx stays a server component (generateStaticParams/generateMetadata,
  * async params) and just hands this component the collection data.
  *
- * Renders Hero → Filters → Grid together because, for collections with
- * `unifiedCategoryNav` (e.g. Wallpapers), the Hero's chips ARE the category
- * filter — they need to share the same `activeCategory` state as
- * CollectionFilters instead of navigating to a separate route. Collections
- * without that flag keep the Hero's chips as plain navigation links and
- * still get their own category-chip row in CollectionFilters, unchanged.
+ * Renders Hero → Customer Actions (inside Hero) → Collection Carousel →
+ * Filters → Grid. For collections with `unifiedCategoryNav` (e.g.
+ * Wallpapers), category browsing now lives in the Collection Carousel
+ * (a premium, horizontally-scrollable replacement for the old inline hero
+ * pills) instead of the Hero itself — both share the same `activeCategory`
+ * state with CollectionFilters, so filtering logic is untouched.
+ * Collections without that flag keep the Hero's chips as plain navigation
+ * links and still get their own category-chip row in CollectionFilters,
+ * unchanged.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Collection, CollectionProduct } from "@/lib/collections";
 import { CollectionHero } from "./CollectionHero";
+import { CollectionCarousel } from "./CollectionCarousel";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionGrid } from "./CollectionGrid";
 import { CollectionHighlights } from "./CollectionHighlights";
@@ -53,18 +57,45 @@ export function CollectionExplorer({ collection }: CollectionExplorerProps) {
     return defaultCategory ? products.filter((p) => p.subcategory === defaultCategory) : products;
   });
 
+  // Anchor for the search/grid section so selecting a collection card can
+  // smoothly bring the results into view (mainly matters on mobile, where
+  // the carousel + hero can push the grid below the fold).
+  const searchGridRef = useRef<HTMLDivElement>(null);
+
+  const handleCarouselCategoryChange = (slug: string) => {
+    setActiveCategory(slug);
+    requestAnimationFrame(() => {
+      searchGridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   return (
     <>
       {/* ── Hero ── */}
-      {/* Chips filter in place (unifiedCategoryNav) or link out, depending
-          on the collection's flag — see CollectionHero for the switch. */}
-      <CollectionHero
-        collection={collection}
-        activeCategory={unifiedCategoryNav ? activeCategory : undefined}
-        onCategoryChange={unifiedCategoryNav ? setActiveCategory : undefined}
-      />
+      {/* Category browsing has moved to the Collection Carousel below, so
+          the hero's inline chips are hidden for unifiedCategoryNav
+          collections (Wallpapers) to avoid duplicating the same control.
+          Other collections keep the hero's chips as plain navigation
+          links, unchanged. Customer Actions still render inside the Hero,
+          right after the title/description block. */}
+      <CollectionHero collection={collection} hideChips={unifiedCategoryNav} />
 
-      <div className="container-site py-10 md:py-14">
+      {/* ── Explore Collections carousel ── */}
+      {/* Replaces the old subcategory pill row. Only relevant for
+          collections with unifiedCategoryNav + subcategories (Wallpapers);
+          purely a UI layer over the same activeCategory state that
+          CollectionFilters and CollectionGrid already consume. */}
+      {unifiedCategoryNav && subcategories && subcategories.length > 0 && (
+        <CollectionCarousel
+          subcategories={subcategories}
+          products={products}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCarouselCategoryChange}
+          placeholderGradient={collection.placeholderGradient}
+        />
+      )}
+
+      <div ref={searchGridRef} className="container-site py-10 md:py-14 scroll-mt-6">
         {showCollectionCards ? (
           <>
             {/* ── Filters (search, sort, category) ── */}

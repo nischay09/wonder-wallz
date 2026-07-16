@@ -19,6 +19,23 @@
  * Nothing that consumes these types needs to change.
  */
 
+// ─── Flooring registry imports ─────────────────────────────────────────────────
+//
+// Phase 3 (routing): Flooring's own Category → Collection → Series → Variant
+// hierarchy is adapted into the flat CollectionProduct[] shape below, the same
+// way generateWallpaperDesigns() adapts wallpaper folders. Nothing here is
+// hardcoded — every category, collection, series and variant is discovered
+// through the flooring registry/helpers, so Phase 2 catalogue changes (new
+// collections, new series, new variants) require zero changes to this file.
+
+import { FLOORING_CATEGORIES } from "./flooring/constants";
+import { getCollectionsByCategory } from "./flooring/helpers";
+import type {
+  FlooringCollection as FlooringCollectionData,
+  FlooringSeries,
+  FlooringVariant,
+} from "./flooring/types";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type WorkflowType = "custom" | "standard";
@@ -466,6 +483,72 @@ function generateWallpaperDesigns(configs: WallpaperCollectionConfig[]): Collect
 
 
 
+/**
+ * Single source of truth for adapting the flooring registry
+ * (Category → Collection → Series → Variant, see src/lib/flooring/) into
+ * the flat CollectionProduct[] shape CollectionExplorer already knows how
+ * to render. This is the flooring analogue of generateWallpaperDesigns():
+ * every card in the grid is a leaf-level Variant, `subcategory` is the
+ * flooring Category slug (drives the unified hero chips, same as
+ * wallpapers' folder-based subcategories), and `collectionLabel` carries
+ * the Collection name — plus the Series name, when the collection uses
+ * one — since there is no separate per-variant route to drill into.
+ *
+ * A collection with no Series (Bern, Berlin, Tego, Trento, Vigo, Venice)
+ * has its variants read directly off `collection.variants`. A collection
+ * with Series (Malaga, Valencia) has its variants read off each series in
+ * turn — so both cases "route directly to variants" from the customer's
+ * point of view, without ever needing a dedicated Series-level page.
+ */
+const FLOORING_GRADIENT: [string, string] = ["#D7B899", "#8B6A4E"];
+
+function flooringVariantToProduct(
+  categorySlug: string,
+  collection: FlooringCollectionData,
+  variant: FlooringVariant,
+  series?: FlooringSeries
+): CollectionProduct {
+  return {
+    id: variant.id,
+    name: variant.displayName,
+    description: series
+      ? `${collection.name} — ${series.name}, reference ${variant.referenceCode}.`
+      : `${collection.name}, reference ${variant.referenceCode}.`,
+    image: variant.previewImage,
+    highResImage: variant.lifestyleImage ?? variant.previewImage,
+    placeholderGradient: FLOORING_GRADIENT,
+    subcategory: categorySlug,
+    collectionLabel: series ? `${collection.name} — ${series.name}` : collection.name,
+  };
+}
+
+/** Flatten every registered flooring collection/series into leaf-level product cards. */
+function generateFlooringProducts(): CollectionProduct[] {
+  return FLOORING_CATEGORIES.flatMap((category) =>
+    getCollectionsByCategory(category.slug).flatMap((collection) => {
+      // Per the architecture doc, a collection owns Series OR owns
+      // Variants directly — never both — so these two branches never overlap.
+      if (collection.series && collection.series.length > 0) {
+        return collection.series.flatMap((series) =>
+          series.variants.map((variant) =>
+            flooringVariantToProduct(category.slug, collection, variant, series)
+          )
+        );
+      }
+      return (collection.variants ?? []).map((variant) =>
+        flooringVariantToProduct(category.slug, collection, variant)
+      );
+    })
+  );
+}
+
+/** Hero/filter chips for flooring — one per registered flooring Category. */
+function generateFlooringSubcategories(): CollectionSubcategory[] {
+  return FLOORING_CATEGORIES.map((category) => sub("flooring", category.slug, category.title));
+}
+
+const flooringProducts = generateFlooringProducts();
+
 export const collections: Collection[] = [
   // ── WALLPAPERS ─────────────────────────────────────────────────────────────
   {
@@ -611,30 +694,20 @@ export const collections: Collection[] = [
     heroImage: "/Wooden-Floor.jpg",
     coverImage: "/Wooden-Floor.jpg",
     placeholderGradient: ["#D7B899", "#8B6A4E"],
-    productCount: 45,
+    productCount: flooringProducts.length,
     workflow: "standard",
     customerActions: ["whatsapp", "home-catalogue", "visit-store"],
-    // Flooring has a full browsable online catalogue.
+    // Flooring has a full browsable online catalogue, now sourced from the
+    // flooring registry (src/lib/flooring/) instead of placeholder seed data.
     showCollectionCards: true,
     featured: true,
-    subcategories: [
-      sub("flooring", "spc", "SPC"),
-      sub("flooring", "wooden", "Wooden"),
-      sub("flooring", "pvc", "PVC"),
-    ],
-    products: seedProducts(
-      "flooring",
-      [
-        { name: "Heritage Oak SPC", description: "Stone-core plank with authentic oak grain", subcategory: "spc" },
-        { name: "Walnut Engineered", description: "Real walnut veneer on birch-ply core", subcategory: "wooden" },
-        { name: "Concrete Grey PVC", description: "Industrial micro-texture, waterproof and quiet underfoot", subcategory: "pvc" },
-        { name: "Bleached Pine SPC", description: "Scandi-blonde tones for light, airy spaces", subcategory: "spc" },
-        { name: "Smoked Ash Engineered", description: "Deep smoke finish on premium ash boards", subcategory: "wooden" },
-        { name: "Warm Ivory PVC", description: "Stone-look warmth without the cold underfoot", subcategory: "pvc" },
-      ],
-      "/Wooden-Floor.jpg",
-      ["#D7B899", "#8B6A4E"]
-    ),
+    subcategories: generateFlooringSubcategories(),
+    products: flooringProducts,
+    // Hero chips (Luxury Vinyl Tiles / Laminate / Sports / Carpet Tiles) are
+    // the only category nav, same pattern as Wallpapers — a flooring
+    // Collection's name (and Series, where present) is carried on each
+    // product's `collectionLabel` instead of a second chip row.
+    unifiedCategoryNav: true,
   },
 
   // ── GLASS FILMS ────────────────────────────────────────────────────────────

@@ -19,11 +19,17 @@ interface CollectionHeroProps {
    * (see `Collection.unifiedCategoryNav`).
    */
   onCategoryChange?: (slug: string) => void;
+  /**
+   * Suppress the hero's inline subcategory chip row entirely. Set this
+   * when category browsing has moved to a dedicated component below the
+   * hero (e.g. the Collection Carousel) so chips aren't duplicated.
+   */
+  hideChips?: boolean;
 }
 
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
 
-export function CollectionHero({ collection, activeCategory, onCategoryChange }: CollectionHeroProps) {
+export function CollectionHero({ collection, activeCategory, onCategoryChange, hideChips = false }: CollectionHeroProps) {
   const { title, heroDescription, productCount, subcategories, workflow, placeholderGradient } = collection;
 
   const isCustom = workflow === "custom";
@@ -155,7 +161,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange }:
           </motion.div>
 
           {/* Subcategory chips */}
-          {subcategories && subcategories.length > 0 && (
+          {!hideChips && subcategories && subcategories.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
