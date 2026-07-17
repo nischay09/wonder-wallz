@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
+import { FadeImage } from "@/components/ui/FadeImage";
 import type { CollectionProduct, WorkflowType, WallpaperMaterial } from "@/lib/collections";
 import { WALLPAPER_MATERIALS } from "@/lib/collections";
 import { useProjectCart } from "@/store/projectCart";
@@ -343,7 +343,8 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   background: `linear-gradient(135deg, ${product.placeholderGradient[0]} 0%, ${product.placeholderGradient[1]} 100%)`,
                 }}
               >
-                <Image
+                <FadeImage
+                  wrapperClassName="absolute inset-0"
                   key={gallery[activeImage]}
                   src={gallery[activeImage]}
                   alt={product.name}
@@ -353,8 +354,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   priority={activeImage === 0}
                   loading={activeImage === 0 ? undefined : "lazy"}
                   onLoad={() => setImageLoaded(true)}
-                  className="object-contain transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                  style={{ opacity: imageLoaded ? 1 : 0 }}
+                  className="object-contain"
                 />
 
                 {/* Workflow badge */}
@@ -434,7 +434,9 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                       aria-label={`View image ${i + 1}`}
                       aria-current={activeImage === i}
                     >
-                      <Image
+                      <FadeImage
+                        wrapperClassName="absolute inset-0"
+                        scaleIn={false}
                         src={src}
                         alt=""
                         fill
@@ -812,7 +814,8 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                  unstretched, centered within the panel. This panel never
                  scrolls. */}
             <div className="relative w-[68%] h-full flex-shrink-0 overflow-hidden">
-              <Image
+              <FadeImage
+                wrapperClassName="absolute inset-0"
                 key={gallery[activeImage]}
                 src={gallery[activeImage]}
                 alt={product.name}
@@ -822,8 +825,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                 priority={activeImage === 0}
                 loading={activeImage === 0 ? undefined : "lazy"}
                 onLoad={() => setImageLoaded(true)}
-                className="object-contain transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                style={{ opacity: imageLoaded ? 1 : 0 }}
+                className="object-contain"
               />
 
               {/* Workflow badge */}
@@ -889,7 +891,9 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         aria-label={`View image ${i + 1}`}
                         aria-current={activeImage === i}
                       >
-                        <Image
+                        <FadeImage
+                          wrapperClassName="absolute inset-0"
+                          scaleIn={false}
                           src={src}
                           alt=""
                           fill

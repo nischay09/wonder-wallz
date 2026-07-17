@@ -145,11 +145,11 @@ interface ProductLandingPageProps extends ProductLandingConfig {
 // single, easily-diffable source of truth for the button hierarchy.
 
 const BTN_PRIMARY_DARK =
-  "inline-flex items-center justify-center rounded-2xl px-8 py-4 text-[15px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(44,31,20,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-10px_rgba(44,31,20,0.6)] active:translate-y-0";
+  "inline-flex items-center justify-center rounded-2xl px-8 py-4 text-[15px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(44,31,20,0.55)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-10px_rgba(44,31,20,0.6)] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D48C43] focus-visible:ring-offset-2";
 const BTN_GHOST_LIGHT =
-  "inline-flex items-center justify-center rounded-2xl border border-white/35 bg-white/[0.06] px-7 py-4 text-[15px] font-medium text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/[0.14]";
+  "inline-flex items-center justify-center rounded-2xl border border-white/35 bg-white/[0.06] px-7 py-4 text-[15px] font-medium text-white backdrop-blur-sm transition-all duration-300 hover:border-white/60 hover:bg-white/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D48C43] focus-visible:ring-offset-2";
 const BTN_TEXT_LIGHT =
-  "group inline-flex items-center gap-2 text-[15px] font-medium text-white/85 transition-colors duration-300 hover:text-white";
+  "group inline-flex items-center gap-2 text-[15px] font-medium text-white/85 transition-colors duration-300 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D48C43] focus-visible:ring-offset-2 rounded-sm";
 
 export function ProductLandingPage({
   collection,
@@ -350,7 +350,7 @@ export function ProductLandingPage({
             {whyChooseUs.items.map((item, i) => (
               <div
                 key={item}
-                className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 py-5"
+                className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-neutral-50 px-5 py-5 transition-colors duration-300 hover:border-neutral-300"
               >
                 <span
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
@@ -443,7 +443,7 @@ export function ProductLandingPage({
             {showrooms.locations.map((room) => (
               <div
                 key={room.name}
-                className="rounded-3xl border border-neutral-200 bg-neutral-50 p-7"
+                className="rounded-3xl border border-neutral-200 bg-neutral-50 p-7 transition-colors duration-300 hover:border-neutral-300"
               >
                 <h3 className="font-serif text-xl font-medium text-neutral-900">
                   {room.name}
@@ -473,7 +473,7 @@ export function ProductLandingPage({
             <button
               type="button"
               onClick={() => setIsShowroomVisitOpen(true)}
-              className="inline-flex items-center justify-center rounded-2xl border border-neutral-300 bg-white px-7 py-3.5 text-[15px] font-semibold text-neutral-800 transition-colors duration-200 hover:border-neutral-400 hover:bg-neutral-100"
+              className="inline-flex items-center justify-center rounded-2xl border border-neutral-300 bg-white px-7 py-3.5 text-[15px] font-semibold text-neutral-800 transition-colors duration-300 hover:border-neutral-400 hover:bg-neutral-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D48C43] focus-visible:ring-offset-2"
             >
               {showrooms.ctaLabel}
             </button>
@@ -507,7 +507,7 @@ export function ProductLandingPage({
                   type="button"
                   onClick={() => setOpenFaqIndex(isOpen ? null : i)}
                   aria-expanded={isOpen}
-                  className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                  className="flex w-full items-center justify-between gap-6 py-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D48C43] focus-visible:ring-offset-2 rounded-sm"
                 >
                   <span
                     className={`font-serif text-lg leading-snug transition-colors duration-300 sm:text-xl ${

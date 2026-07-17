@@ -32,8 +32,10 @@ export function ProjectCartButton({ onOpen, variant = "icon" }: ProjectCartButto
   if (variant === "row") {
     // ── Mobile bottom-bar style ──────────────────────────────────────────────
     return (
-      <button
+      <motion.button
         onClick={onOpen}
+        whileTap={{ scale: 0.92 }}
+        transition={{ duration: 0.15 }}
         className="flex items-center gap-1.5 text-xs font-semibold ml-auto relative focus:outline-none focus-visible:ring-2"
         style={{ color: "#6B6258" }}
         aria-label={`Open project cart, ${count} ${count === 1 ? "item" : "items"}`}
@@ -56,7 +58,7 @@ export function ProjectCartButton({ onOpen, variant = "icon" }: ProjectCartButto
             </motion.span>
           )}
         </AnimatePresence>
-      </button>
+      </motion.button>
     );
   }
 

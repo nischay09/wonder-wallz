@@ -11,8 +11,8 @@
  */
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import type { CollectionProduct, CollectionSubcategory } from "@/lib/collections";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 interface CollectionCarouselProps {
   subcategories: CollectionSubcategory[];
@@ -75,21 +75,24 @@ export function CollectionCarousel({
             >
               {/* Cover image */}
               <div className="relative w-full overflow-hidden" style={{ aspectRatio: "4/3" }}>
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: `linear-gradient(135deg, ${placeholderGradient[0]} 0%, ${placeholderGradient[1]} 100%)`,
-                  }}
-                  aria-hidden="true"
-                />
-                {coverProduct && (
-                  <Image
+                {coverProduct ? (
+                  <FadeImage
+                    wrapperClassName="absolute inset-0"
+                    placeholderGradient={placeholderGradient}
                     src={coverProduct.image}
                     alt=""
                     fill
                     sizes="(max-width: 768px) 220px, 260px"
                     quality={70}
-                    className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+                    className="object-cover group-hover:scale-105"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${placeholderGradient[0]} 0%, ${placeholderGradient[1]} 100%)`,
+                    }}
+                    aria-hidden="true"
                   />
                 )}
                 <div

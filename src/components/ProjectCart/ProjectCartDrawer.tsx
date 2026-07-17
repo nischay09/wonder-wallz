@@ -10,8 +10,8 @@
  * Out of scope: WhatsApp, Project Builder, backend, checkout.
  */
 
-import { Fragment, useEffect, useCallback, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Fragment, useEffect, useCallback, useMemo, useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -39,35 +39,62 @@ interface ProjectCartDrawerProps {
 // Animation variants
 // ---------------------------------------------------------------------------
 
-const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, ease: "easeOut" } },
-  exit: { opacity: 0, transition: { duration: 0.25, ease: "easeIn" } },
-};
+// Variant builders take a `reduced` flag so every animated surface in the
+// cart collapses to a near-instant fade when the user has requested less
+// motion, instead of skipping animation definitions ad hoc per-component.
+function getBackdropVariants(reduced: boolean) {
+  return {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: reduced ? 0.1 : 0.3, ease: "easeOut" },
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: reduced ? 0.1 : 0.25, ease: "easeIn" },
+    },
+  };
+}
 
-const drawerVariants = {
-  hidden: { x: "100%", opacity: 0.6 },
-  visible: {
-    x: 0,
-    opacity: 1,
-    transition: { type: "spring", stiffness: 300, damping: 35, mass: 0.9 },
-  },
-  exit: {
-    x: "100%",
-    opacity: 0.4,
-    transition: { duration: 0.28, ease: [0.4, 0, 1, 1] },
-  },
-};
+function getDrawerVariants(reduced: boolean) {
+  return {
+    hidden: { x: reduced ? 0 : "100%", opacity: reduced ? 0 : 0.6 },
+    visible: {
+      x: 0,
+      opacity: 1,
+      transition: reduced
+        ? { duration: 0.15, ease: "easeOut" }
+        : { type: "spring", stiffness: 300, damping: 35, mass: 0.9 },
+    },
+    exit: {
+      x: reduced ? 0 : "100%",
+      opacity: reduced ? 0 : 0.4,
+      transition: reduced
+        ? { duration: 0.12, ease: "easeIn" }
+        : { duration: 0.28, ease: [0.4, 0, 1, 1] },
+    },
+  };
+}
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.055, duration: 0.3, ease: "easeOut" },
-  }),
-  exit: { opacity: 0, x: 24, transition: { duration: 0.2 } },
-};
+function getItemVariants(reduced: boolean) {
+  return {
+    hidden: { opacity: 0, y: reduced ? 0 : 12 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: reduced ? 0 : i * 0.055,
+        duration: reduced ? 0.12 : 0.3,
+        ease: "easeOut",
+      },
+    }),
+    exit: {
+      opacity: 0,
+      x: reduced ? 0 : 24,
+      transition: { duration: reduced ? 0.1 : 0.2 },
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -259,6 +286,11 @@ interface CartItemRowProps {
 function CartItemRow({ item, index }: CartItemRowProps) {
   const removeItem = useProjectCart((s) => s.removeItem);
   const updateQuantity = useProjectCart((s) => s.updateQuantity);
+  const prefersReducedMotion = useReducedMotion();
+  const itemVariants = useMemo(
+    () => getItemVariants(Boolean(prefersReducedMotion)),
+    [prefersReducedMotion]
+  );
 
   const displayPrice = getDisplayPrice(item.product);
   const unitPriceLabel =
@@ -330,7 +362,7 @@ function CartItemRow({ item, index }: CartItemRowProps) {
           <button
             onClick={() => removeItem(item.id)}
             aria-label={`Remove ${item.product.title} from cart`}
-            className="shrink-0 rounded-full p-1.5 text-[#C4A882] transition-colors duration-150 hover:bg-[#F3EDE4] hover:text-[#8B6A48] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+            className="shrink-0 rounded-full p-1.5 text-[#C4A882] transition-all duration-150 hover:bg-[#F9E9E4] hover:text-[#B5573D] active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
           >
             <RemoveIcon />
           </button>
@@ -344,12 +376,12 @@ function CartItemRow({ item, index }: CartItemRowProps) {
               onClick={() => updateQuantity(item.id, item.quantity - 1)}
               disabled={item.quantity <= 1}
               aria-label="Decrease quantity"
-              className="flex h-6 w-6 items-center justify-center rounded-full text-[#8B6A48] transition-colors hover:bg-[#F3EDE4] disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[#8B6A48] transition-all duration-150 hover:bg-[#F3EDE4] active:scale-90 disabled:opacity-30 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
             >
               <MinusIcon />
             </button>
             <span
-              className="w-7 text-center font-['DM_Sans'] text-[13px] font-medium text-[#2C2017]"
+              className="w-7 text-center font-['DM_Sans'] text-[13px] font-medium tabular-nums text-[#2C2017]"
               aria-label={`Quantity: ${item.quantity}`}
             >
               {item.quantity}
@@ -357,7 +389,7 @@ function CartItemRow({ item, index }: CartItemRowProps) {
             <button
               onClick={() => updateQuantity(item.id, item.quantity + 1)}
               aria-label="Increase quantity"
-              className="flex h-6 w-6 items-center justify-center rounded-full text-[#8B6A48] transition-colors hover:bg-[#F3EDE4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[#8B6A48] transition-all duration-150 hover:bg-[#F3EDE4] active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
             >
               <PlusIcon />
             </button>
@@ -365,9 +397,15 @@ function CartItemRow({ item, index }: CartItemRowProps) {
 
           {/* Price */}
           <div className="text-right">
-            <p className="font-['DM_Sans'] text-[14px] font-semibold text-[#2C2017]">
+            <motion.p
+              key={formatLineTotal(item)}
+              initial={{ opacity: 0.4, y: -2 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="font-['DM_Sans'] text-[14px] font-semibold text-[#2C2017]"
+            >
               {formatLineTotal(item)}
-            </p>
+            </motion.p>
             {item.quantity > 1 && item.estimatedPrice !== undefined && (
               <p className="font-['DM_Sans'] text-[11px] text-[#A08060]">
                 {unitPriceLabel} ea.
@@ -536,6 +574,16 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
   // the customer by name in the success state.
   const [submittedOrder, setSubmittedOrder] = useState<SubmittedOrder | null>(
     null
+  );
+
+  const prefersReducedMotion = useReducedMotion();
+  const backdropVariants = useMemo(
+    () => getBackdropVariants(Boolean(prefersReducedMotion)),
+    [prefersReducedMotion]
+  );
+  const drawerVariants = useMemo(
+    () => getDrawerVariants(Boolean(prefersReducedMotion)),
+    [prefersReducedMotion]
   );
 
   const handlePlaceOrderClick = useCallback(() => {
@@ -721,10 +769,10 @@ export function ProjectCartDrawer({ isOpen, onClose }: ProjectCartDrawerProps) {
                   </AnimatePresence>
 
                   {/* Clear all */}
-                  <div className="flex justify-end pt-1">
+                  <div className="flex justify-end border-t border-[#EDE4D8] pt-3">
                     <button
                       onClick={clearCart}
-                      className="font-['DM_Sans'] text-[12px] text-[#A08060] underline underline-offset-2 transition-colors hover:text-[#8B6A48] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+                      className="font-['DM_Sans'] text-[12px] text-[#A08060] underline underline-offset-2 transition-colors duration-150 hover:text-[#8B6A48] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
                     >
                       Clear all
                     </button>

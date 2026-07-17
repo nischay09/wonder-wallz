@@ -65,25 +65,52 @@ export function CustomerInfoModal({
             className="fixed inset-0 z-[60] bg-[#1A1208]/50 backdrop-blur-[3px]"
           />
 
+          {/*
+            Mobile (<768px): full-width bottom sheet, anchored to the bottom
+            of the viewport, capped at 90dvh with its own internal scroll
+            area so the form never extends past the visible screen — even
+            when the on-screen keyboard is open.
+
+            Tablet/desktop (sm and up): reverts to the original centered
+            drawer treatment.
+          */}
           <motion.div
             key="order-modal"
             role="dialog"
             aria-modal="true"
             aria-label="Your details"
-            initial={{ opacity: 0, y: 16, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 340, damping: 30 }}
-            className="fixed left-1/2 top-1/2 z-[70] w-[92%] max-w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-[20px] bg-[#FAF7F3] p-6 shadow-[0_20px_60px_rgba(44,32,23,0.25)]"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ type: "spring", stiffness: 340, damping: 32 }}
+            className="fixed inset-x-0 bottom-0 z-[70] flex max-h-[90dvh] w-full flex-col rounded-t-[20px] bg-[#FAF7F3] shadow-[0_-8px_40px_rgba(44,32,23,0.25)] sm:inset-x-auto sm:inset-y-0 sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85vh] sm:w-[92%] sm:max-w-[420px] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[20px] sm:shadow-[0_20px_60px_rgba(44,32,23,0.25)]"
           >
-            <h2 className="mb-1 font-['Playfair_Display'] text-[20px] font-semibold text-[#2C2017]">
-              Your Details
-            </h2>
-            <p className="mb-5 font-['DM_Sans'] text-[13px] text-[#8B6A48]">
-              We&apos;ll use this to confirm your order.
-            </p>
+            <div className="flex shrink-0 items-start justify-between gap-4 px-6 pb-1 pt-6">
+              <div>
+                <h2 className="font-['Playfair_Display'] text-[20px] font-semibold text-[#2C2017]">
+                  Your Details
+                </h2>
+                <p className="mt-1 font-['DM_Sans'] text-[13px] text-[#8B6A48]">
+                  We&apos;ll use this to confirm your order.
+                </p>
+              </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#EDE4D8] bg-white/80 text-[#8B6A48] shadow-sm transition-all duration-150 hover:border-[#C9A96E]/40 hover:bg-[#F3EDE4] hover:text-[#2C2017] active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A96E]/60"
+              >
+                <span aria-hidden="true" className="text-[18px] leading-none">
+                  ×
+                </span>
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-6 pb-6 pt-4"
+            >
               <Field
                 label="Name"
                 value={customer.name}
@@ -123,14 +150,14 @@ export function CustomerInfoModal({
                   type="button"
                   onClick={onClose}
                   disabled={isSubmitting}
-                  className="flex-1 rounded-full border border-[#DDD0C0] bg-transparent py-3 font-['DM_Sans'] text-[14px] font-medium text-[#8B6A48] transition-colors hover:border-[#C9A96E] hover:bg-[#F3EDE4] disabled:opacity-50"
+                  className="flex-1 rounded-full border border-[#DDD0C0] bg-transparent py-3 font-['DM_Sans'] text-[14px] font-medium text-[#8B6A48] transition-all duration-200 hover:border-[#C9A96E] hover:bg-[#F3EDE4] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 rounded-full bg-[#2C2017] py-3 font-['DM_Sans'] text-[14px] font-semibold text-[#FAF7F3] shadow-[0_4px_20px_rgba(44,32,23,0.28)] transition-colors hover:bg-[#3D2E1A] disabled:opacity-60"
+                  className="flex-1 rounded-full bg-[#2C2017] py-3 font-['DM_Sans'] text-[14px] font-semibold text-[#FAF7F3] shadow-[0_4px_20px_rgba(44,32,23,0.28)] transition-all duration-200 hover:bg-[#3D2E1A] hover:shadow-[0_6px_26px_rgba(44,32,23,0.34)] active:scale-[0.98] disabled:opacity-60 disabled:active:scale-100"
                 >
                   {isSubmitting ? "Placing Order…" : "Place Order"}
                 </button>
@@ -165,7 +192,7 @@ function Field({ label, value, onChange, error, type = "text", autoComplete }: F
         value={value}
         onChange={(e) => onChange(e.target.value)}
         autoComplete={autoComplete}
-        className={`w-full rounded-[10px] border bg-white/80 px-3.5 py-2.5 font-['DM_Sans'] text-[14px] text-[#2C2017] outline-none transition-colors focus:border-[#9C7A3F] ${
+        className={`w-full rounded-[10px] border bg-white/80 px-3.5 py-2.5 font-['DM_Sans'] text-[14px] text-[#2C2017] outline-none transition-all duration-150 focus:border-[#9C7A3F] focus:ring-2 focus:ring-[#C9A96E]/40 ${
           error ? "border-red-400" : "border-[#E8DDD0]"
         }`}
       />

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import type { CollectionProduct, WorkflowType } from "@/lib/collections";
 import { getWorkflowCTA } from "@/lib/collections";
 import { QuickViewModal } from "./QuickViewModal";
+import { FadeImage } from "@/components/ui/FadeImage";
 
 interface CollectionCardProps {
   product: CollectionProduct;
@@ -50,17 +50,11 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
           className="relative w-full overflow-hidden"
           style={{ aspectRatio: "4/3" }}
         >
-          {/* Gradient placeholder — always visible as background */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${product.placeholderGradient[0]} 0%, ${product.placeholderGradient[1]} 100%)`,
-            }}
-            aria-hidden="true"
-          />
-
-          {/* Product image — responsive, lazy-loaded, capped quality (full-res reserved for Quick View) */}
-          <Image
+          {/* Product image — gradient placeholder + fade/scale-in on load,
+              responsive, lazy-loaded, capped quality (full-res reserved for Quick View) */}
+          <FadeImage
+            wrapperClassName="absolute inset-0"
+            placeholderGradient={product.placeholderGradient}
             src={product.image}
             alt={product.name}
             fill
@@ -69,11 +63,7 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
             loading={isAboveFold ? undefined : "lazy"}
             priority={isAboveFold}
             onLoad={() => setImageLoaded(true)}
-            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
-            style={{
-              opacity: imageLoaded ? 1 : 0,
-              transition: "opacity 0.4s ease, transform 0.5s cubic-bezier(0.22,1,0.36,1)",
-            }}
+            className="object-cover group-hover:scale-105"
             onError={() => {
               // Gracefully falls back to gradient if image 404s
             }}
