@@ -243,7 +243,7 @@ export const products: Product[] = [
     title: "Curtains",
     description: "Tailored drapery for every room",
     href: "/collections/curtains",
-    coverImage: "/Curtain.jpg",
+    coverImage: "/Curtain.webp",
     placeholderGradient: ["#F7F1EA", "#DCCFC2"],
     featured: false,
     subcategories: [

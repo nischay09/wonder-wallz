@@ -643,8 +643,8 @@ export const collections: Collection[] = [
     heroDescription:
       "From sheer voiles that diffuse morning light to full blackout panels for total privacy — every curtain is tailored to your window, your room, and your style.",
     href: "/collections/curtains",
-    heroImage: "/Curtain.jpg",
-    coverImage: "/Curtain.jpg",
+    heroImage: "/Curtain.webp",
+    coverImage: "/Curtain.webp",
     placeholderGradient: ["#F7F1EA", "#DCCFC2"],
     productCount: 60,
     workflow: "standard",
@@ -677,7 +677,7 @@ export const collections: Collection[] = [
         { name: "Linen Eyelet Natural", description: "Relaxed, washed linen with generous fullness", subcategory: "eyelet" },
         { name: "Pinch Pleat Velvet", description: "Rich jewel-toned velvet with crisp pinch folds", subcategory: "pleated" },
       ],
-      "/Curtain.jpg",
+      "/Curtain.webp",
       ["#F7F1EA", "#DCCFC2"]
     ),
   },
