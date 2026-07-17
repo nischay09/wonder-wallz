@@ -1,4 +1,5 @@
 import React from "react";
+import { AnimatedImage } from "./AnimatedImage";
 
 /**
  * Wonder Wallz — Card Component
@@ -38,14 +39,20 @@ function CardImage({
   alt = "",
   aspectRatio = "aspect-video",
   className = "",
+  sizes = "(max-width: 768px) 100vw, 33vw",
+  priority = false,
 }) {
   return (
     <div className={`${aspectRatio} w-full overflow-hidden bg-subtle`}>
       {src ? (
-        <img
+        <AnimatedImage
           src={src}
           alt={alt}
-          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${className}`}
+          fill
+          sizes={sizes}
+          priority={priority}
+          containerClassName="w-full h-full"
+          className={`object-cover group-hover:scale-105 transition-transform duration-500 ${className}`}
         />
       ) : (
         <div className="w-full h-full flex items-center justify-center">

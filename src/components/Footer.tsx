@@ -69,9 +69,9 @@ const FooterLink: FC<{
     <button
       type="button"
       onClick={onClick}
-      className="group flex items-center gap-1.5 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200 text-left"
+      className="group flex items-center gap-1.5 text-sm text-stone-400 transition-colors duration-200 ease-out text-left cursor-pointer hover:text-amber-300 active:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900 rounded-sm"
     >
-      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 rounded-full" />
+      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 ease-out rounded-full" />
       {children}
     </button>
   ) : (
@@ -79,9 +79,9 @@ const FooterLink: FC<{
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className="group flex items-center gap-1.5 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200"
+      className="group flex items-center gap-1.5 text-sm text-stone-400 transition-colors duration-200 ease-out hover:text-amber-300 active:text-amber-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900 rounded-sm"
     >
-      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 rounded-full" />
+      <span className="w-0 group-hover:w-2 h-px bg-amber-400 transition-all duration-200 ease-out rounded-full" />
       {children}
     </Link>
   );
@@ -148,7 +148,7 @@ const MobileContactRow: FC<{
     target={external ? "_blank" : undefined}
     rel={external ? "noopener noreferrer" : undefined}
     aria-label={label}
-    className="flex items-center gap-3 py-3 min-h-[44px] border-b border-white/5 last:border-b-0 text-stone-300 active:bg-white/5 rounded-lg transition-colors duration-150 -mx-1 px-1"
+    className="flex items-center gap-3 py-3 min-h-[44px] border-b border-white/5 last:border-b-0 text-stone-300 active:bg-white/5 rounded-lg transition-colors duration-150 ease-out -mx-1 px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
   >
     <span className="flex-shrink-0 w-9 h-9 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-amber-400">
       {icon}
@@ -392,9 +392,9 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
                   href={store.mapHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group block"
+                  className="group block rounded-sm transition-transform duration-200 ease-out hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900"
                 >
-                  <p className="text-sm font-medium text-stone-200 group-hover:text-amber-300 transition-colors duration-200 mb-1 leading-snug">
+                  <p className="text-sm font-medium text-stone-200 group-hover:text-amber-300 transition-colors duration-200 ease-out mb-1 leading-snug">
                     {store.name}
                   </p>
                   <p className="text-xs text-stone-500 leading-relaxed group-hover:text-stone-400 transition-colors duration-200">
@@ -420,9 +420,9 @@ export const Footer: FC<FooterProps> = ({ className = "" }) => {
                   target={item.external ? "_blank" : undefined}
                   rel={item.external ? "noopener noreferrer" : undefined}
                   aria-label={item.label}
-                  className="group flex items-center gap-3 text-sm text-stone-400 hover:text-amber-300 transition-colors duration-200"
+                  className="group flex items-center gap-3 text-sm text-stone-400 transition-colors duration-200 ease-out hover:text-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-stone-900 rounded-sm"
                 >
-                  <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 group-hover:bg-amber-500/10 border border-white/5 group-hover:border-amber-500/20 flex items-center justify-center transition-all duration-200">
+                  <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-white/5 group-hover:bg-amber-500/10 border border-white/5 group-hover:border-amber-500/20 flex items-center justify-center transition-all duration-200 ease-out group-hover:-translate-y-0.5">
                     {item.icon}
                   </span>
                   <span className="truncate">{item.display}</span>

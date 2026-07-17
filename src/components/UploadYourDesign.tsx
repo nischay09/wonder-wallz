@@ -232,7 +232,7 @@ export default function UploadYourDesign() {
               setIsDragging(false);
               handleFiles(e.dataTransfer.files);
             }}
-            className={`relative flex min-h-[260px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed text-center transition-all duration-300 ${
+            className={`relative flex min-h-[260px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed text-center transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A227] focus-visible:ring-offset-2 ${
               isDragging
                 ? 'scale-[1.01] border-[#C9A227] bg-[#FBF3DF]'
                 : 'border-[#D9C9A0] bg-[#FBF8F1] hover:border-[#C9A227] hover:bg-white'
@@ -267,7 +267,7 @@ export default function UploadYourDesign() {
                       removeFile();
                     }}
                     aria-label="Remove uploaded image"
-                    className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition-colors hover:bg-red-500/80"
+                    className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur transition-all duration-200 ease-out hover:bg-red-500/80 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -407,7 +407,7 @@ export default function UploadYourDesign() {
               href={WHATSAPP_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#25D366]/20 transition-transform duration-300 hover:scale-[1.02] hover:bg-[#21bd5c]"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-[#25D366]/20 transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-[#21bd5c] hover:shadow-xl hover:shadow-[#25D366]/25 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2"
             >
               <MessageCircle className="h-4 w-4" /> Chat on WhatsApp — Fastest Response
             </a>
@@ -415,7 +415,7 @@ export default function UploadYourDesign() {
               type="button"
               onClick={handleSubmit}
               disabled={status === 'submitting'}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-[#C9A227]/50 bg-transparent px-6 py-3.5 text-sm font-semibold text-[#8A6D2E] transition-colors duration-300 hover:bg-[#FBF3DF] disabled:cursor-not-allowed disabled:opacity-70"
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-xl border border-[#C9A227]/50 bg-transparent px-6 py-3.5 text-sm font-semibold text-[#8A6D2E] transition-all duration-300 ease-out hover:bg-[#FBF3DF] hover:border-[#C9A227] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A227] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 disabled:active:scale-100"
             >
               {status === 'submitting' ? (
                 <>

@@ -1,54 +1,60 @@
-export type CustomerRole =
-  | "Verified Homeowner"
-  | "Interior Designer"
-  | "Residential Client"
-  | "Commercial Client"
-  | "Verified Customer";
+export type TestimonialSource = "Google Review";
 
 export interface Testimonial {
   id: string;
   name: string;
-  role: CustomerRole;
   rating: number; // 1–5
   review: string;
-  productUsed: string;
+  source: TestimonialSource;
+  date: string; // e.g. "8 months ago"
+  avatar?: string; // optional avatar image path/URL
+  category?: string; // optional product/category tag
 }
 
+/**
+ * Real customer testimonials sourced from Google Reviews.
+ *
+ * To add a new review, just append a new object to this array —
+ * the testimonial component reads from here automatically.
+ */
 export const testimonials: Testimonial[] = [
   {
-    id: "t1",
-    name: "Ananya Roy",
-    role: "Verified Homeowner",
+    id: "g1",
+    name: "Moumita Kundu",
     rating: 5,
     review:
-      "The texture and finish completely changed how our living room feels. Installation was clean, on time, and the team explained every step before starting.",
-    productUsed: "Royale Play Texture Finish",
+      "The shop specializes in wallpapers and wall coverings for homes, and also offers customised wallpapers. They have their own HP Latex printing machine, which is a big advantage. Overall, it's a great company, and I would definitely recommend them for interior products.",
+    source: "Google Review",
+    date: "8 months ago",
+    category: "Custom Wallpapers",
   },
   {
-    id: "t2",
-    name: "Debashish Sen",
-    role: "Residential Client",
+    id: "g2",
+    name: "Yash Khajanchi",
     rating: 5,
     review:
-      "We visited the showroom undecided and left confident. The design preview helped us pick a look we still love a year later.",
-    productUsed: "3D Wall Panels – Stone Series",
+      "Wonderful experience. They offer excellent customised wallpapers with great print quality at very reasonable prices. A great place for wallpapers and beautiful interior solutions.",
+    source: "Google Review",
+    date: "4 months ago",
+    category: "Wallpapers",
   },
   {
-    id: "t3",
-    name: "Priya Banerjee",
-    role: "Interior Designer",
-    rating: 4,
-    review:
-      "Premium quality without the premium hassle. The colour consultant was patient with our endless questions, and the result speaks for itself.",
-    productUsed: "Asian Paints Ace Emulsion",
+    id: "g3",
+    name: "Vivek Singh",
+    rating: 5,
+    review: "Best place to buy customised wallpapers for your home.",
+    source: "Google Review",
+    date: "4 months ago",
+    category: "Custom Wallpapers",
   },
   {
-    id: "t4",
-    name: "Rohit Mehta",
-    role: "Commercial Client",
+    id: "g4",
+    name: "Hrithik Biswakarma",
     rating: 5,
     review:
-      "Used Wonder Wallz for our café renovation. The wallpaper durability in a high-traffic space has genuinely surprised us.",
-    productUsed: "Designer Wallpaper – Commercial Grade",
+      "Excellent printing quality and a great working environment. The graphic design work and overall finishing are impressive.",
+    source: "Google Review",
+    date: "5 months ago",
+    category: "Printing Quality",
   },
 ];

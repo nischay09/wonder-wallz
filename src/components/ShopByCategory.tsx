@@ -77,6 +77,7 @@ function CategoryTile({ product }: { product: Product }) {
             ? {}
             : { y: -3, boxShadow: "0 14px 28px -10px rgba(30,27,24,0.20)" }
         }
+        whileTap={prefersReduced ? {} : { scale: 0.98 }}
         transition={{ type: "spring", stiffness: 360, damping: 30 }}
       >
         <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl">
@@ -164,7 +165,7 @@ export default function ShopByCategory() {
 
           <Link
             href="/collections"
-            className="group inline-flex shrink-0 items-center gap-2 font-[family-name:var(--font-body)] text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[#1E1B18] transition-colors duration-300 hover:text-[#C4541A]"
+            className="group inline-flex shrink-0 items-center gap-2 rounded-sm font-[family-name:var(--font-body)] text-[0.8rem] font-semibold uppercase tracking-[0.08em] text-[#1E1B18] transition-colors duration-300 ease-out hover:text-[#C4541A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4541A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#F7F3EC]"
           >
             View Full Catalog
             <ArrowIcon className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
