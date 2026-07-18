@@ -79,6 +79,7 @@ export const metadata: Metadata = {
       "Premium custom wallpapers for every room. 1,500+ designs. Delivery all over West Bengal. Free WhatsApp consultation.",
     url: "https://wonderwallz.in",
     siteName: "Wonder Wallz",
+    // NOTE: url + siteName were already present here — kept as-is.
     images: [
       {
         url: "/og-image.jpg",
@@ -115,17 +116,31 @@ const jsonLd = {
       url: "https://wonderwallz.in",
       logo: "https://wonderwallz.in/logo.png",
       description:
-        "Wonder Wallz offers premium custom-sized designer wallpapers for residential and commercial spaces across India.",
+        "Wonder Wallz offers premium custom-sized designer wallpapers, wall murals, glass films, flooring, blinds, curtains, upholstery and canvas prints for residential and commercial spaces across India.",
       areaServed: "IN",
-      contactPoint: {
-        "@type": "ContactPoint",
-        contactType: "customer service",
-        availableLanguage: ["English", "Hindi"],
-      },
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "customer service",
+          telephone: "+91-98831-00377",
+          availableLanguage: ["English", "Hindi"],
+          areaServed: "IN",
+        },
+        {
+          "@type": "ContactPoint",
+          contactType: "sales",
+          telephone: "+91-98301-73898",
+          availableLanguage: ["English", "Hindi"],
+          areaServed: "IN",
+        },
+      ],
       sameAs: [
         "https://www.instagram.com/wonderwallz_kolkata",
         "https://wa.me/9883100377",
       ],
+      // Full showroom addresses/hours are declared once, on /contact
+      // (the canonical page for that data) to avoid duplicating
+      // LocalBusiness/address markup across pages. See app/contact/page.tsx.
     },
     {
       "@type": "WebSite",

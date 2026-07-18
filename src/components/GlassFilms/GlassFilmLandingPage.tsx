@@ -129,7 +129,7 @@ export function GlassFilmLandingPage({ collection: _collection }: GlassFilmLandi
           }}
         />
 
-        <div className="container-site relative z-10 py-12 sm:py-16">
+        <div className="container-site relative z-10 pt-28 pb-12 sm:pt-32 sm:pb-16">
           <div className="ml-auto max-w-2xl text-right">
             <div
               className="gflp-hero-fade-up flex flex-wrap items-center justify-end gap-2"

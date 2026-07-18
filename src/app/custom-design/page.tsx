@@ -39,6 +39,25 @@ export const metadata: Metadata = {
     siteName: "Wonder Wallz",
     locale: "en_IN",
     type: "website",
+    // Was missing — OG cards without an image render as a bare text link
+    // when shared on WhatsApp/Facebook/LinkedIn, which matters a lot for
+    // this page since it's meant to be shared as a CTA.
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Wonder Wallz Custom Design — Turn Your Artwork Into Wallpaper",
+      },
+    ],
+  },
+  // Was missing entirely.
+  twitter: {
+    card: "summary_large_image",
+    title: "Create Your Own Wallpaper — Wonder Wallz Custom Design",
+    description:
+      "Upload your own artwork or reference image and get premium custom wallpaper, printed with HP Latex technology.",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -47,9 +66,46 @@ export const metadata: Metadata = {
   },
 };
 
+// ── JSON-LD structured data ───────────────────────────────────────────────────
+// Service, not Product: there's no single fixed SKU/price here — the page
+// describes a bespoke design-to-print workflow (Upload → Project Builder →
+// Email), which Service accurately models. No fake pricing/offers included.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Custom Design",
+          item: "https://wonderwallz.in/custom-design",
+        },
+      ],
+    },
+    {
+      "@type": "Service",
+      "@id": "https://wonderwallz.in/custom-design#service",
+      name: "Custom Wallpaper & Wall Mural Design",
+      serviceType: "Custom wallpaper design and printing",
+      description:
+        "Turn your own artwork, photos or inspiration into premium custom wallpaper printed using HP Latex technology, sized to your exact wall dimensions.",
+      provider: { "@id": "https://wonderwallz.in/#business" },
+      areaServed: "IN",
+      url: "https://wonderwallz.in/custom-design",
+    },
+  ],
+};
+
 export default function CustomDesignPage() {
   return (
     <main id="main-content">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
       <CustomDesignHero />
 

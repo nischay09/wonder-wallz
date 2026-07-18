@@ -442,7 +442,7 @@ export function Navbar() {
 
                 {/* Mobile hamburger */}
                 <motion.button
-                  className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full ml-0.5 overflow-hidden"
+                  className="lg:hidden flex items-center justify-center w-11 h-11 rounded-full ml-0.5 overflow-hidden"
                   style={{
                     background: "rgba(255,253,248,0.7)",
                     border: `1px solid ${BORDER}`,
@@ -536,7 +536,7 @@ export function Navbar() {
 
                 <button
                   onClick={() => setMobileOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                  className="w-11 h-11 flex items-center justify-center rounded-full transition-colors"
                   aria-label="Close menu"
                   style={{ color: INK_SOFT }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = "#F4ECDA")}
@@ -691,7 +691,7 @@ function CircleIconBtn({
     <motion.button
       aria-label={ariaLabel}
       onClick={onClick}
-      className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-colors ${className}`}
+      className={`relative flex items-center justify-center w-11 h-11 rounded-full transition-colors ${className}`}
       style={{
         color: INK_SOFT,
         background: "rgba(255,253,248,0.70)",

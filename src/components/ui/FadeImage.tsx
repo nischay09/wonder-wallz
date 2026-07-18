@@ -48,8 +48,19 @@ export function FadeImage({
 }: FadeImageProps) {
   const [loaded, setLoaded] = useState(false);
 
+  // Avoid clashing with a positioning utility (e.g. "absolute inset-0")
+  // passed in via wrapperClassName. Tailwind's cascade order means a
+  // hardcoded `relative` here can silently win over a caller-supplied
+  // `absolute`, collapsing the wrapper (and the fill image's parent) to
+  // height: 0. Only default to `relative` if the caller hasn't already
+  // declared a position class.
+  const hasExplicitPosition = /\b(absolute|fixed|sticky|static|relative)\b/.test(
+    wrapperClassName
+  );
+  const positionClass = hasExplicitPosition ? "" : "relative";
+
   return (
-    <div className={`relative overflow-hidden ${wrapperClassName}`} style={wrapperStyle}>
+    <div className={`${positionClass} overflow-hidden ${wrapperClassName}`} style={wrapperStyle}>
       {placeholderGradient && (
         <div
           className="absolute inset-0"

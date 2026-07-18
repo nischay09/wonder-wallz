@@ -57,12 +57,18 @@ export function buildSearchIndex(): SearchEntry[] {
     });
 
     // ── 2. Product subcategories ─────────────────────────────────────────────
+    // NOTE: subcategories don't have their own route — app/collections/[category]
+    // is a single-segment dynamic route, there is no [category]/[subcategory]
+    // page. `sub.href` (e.g. "/collections/wallpapers/religion") therefore 404s.
+    // Search results link to the parent collection page instead; the
+    // subcategory's own href stays on the data model for chip-filtering,
+    // untouched — this only changes where the search result navigates.
     for (const sub of p.subcategories ?? []) {
       entries.push({
         id: `subcategory-${sub.id}`,
         title: sub.title,
         description: `${p.title} › ${sub.title}`,
-        href: sub.href,
+        href: p.href,
         kind: "subcategory",
         group: p.title,
         searchText: [sub.title, sub.slug, p.title, p.slug].join(" ").toLowerCase(),
@@ -83,6 +89,8 @@ export function buildSearchIndex(): SearchEntry[] {
     });
 
     // ── 4. Collection subcategories ──────────────────────────────────────────
+    // Same routing fix as the product-subcategory loop above: link to the
+    // collection page (c.href), not the non-existent subcategory route.
     for (const sub of c.subcategories ?? []) {
       const existingId = `subcategory-${sub.id}`;
       // Avoid duplicating entries already added via products
@@ -91,7 +99,7 @@ export function buildSearchIndex(): SearchEntry[] {
           id: `col-subcategory-${sub.id}`,
           title: sub.title,
           description: `${c.title} › ${sub.title}`,
-          href: sub.href,
+          href: c.href,
           kind: "subcategory",
           group: c.title,
           searchText: [sub.title, sub.slug, c.title, c.slug].join(" ").toLowerCase(),

@@ -47,12 +47,22 @@ export const metadata: Metadata = {
     url: "https://wonderwallz.in/collections",
     siteName: "Wonder Wallz",
     type: "website",
+    locale: "en_IN",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Wonder Wallz Collections — Wallpapers, Blinds, Curtains, Flooring, Glass Films & Canvas",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Shop All Collections | Wonder Wallz",
     description:
       "Premium interior products for every space — wallpapers, blinds, curtains, flooring, glass films and canvas prints.",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -64,22 +74,38 @@ export const metadata: Metadata = {
 // ── JSON-LD structured data ───────────────────────────────────────────────────
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "@id": "https://wonderwallz.in/collections#page",
-  name: "Wonder Wallz Collections",
-  url: "https://wonderwallz.in/collections",
-  isPartOf: { "@id": "https://wonderwallz.in/#website" },
-  about: {
-    "@id": "https://wonderwallz.in/#business",
-  },
-  hasPart: [
-    "Wallpapers",
-    "Blinds",
-    "Curtains",
-    "Flooring",
-    "Glass Films",
-    "Canvas Prints",
-  ].map((name) => ({ "@type": "Thing", name })),
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Collections",
+          item: "https://wonderwallz.in/collections",
+        },
+      ],
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://wonderwallz.in/collections#page",
+      name: "Wonder Wallz Collections",
+      url: "https://wonderwallz.in/collections",
+      isPartOf: { "@id": "https://wonderwallz.in/#website" },
+      about: {
+        "@id": "https://wonderwallz.in/#business",
+      },
+      hasPart: [
+        "Wallpapers",
+        "Blinds",
+        "Curtains",
+        "Flooring",
+        "Glass Films",
+        "Canvas Prints",
+      ].map((name) => ({ "@type": "Thing", name })),
+    },
+  ],
 };
 
 export default function CollectionsLandingPage() {

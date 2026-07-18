@@ -11,7 +11,8 @@
  * No address field (not required for this flow), no payment.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   makeCustomerDetails,
@@ -38,6 +39,12 @@ export function CustomerInfoModal({
   const [customer, setCustomer] = useState<CustomerDetails>(makeCustomerDetails());
   const [errors, setErrors] = useState<CustomerDetailsErrors>({});
 
+  // Portals need a real DOM node, which only exists after mount — this
+  // guards against SSR (document is undefined on the server) and avoids
+  // a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const handleChange = (field: keyof CustomerDetails, value: string) => {
     setCustomer((prev) => ({ ...prev, [field]: value }));
   };
@@ -50,7 +57,9 @@ export function CustomerInfoModal({
     onSubmit(customer);
   };
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -166,7 +175,8 @@ export function CustomerInfoModal({
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 

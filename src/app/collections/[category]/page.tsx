@@ -89,15 +89,92 @@ export async function generateMetadata({
     return { title: "Collection Not Found | Wonder Wallz" };
   }
 
+  const canonicalPath = `/collections/${collection.slug}`;
+
   return {
     title: `${collection.title} — ${collection.description}`,
     description: collection.heroDescription,
+    // Was missing entirely: without this, Google could index duplicate/
+    // paginated/filtered variants of each collection URL as separate pages.
+    alternates: { canonical: canonicalPath },
     openGraph: {
       title: `${collection.title} | Wonder Wallz`,
       description: collection.heroDescription,
-      images: [{ url: collection.coverImage, alt: collection.title }],
+      url: `https://wonderwallz.in${canonicalPath}`,
+      siteName: "Wonder Wallz",
+      type: "website",
+      locale: "en_IN",
+      images: [{ url: collection.coverImage, width: 1200, height: 630, alt: collection.title }],
+    },
+    // Was missing entirely on every collection page.
+    twitter: {
+      card: "summary_large_image",
+      title: `${collection.title} | Wonder Wallz`,
+      description: collection.heroDescription,
+      images: [collection.coverImage],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large" },
     },
   };
+}
+
+// ─── JSON-LD helpers ────────────────────────────────────────────────────────
+
+// Collections that are consultation-driven (or, for canvas-prints, custom
+// per-project) don't have a fixed SKU/price the way a catalogue item would —
+// Service accurately reflects "we'll scope this with you", Product does not.
+// This mirrors the LANDING_PAGES map above 1:1, so it stays in sync if a new
+// consultation product is added there.
+const SERVICE_COLLECTIONS = new Set(Object.keys(LANDING_PAGES));
+
+function buildJsonLd(collection: Collection) {
+  const canonicalUrl = `https://wonderwallz.in/collections/${collection.slug}`;
+
+  const breadcrumb = {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Collections",
+        item: "https://wonderwallz.in/collections",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: collection.title,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
+  const graph: Record<string, unknown>[] = [breadcrumb];
+
+  if (SERVICE_COLLECTIONS.has(collection.slug)) {
+    // Consultation / bespoke-project collections → Service.
+    graph.push({
+      "@type": "Service",
+      "@id": `${canonicalUrl}#service`,
+      name: collection.title,
+      description: collection.heroDescription,
+      serviceType: collection.title,
+      provider: { "@id": "https://wonderwallz.in/#business" },
+      areaServed: "IN",
+      url: canonicalUrl,
+    });
+  }
+  // Catalogue/browse collections (e.g. Wallpapers) intentionally get no
+  // Product or ItemList entries here: individual product/price/availability
+  // data isn't available at this layer, and fabricating it would violate
+  // Schema.org's structured-data guidelines. Only real per-product markup
+  // (added on individual product pages, if/when those exist) should carry
+  // Product schema for these.
+
+  return { "@context": "https://schema.org", "@graph": graph };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -113,16 +190,30 @@ export default async function CollectionPage({
   // Unknown slug → 404
   if (!collection) notFound();
 
+  const jsonLd = buildJsonLd(collection);
+
   // ── Consultation products: dedicated landing page, not a catalogue browser ──
   const LandingPage = LANDING_PAGES[collection.slug];
   if (LandingPage) {
-    return <LandingPage collection={collection} />;
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <LandingPage collection={collection} />
+      </>
+    );
   }
 
   const { productCount } = collection;
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* ── CollectionExplorer renders Hero + Filters + Grid together ── */}
       {/* (Hero lives inside CollectionExplorer so its category chips can
           share `activeCategory` state with the filters for collections

@@ -69,13 +69,15 @@ function ArrowIcon({ className = "" }: { className?: string }) {
   );
 }
 
-// ─── Gradient accent chip ────────────────────────────────────────────────────
+// ─── Brand-color accent chip ─────────────────────────────────────────────────
 function CategoryChip({ label }: { label: string }) {
   return (
     <span
       className="inline-block rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white"
       style={{
-        background: "linear-gradient(105deg, #4F6EF7 0%, #8B5CF6 100%)",
+        // Matches --color-primary / --color-accent from globals.css instead
+        // of the previous off-brand blue→purple gradient.
+        background: "linear-gradient(105deg, #1F2238 0%, #B38B6D 100%)",
       }}
     >
       {label}

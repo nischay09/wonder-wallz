@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans, Geist } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
@@ -21,7 +21,13 @@ const dmSans = DM_Sans({
   weight: ["300", "400", "500", "600"],
 });
 
+// NOTE (SEO audit): metadataBase was previously only declared on the
+// homepage's metadata export. Declaring it here on the root layout means
+// EVERY route (including ones that don't set their own metadataBase, e.g.
+// /contact) resolves relative OG/canonical URLs against the correct domain
+// instead of silently falling back to Next's localhost default.
 export const metadata: Metadata = {
+  metadataBase: new URL("https://wonderwallz.in"),
   title: {
     default: "Wonder Wallz — Statement Wallpapers for Bold Interiors",
     template: "%s | Wonder Wallz",
@@ -29,12 +35,23 @@ export const metadata: Metadata = {
   description:
     "Curated collections of designer wallpapers, murals, and wall art. Transform any room into a work of art.",
   keywords: ["wallpaper", "wall murals", "interior design", "home decor", "designer wallpaper"],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Wonder Wallz",
     description: "Statement Wallpapers for Bold Interiors",
     type: "website",
     locale: "en_US",
   },
+};
+
+// themeColor moved out of `metadata` into its own `viewport` export —
+// Next.js 14+ deprecated metadata.themeColor in favor of this API.
+export const viewport: Viewport = {
+  themeColor: "#1F2238", // --color-primary, matches globals.css design tokens
 };
 
 export default function RootLayout({

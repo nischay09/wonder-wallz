@@ -228,7 +228,7 @@ export function ProductLandingPage({
           }}
         />
 
-        <div className="container-site relative z-10 py-12 sm:py-16">
+        <div className="container-site relative z-10 pt-28 pb-12 sm:pt-32 sm:pb-16">
           <div className="ml-auto max-w-2xl text-right">
             <div className="plp-hero-fade-up" style={{ animationDelay: "0ms" }}>
               <span className="inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.4em] text-white/75">
@@ -534,7 +534,7 @@ export function ProductLandingPage({
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
                   <div className="overflow-hidden">
-                    <p className="pb-6 pr-10 text-[15px] leading-relaxed text-neutral-600">
+                    <p className="pb-6 pr-4 text-[15px] leading-relaxed text-neutral-600">
                       {item.a}
                     </p>
                   </div>
