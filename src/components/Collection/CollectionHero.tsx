@@ -38,7 +38,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange, h
   return (
     <section
       className="relative w-full overflow-hidden"
-      style={{ minHeight: "420px" }}
+      style={{ minHeight: "460px" }}
       aria-label={`${title} collection hero`}
     >
       {/* ── Background gradient ── */}
@@ -60,35 +60,45 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange, h
         aria-hidden="true"
       />
 
+      {/* ── Soft fade into the catalogue section below, so the hero reads
+          as a continuous surface rather than a hard-edged banner ── */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-24 md:h-32"
+        style={{
+          background: "linear-gradient(to bottom, transparent 0%, rgba(250,250,249,0.6) 100%)",
+        }}
+        aria-hidden="true"
+      />
+
       {/* ── Content ── */}
-      <div className="container-site relative z-10 py-16 md:py-20 lg:py-24">
+      <div className="container-site relative z-10 py-16 md:py-20 lg:py-28">
         {/* Breadcrumb */}
         <motion.nav
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: EASE_BRAND }}
           aria-label="Breadcrumb"
-          className="mb-8"
+          className="mb-10"
         >
-          <ol className="flex items-center gap-2 text-sm font-medium">
+          <ol className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider">
             <li>
               <Link
                 href="/"
-                className="text-neutral-600 hover:text-neutral-900 transition-colors duration-150"
+                className="text-neutral-500 hover:text-neutral-900 transition-colors duration-150"
               >
                 Home
               </Link>
             </li>
-            <li aria-hidden="true" className="text-neutral-400 select-none">/</li>
+            <li aria-hidden="true" className="text-neutral-300 select-none">/</li>
             <li>
               <Link
                 href="/#shop"
-                className="text-neutral-600 hover:text-neutral-900 transition-colors duration-150"
+                className="text-neutral-500 hover:text-neutral-900 transition-colors duration-150"
               >
                 Collections
               </Link>
             </li>
-            <li aria-hidden="true" className="text-neutral-400 select-none">/</li>
+            <li aria-hidden="true" className="text-neutral-300 select-none">/</li>
             <li className="text-neutral-900 font-semibold" aria-current="page">
               {title}
             </li>
@@ -101,7 +111,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange, h
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: EASE_BRAND, delay: 0.05 }}
-            className="mb-4"
+            className="mb-5"
           >
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-xs font-semibold tracking-wider uppercase border ${
@@ -125,7 +135,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange, h
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE_BRAND, delay: 0.1 }}
-            className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-900 mb-4"
+            className="font-display text-4xl md:text-5xl lg:text-[3.75rem] font-bold tracking-tight text-neutral-900 mb-5 leading-[1.05]"
             style={{ fontFamily: "var(--font-playfair, serif)" }}
           >
             {title}
@@ -136,7 +146,7 @@ export function CollectionHero({ collection, activeCategory, onCategoryChange, h
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: EASE_BRAND, delay: 0.15 }}
-            className="text-lg md:text-xl text-neutral-700 leading-relaxed mb-6"
+            className="text-lg md:text-xl text-neutral-700 leading-relaxed mb-6 max-w-xl"
             style={{ fontFamily: "var(--font-dm-sans, sans-serif)" }}
           >
             {heroDescription}

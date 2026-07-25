@@ -35,17 +35,24 @@ export function CollectionCarousel({
   if (!subcategories || subcategories.length === 0) return null;
 
   return (
-    <section aria-label="Explore collections" className="container-site py-8 md:py-10">
-      <motion.h2
+    <section aria-label="Explore collections" className="container-site py-10 md:py-14">
+      <motion.div
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.4, ease: EASE_BRAND }}
-        className="text-xl md:text-2xl font-bold text-neutral-900 mb-5"
-        style={{ fontFamily: "var(--font-playfair, serif)" }}
+        className="mb-6"
       >
-        Explore Collections
-      </motion.h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-400 mb-2">
+          By Category
+        </p>
+        <h2
+          className="text-xl md:text-2xl font-bold text-neutral-900"
+          style={{ fontFamily: "var(--font-playfair, serif)" }}
+        >
+          Explore Collections
+        </h2>
+      </motion.div>
 
       <div
         className="flex gap-4 md:gap-5 overflow-x-auto pb-4 -mx-1 px-1 snap-x snap-mandatory scroll-smooth [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-200 [&::-webkit-scrollbar-thumb]:rounded-full"
@@ -120,14 +127,14 @@ export function CollectionCarousel({
               </div>
 
               {/* Label */}
-              <div className="p-4">
+              <div className="p-4 md:p-5">
                 <h3
-                  className="text-sm md:text-base font-semibold mb-0.5 text-neutral-900"
+                  className="text-sm md:text-base font-semibold mb-1 text-neutral-900"
                   style={{ fontFamily: "var(--font-playfair, serif)" }}
                 >
                   {sub.title}
                 </h3>
-                <p className="text-xs text-neutral-500 font-medium">
+                <p className="text-xs text-neutral-500 font-medium tracking-wide">
                   {count} {count === 1 ? "design" : "designs"}
                 </p>
               </div>

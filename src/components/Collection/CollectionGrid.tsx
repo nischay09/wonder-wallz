@@ -53,7 +53,7 @@ export function CollectionGrid({ products, workflow, collectionSlug }: Collectio
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3, ease: EASE_BRAND }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
       role="list"
       aria-label="Product grid"
     >

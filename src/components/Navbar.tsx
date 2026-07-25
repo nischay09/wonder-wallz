@@ -95,6 +95,48 @@ function useHandleReviewProject() {
   };
 }
 
+/**
+ * Publishes the navbar's real, currently-rendered height as `--navbar-h` on
+ * the document root.
+ *
+ * The navbar is `position: fixed` and floats outside normal document flow,
+ * so no page reserves space for it — anything sitting at the top of a page
+ * renders directly underneath it. Rather than have every page hardcode a
+ * guessed offset (which drifts out of sync whenever the navbar's own
+ * padding/scale animation changes), the navbar measures itself and any
+ * page can reserve accurate space via `padding-top: var(--navbar-h)`.
+ *
+ * Re-measures on resize and whenever the wrapper's own size changes (e.g.
+ * the scrolled-state padding/scale animation, or the safe-area inset on
+ * orientation change), so the variable stays correct without polling.
+ */
+function useNavbarHeightVar(ref: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const publish = () => {
+      const height = el.getBoundingClientRect().height;
+      if (height > 0) {
+        document.documentElement.style.setProperty("--navbar-h", `${Math.ceil(height)}px`);
+      }
+    };
+
+    publish();
+
+    const resizeObserver = new ResizeObserver(publish);
+    resizeObserver.observe(el);
+    window.addEventListener("resize", publish);
+    window.addEventListener("orientationchange", publish);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", publish);
+      window.removeEventListener("orientationchange", publish);
+    };
+  }, [ref]);
+}
+
 export function Navbar() {
   const [scrolled,              setScrolled]              = useState(false);
   const [hidden,                setHidden]                = useState(false);
@@ -122,6 +164,12 @@ export function Navbar() {
   // ── Active link highlighting ────────────────────────────────────────────
   const pathname = usePathname();
 
+  // ── Measured height, published as --navbar-h so pages (e.g. the
+  //    Wallpapers flagship hero) can reserve accurate top space instead of
+  //    guessing a fixed offset. See useNavbarHeightVar above. ──
+  const navWrapperRef = useRef<HTMLDivElement>(null);
+  useNavbarHeightVar(navWrapperRef);
+
   const { scrollY } = useScroll();
   const lastY = useRef(0);
 
@@ -148,6 +196,7 @@ export function Navbar() {
     <>
       {/* ── Floating Navbar Wrapper ── */}
       <div
+        ref={navWrapperRef}
         className="fixed top-0 left-0 right-0 z-50"
         style={{
           paddingTop: "env(safe-area-inset-top, 0px)",
@@ -207,7 +256,7 @@ export function Navbar() {
                 <Link
                   href="/"
                   aria-label="Wonder Wallz home"
-                  className="flex items-center gap-2.5 shrink-0 relative rounded-2xl px-3.5 py-1.5"
+                  className="flex items-center gap-2 sm:gap-2.5 shrink min-w-0 relative rounded-2xl px-2.5 sm:px-3.5 py-1.5"
                   style={{
                     background: "linear-gradient(135deg, #FFFDF8 0%, #F7F1E6 100%)",
                     boxShadow: "0 1px 8px rgba(156,122,63,0.16)",
@@ -215,13 +264,20 @@ export function Navbar() {
                   }}
                 >
                   <div
-                    className="relative w-8 h-8 shrink-0"
-                    style={{ filter: "drop-shadow(0 1px 2px rgba(122,94,48,0.20))" }}
+                    className="relative shrink-0"
+                    style={{
+                      width: "clamp(26px, 7vw, 32px)",
+                      height: "clamp(26px, 7vw, 32px)",
+                      filter: "drop-shadow(0 1px 2px rgba(122,94,48,0.20))",
+                    }}
                   >
                     <BrandLogoMark priority />
                   </div>
+                  {/* Wordmark hides below ~360px so the logo mark + right icon
+                      cluster never fight each other for space; the icon alone
+                      is enough for brand recognition at that width. */}
                   <span
-                    className="text-[14px] uppercase whitespace-nowrap"
+                    className="hidden min-[360px]:inline text-[12px] sm:text-[14px] uppercase whitespace-nowrap truncate min-w-0"
                     style={{ letterSpacing: "0.07em", fontFamily: SERIF, fontWeight: 600, color: INK }}
                   >
                     Wonder
@@ -432,10 +488,19 @@ export function Navbar() {
               </ul>
 
               {/* ── Right Icon Group ── */}
-              <div className="flex items-center gap-1.5 pr-0.5 shrink-0 justify-self-end">
-                <CircleIconBtn aria-label="Search" onClick={openSearch}>
-                  <Search size={16} />
-                </CircleIconBtn>
+              <div
+                className="flex items-center pr-0.5 shrink-0 justify-self-end"
+                style={{ gap: "clamp(2px, 1.5vw, 6px)" }}
+              >
+                {/* Hidden below sm: this exact Search action already lives in
+                    the mobile drawer footer, so nothing is lost — it just
+                    frees up ~44px on the narrowest phones (S8+, SE, etc.)
+                    where it was the direct cause of the right-cluster overflow. */}
+                <div className="hidden sm:block">
+                  <CircleIconBtn aria-label="Search" onClick={openSearch}>
+                    <Search size={16} />
+                  </CircleIconBtn>
+                </div>
 
                 {/* Task 2 + 4: Live cart button — opens the drawer */}
                 <ProjectCartButton onOpen={openCart} variant="icon" />

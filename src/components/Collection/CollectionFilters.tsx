@@ -92,7 +92,7 @@ export function CollectionFilters({
       className="w-full"
     >
       {/* ── Top bar: search + sort + toggle ── */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-4">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center mb-4 last:mb-0">
         {/* Search */}
         <div className="relative flex-1 min-w-0">
           <label htmlFor="collection-search" className="sr-only">
@@ -187,7 +187,7 @@ export function CollectionFilters({
                 key={sub.id}
                 type="button"
                 onClick={() => onCategoryChange(sub.slug)}
-                className={`inline-flex items-center px-4 py-1.5 rounded-pill text-sm font-medium transition-all duration-200 ${
+                className={`inline-flex items-center px-4 py-1.5 rounded-pill text-sm font-medium tracking-wide transition-all duration-200 ${
                   activeCategory === sub.slug
                     ? "bg-neutral-900 text-white shadow-sm"
                     : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400 hover:text-neutral-900"
@@ -200,21 +200,6 @@ export function CollectionFilters({
           </div>
         </motion.div>
       )}
-
-      {/* ── Results count ── */}
-      <p className="mt-4 text-sm text-neutral-500" aria-live="polite" aria-atomic="true">
-        Showing{" "}
-        <span className="font-semibold text-neutral-700">{filteredProducts.length}</span>{" "}
-        {filteredProducts.length === 1 ? "product" : "products"}
-        {activeCategory && subcategories && (
-          <>
-            {" "}in{" "}
-            <span className="font-semibold text-neutral-700">
-              {subcategories.find((s) => s.slug === activeCategory)?.title ?? activeCategory}
-            </span>
-          </>
-        )}
-      </p>
     </motion.div>
   );
 }

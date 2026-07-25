@@ -545,21 +545,39 @@
     z-index: 3;
     background: transparent;
     min-height: 100vh;
-    justify-content: flex-end;
+    /* Centering (not bottom-anchoring) the block means any extra
+       viewport height gets split above *and* below the content
+       instead of all piling up as dead space above it — that's what
+       was producing the big empty gap under the navbar on tall
+       screens. The safe-area/navbar padding still keeps content clear
+       of the top notch and the bottom padding still keeps CTAs off
+       the edge; centering just governs how the leftover space is
+       distributed between them. */
+    justify-content: center;
     /* --navbar-height is the height of the site's fixed/floating mobile
        navbar. Set it from the layout that renders the navbar (default
        here covers a ~72px pill navbar + safe area); override it via
        inline style or a wrapping class if your navbar differs. */
+    /* Bottom padding scales with viewport height instead of a fixed
+       rem value, so the CTA group sits proportionally off the bottom
+       edge on short phones (SE-class) as well as tall ones (Pro Max /
+       Ultra), rather than crowding or floating away from the fold. */
     padding: calc(env(safe-area-inset-top) + var(--navbar-height, 88px))
-      1.5rem calc(env(safe-area-inset-bottom) + 2.5rem);
+      1.5rem calc(env(safe-area-inset-bottom) + clamp(1.5rem, 6vh, 3rem));
     order: initial;
   }
   .heroContent::after {
     display: none;
   }
 
+  /* Vertical rhythm below the fold scales with viewport height rather
+     than fixed rem values, so short phones (SE-class, ~667px) tighten
+     up and tall phones (Pro Max / Ultra, 900px+) get proportionally
+     more breathing room — without ever collapsing to zero or ballooning
+     past what the fold can hold. */
   .eyebrow {
     color: var(--gold-light);
+    margin-bottom: clamp(0.75rem, 2.5vh, 1.5rem);
   }
   .eyebrowLine {
     background: var(--gold-light);
@@ -567,6 +585,9 @@
   .headline,
   .headline em {
     color: #fff;
+  }
+  .headline {
+    margin-bottom: clamp(0.75rem, 2.2vh, 1.5rem);
   }
   .subheadline {
     color: rgba(255, 255, 255, 0.82);
@@ -601,8 +622,8 @@
 
   .socialProof {
     max-width: 100%;
-    padding: 11px 14px;
-    margin-bottom: 1.5rem;
+    padding: clamp(9px, 1.6vh, 11px) 14px;
+    margin-bottom: clamp(1rem, 3vh, 1.5rem);
   }
   .spNumber {
     font-size: 1.4rem;
@@ -616,14 +637,15 @@
 
   .trustGrid {
     max-width: 100%;
-    margin-bottom: 1.5rem;
+    margin-bottom: clamp(1rem, 3vh, 1.5rem);
+    gap: clamp(8px, 1.4vh, 10px) 24px;
   }
   .subheadline {
-    margin-bottom: 1.75rem;
+    margin-bottom: clamp(1.1rem, 3.4vh, 1.75rem);
   }
 
   .ctaGroup {
-    gap: 10px;
+    gap: clamp(8px, 1.6vh, 10px);
   }
   .ctaPrimary,
   .ctaWhatsapp {
@@ -635,7 +657,7 @@
     flex: 1 1 100%;
     justify-content: center;
     text-align: center;
-    margin-top: 0.75rem;
+    margin-top: clamp(0.5rem, 1.6vh, 0.75rem);
     padding: 14px 24px;
     min-height: 48px;
     background: rgba(248, 244, 238, 0.14);

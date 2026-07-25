@@ -42,7 +42,6 @@ import {
   collections,
   getCollectionBySlug,
 } from "@/lib/collections";
-import { CollectionPagination } from "@/components/Collection";
 import { CollectionExplorer } from "@/components/Collection/CollectionExplorer";
 import { FlooringLandingPage } from "@/components/Flooring/FlooringLandingPage";
 import { CanvasLandingPage } from "@/components/Canvas/CanvasLandingPage";
@@ -206,30 +205,26 @@ export default async function CollectionPage({
     );
   }
 
-  const { productCount } = collection;
-
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-neutral-50/60">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      {/* ── CollectionExplorer renders Hero + Filters + Grid together ── */}
+      {/* ── CollectionExplorer renders Hero + Filters + Grid + Pagination ── */}
       {/* (Hero lives inside CollectionExplorer so its category chips can
           share `activeCategory` state with the filters for collections
-          with `unifiedCategoryNav` — see CollectionExplorer.tsx.) */}
+          with `unifiedCategoryNav` — see CollectionExplorer.tsx. Pagination
+          also lives inside CollectionExplorer now, driven by the real
+          filtered product count and viewport-based page size — see the
+          "── Pagination ──" section of that file. A second, disconnected
+          CollectionPagination used to be rendered here directly off
+          `collection.productCount` with a hardcoded itemsPerPage={12};
+          that was leftover UI from before CollectionExplorer owned
+          pagination and produced a duplicate "Showing X of Y" block with
+          different numbers than the one above it. Removed — do not
+          re-add a second pagination render here.) */}
       <CollectionExplorer collection={collection} />
-
-      {/* ── Pagination — UI only ── */}
-      <div className="container-site">
-        <div className="mt-10 pb-10 md:pb-14">
-          <CollectionPagination
-            totalItems={productCount}
-            itemsPerPage={12}
-            ariaLabel={`${collection.title} collection pages`}
-          />
-        </div>
-      </div>
     </div>
   );
 }

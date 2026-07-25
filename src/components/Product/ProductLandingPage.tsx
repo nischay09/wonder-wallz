@@ -219,16 +219,22 @@ export function ProductLandingPage({
         </div>
 
         {/* Light, right-weighted wash — legibility only, most of the
-            frame stays visible. */}
+            frame stays visible. A bottom-anchored wash is layered in
+            alongside it so the lower portion of the (right-aligned) text
+            block keeps contrast too, since the original two washes only
+            covered the left side and the very top of the image. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(270deg, rgba(16,11,8,0.52) 0%, rgba(16,11,8,0.22) 40%, rgba(16,11,8,0) 62%), linear-gradient(180deg, rgba(16,11,8,0.30) 0%, rgba(16,11,8,0) 30%)",
+              "linear-gradient(270deg, rgba(16,11,8,0.52) 0%, rgba(16,11,8,0.22) 40%, rgba(16,11,8,0) 62%), linear-gradient(180deg, rgba(16,11,8,0.30) 0%, rgba(16,11,8,0) 30%), linear-gradient(0deg, rgba(16,11,8,0.38) 0%, rgba(16,11,8,0) 42%)",
           }}
         />
 
-        <div className="container-site relative z-10 pt-28 pb-12 sm:pt-32 sm:pb-16">
+        {/* Mobile top padding is safe-area-aware (navbar height + notch
+            inset) instead of a fixed guess, so hero content always clears
+            the fixed/floating navbar on phones. sm:pt-32 (desktop) unchanged. */}
+        <div className="container-site relative z-10 pt-[calc(6.5rem+env(safe-area-inset-top,0px))] pb-12 sm:pt-32 sm:pb-16">
           <div className="ml-auto max-w-2xl text-right">
             <div className="plp-hero-fade-up" style={{ animationDelay: "0ms" }}>
               <span className="inline-flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.4em] text-white/75">
@@ -239,7 +245,7 @@ export function ProductLandingPage({
 
             <h1
               className="plp-hero-fade-up mt-7 font-serif text-[2.75rem] font-medium leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[3.6rem] xl:text-[4rem]"
-              style={{ animationDelay: "130ms" }}
+              style={{ animationDelay: "130ms", textShadow: "0 2px 16px rgba(16,11,8,0.35)" }}
             >
               {hero.headlineLead}{" "}
               <span className="italic" style={{ color: "#E4A868" }}>
@@ -249,7 +255,7 @@ export function ProductLandingPage({
 
             <p
               className="plp-hero-fade-up ml-auto mt-6 max-w-md text-[15px] leading-relaxed text-white/85 sm:text-base"
-              style={{ animationDelay: "240ms" }}
+              style={{ animationDelay: "240ms", textShadow: "0 1px 10px rgba(16,11,8,0.3)" }}
             >
               {hero.description}
             </p>

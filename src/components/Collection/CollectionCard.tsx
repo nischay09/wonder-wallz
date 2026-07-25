@@ -38,7 +38,7 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
           ease: EASE_BRAND,
           delay: Math.min(index * 0.06, 0.4),
         }}
-        className="group card card-hover h-full flex flex-col overflow-hidden rounded-3xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 cursor-pointer"
+        className="group card card-hover h-full flex flex-col overflow-hidden rounded-3xl border border-neutral-200/60 shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_-8px_rgba(0,0,0,0.12)] transition-shadow duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 cursor-pointer"
         aria-label={product.name}
         onClick={() => setModalOpen(true)}
         role="button"
@@ -115,24 +115,24 @@ export function CollectionCard({ product, workflow, index = 0, collectionSlug }:
         </div>
 
         {/* ── Content ── */}
-        <div className="flex flex-col flex-1 p-5">
+        <div className="flex flex-col flex-1 p-5 md:p-6">
           {/* Subcategory label — always rendered to reserve consistent height,
               even when a product has no subcategory (prevents title/button drift) */}
-          <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-1.5 min-h-[1rem]">
+          <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider mb-2 min-h-[1rem]">
             {product.subcategory ? product.subcategory.replace(/-/g, " ") : "\u00A0"}
           </p>
 
           {/* Product name — fixed 2-line height reserved regardless of actual
               line count, so 1-line and 2-line titles occupy the same space */}
           <h3
-            className="font-semibold text-neutral-900 text-base leading-snug mb-2 line-clamp-2 min-h-[2.5rem]"
+            className="font-semibold text-neutral-900 text-base leading-snug mb-2.5 line-clamp-2 min-h-[2.5rem]"
             style={{ fontFamily: "var(--font-playfair, serif)" }}
           >
             {product.name}
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 flex-1 mb-4">
+          <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2 flex-1 mb-5">
             {product.description}
           </p>
 
