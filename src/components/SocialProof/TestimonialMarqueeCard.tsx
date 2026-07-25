@@ -12,7 +12,7 @@ interface TestimonialMarqueeCardProps {
 export default function TestimonialMarqueeCard({
   testimonial,
 }: TestimonialMarqueeCardProps) {
-  const { name, role, rating, review } = testimonial;
+  const { name, source, rating, review } = testimonial;
 
   return (
     <figure
@@ -50,7 +50,7 @@ export default function TestimonialMarqueeCard({
 
       <figcaption className="mt-5 border-t border-[#E7DFCF] pt-4">
         <p className="font-medium text-[#2B2521]">{name}</p>
-        <p className="text-sm text-[#7A7264]">{role}</p>
+        <p className="text-sm text-[#7A7264]">{source}</p>
       </figcaption>
     </figure>
   );

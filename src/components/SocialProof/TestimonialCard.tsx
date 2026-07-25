@@ -13,7 +13,7 @@ interface TestimonialCardProps {
  * never tied to a specific project image shown elsewhere on the page.
  */
 export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
-  const { name, role, rating, review, productUsed } = testimonial;
+  const { name, rating, review, category, source } = testimonial;
 
   return (
     <figure
@@ -52,11 +52,13 @@ export default function TestimonialCard({ testimonial }: TestimonialCardProps) {
       <figcaption className="mt-6 flex items-center justify-between gap-4 border-t border-[#E7DFCF] pt-5">
         <div>
           <p className="font-medium text-[#2B2521]">{name}</p>
-          <p className="text-sm text-[#7A7264]">{role}</p>
+          <p className="text-sm text-[#7A7264]">{source}</p>
         </div>
-        <p className="text-right text-xs uppercase tracking-wide text-[#9C8B61]">
-          {productUsed}
-        </p>
+        {category && (
+          <p className="text-right text-xs uppercase tracking-wide text-[#9C8B61]">
+            {category}
+          </p>
+        )}
       </figcaption>
     </figure>
   );
