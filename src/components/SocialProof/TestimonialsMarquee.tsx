@@ -52,9 +52,10 @@ export default function TestimonialsMarquee() {
     claimed: false,
     startX: 0,
     startY: 0,
-    lastX: 0,
-    lastT: 0,
-    velocity: 0, // px/ms, for momentum on release
+    // Short rolling window of recent (x, t) samples, used to compute a
+    // smoothed release velocity instead of a single (noisy) last-frame
+    // delta — real touch input jitters right before lift-off.
+    samples: [] as { x: number; t: number }[],
     currentOffset: 0, // current translateX (px) applied to the drag layer
   });
 
@@ -91,31 +92,56 @@ export default function TestimonialsMarquee() {
     }
   };
 
-  // Decays the drag-layer offset back to 0 with a simple ease-out, using
-  // the release velocity for a bit of momentum, then (once settled)
-  // schedules the marquee to resume after RESUME_DELAY_MS. The track
-  // stays paused throughout, so there is no visual conflict between
-  // "momentum" and "marquee motion" at any point.
+  // Computes a smoothed release velocity from the last few touch samples
+  // (rather than a single last-frame delta, which is noisy — a finger
+  // often micro-decelerates or twitches right before lift-off, and using
+  // just that last sample was the cause of the "bounce" at release).
+  const getReleaseVelocity = () => {
+    const samples = gesture.current.samples;
+    if (samples.length < 2) return 0;
+    const first = samples[0];
+    const last = samples[samples.length - 1];
+    const dt = Math.max(last.t - first.t, 1);
+    // Clamp to a sane max so a single erratic sample can't fling the
+    // offset far past where the finger actually was.
+    const v = (last.x - first.x) / dt;
+    return Math.max(Math.min(v, 1.5), -1.5);
+  };
+
+  // Two-phase release animation, run entirely on the drag-layer offset
+  // (the track underneath stays paused and untouched the whole time):
+  //
+  //   Phase 1 — momentum: offset keeps moving using the release
+  //   velocity, which decays via friction each frame.
+  //   Phase 2 — settle: once velocity has died down, ease the
+  //   remaining offset back to exactly 0.
+  //
+  // These phases never run at the same time on the same offset, so
+  // there's no more tug-of-war between "keep moving" and "go to zero"
+  // — that conflict was what caused the bounce/snap-back.
   const settleAndScheduleResume = () => {
-    const state = gesture.current;
-    let velocity = state.velocity; // px/ms
-    let offset = state.currentOffset;
+    let velocity = getReleaseVelocity(); // px/ms
+    let offset = gesture.current.currentOffset;
+    let phase: "momentum" | "settle" = "momentum";
 
     const step = () => {
-      // Friction-based decay.
-      velocity *= 0.92;
-      offset += velocity * 16; // ~1 frame at 16ms
-      // Ease the residual offset itself back toward 0 as well, so we
-      // always land on exactly 0 rather than relying on velocity alone.
-      offset *= 0.9;
-
-      if (Math.abs(velocity) < 0.01 && Math.abs(offset) < 0.5) {
-        setDragOffset(0);
-        momentumRafRef.current = null;
+      if (phase === "momentum") {
+        velocity *= 0.92; // friction
+        offset += velocity * 16; // ~1 frame at 16ms
+        if (Math.abs(velocity) < 0.03) {
+          phase = "settle";
+        }
       } else {
-        setDragOffset(offset);
-        momentumRafRef.current = requestAnimationFrame(step);
+        // Pure ease-out toward 0, no velocity involved anymore.
+        offset *= 0.85;
+        if (Math.abs(offset) < 0.5) {
+          setDragOffset(0);
+          momentumRafRef.current = null;
+          return;
+        }
       }
+      setDragOffset(offset);
+      momentumRafRef.current = requestAnimationFrame(step);
     };
 
     momentumRafRef.current = requestAnimationFrame(step);
@@ -141,9 +167,7 @@ export default function TestimonialsMarquee() {
       gesture.current.claimed = false;
       gesture.current.startX = touch.clientX;
       gesture.current.startY = touch.clientY;
-      gesture.current.lastX = touch.clientX;
-      gesture.current.lastT = e.timeStamp;
-      gesture.current.velocity = 0;
+      gesture.current.samples = [{ x: touch.clientX, t: e.timeStamp }];
 
       // Pause immediately — this also covers the "tap pauses" case,
       // since a tap is just a touchstart+touchend with ~0 movement.
@@ -178,12 +202,11 @@ export default function TestimonialsMarquee() {
       // scroll vertically while the user drags the marquee sideways.
       e.preventDefault();
 
-      const now = e.timeStamp;
-      const dt = Math.max(now - gesture.current.lastT, 1);
-      const stepDx = touch.clientX - gesture.current.lastX;
-      gesture.current.velocity = stepDx / dt;
-      gesture.current.lastX = touch.clientX;
-      gesture.current.lastT = now;
+      const samples = gesture.current.samples;
+      samples.push({ x: touch.clientX, t: e.timeStamp });
+      // Keep only a short recent window (~last 5 samples) so velocity
+      // reflects the current motion, not the whole gesture.
+      if (samples.length > 5) samples.shift();
 
       setDragOffset(dx);
     };
