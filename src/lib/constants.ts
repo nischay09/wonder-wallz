@@ -6,4 +6,4 @@
  * Kept centralized so it's never hardcoded inside a component.
  */
 export const GOOGLE_REVIEW_URL =
-  "https://g.page/r/REPLACE_WITH_WONDER_WALLZ_PLACE_ID/review";
+  "https://g.page/r/CYCwMiOXuBVwEBM/review";
