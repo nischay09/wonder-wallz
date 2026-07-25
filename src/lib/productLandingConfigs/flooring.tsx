@@ -36,7 +36,7 @@ export const flooringLandingConfig: ProductLandingConfig = {
     headlineAccent: "for Every Space",
     description:
       "Discover Luxury Vinyl, Laminate Flooring, Sports Flooring and Carpet Tiles through our personalised catalogue experience.",
-    image: "/Wooden-Floor.jpg",
+    image: "/Wooden-Floor.webp",
     imageAlt: "Premium flooring",
     primaryCtaLabel: "Review Catalogues at Home",
     secondaryCtaLabel: "Visit Showroom",
@@ -104,7 +104,7 @@ export const flooringLandingConfig: ProductLandingConfig = {
     // Reusing the hero asset for now (this static config has no access to
     // the runtime `collection.heroImage` the page used to fall back to).
     // Swap to a dedicated in-home-consultation photo whenever one's ready.
-    image: "/Flooring.png",
+    image: "/Flooring.webp",
     imageAlt: "Catalogue review at home",
     ctaLabel: "Review Catalogues at Home",
   },

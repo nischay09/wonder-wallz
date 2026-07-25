@@ -124,7 +124,7 @@ export const glassFilmsLandingConfig: GlassFilmLandingConfig = {
     headlineAccent: "Designed Your Way.",
     description:
       "Whether you're looking for elegant decorative films or completely custom graphics, we'll help you create the perfect solution for your home, office or commercial space.",
-    image: "/GlassFilmsHero.png ",
+    image: "/GlassFilmsHero.webp",
     imageAlt: "Decorative frosted glass film in a modern office interior",
     primaryCtaLabel: "Start Custom Project",
     secondaryCtaLabel: "View Decorative Options on WhatsApp",
@@ -178,7 +178,7 @@ export const glassFilmsLandingConfig: GlassFilmLandingConfig = {
       { title: "Meeting Rooms", image: "/glassfilmimages/Decorativemeeting.jpeg", imageAlt: "Decorative film on a meeting room glass wall" },
       { title: "Homes", image: "/glassfilmimages/Decorativehome.jpg", imageAlt: "Decorative glass film in a home interior" },
       { title: "Personal Branding", image: "/glassfilmimages/Retail.jpeg", imageAlt: "Branded glass film in a retail storefront" },
-      { title: "Restaurants", image: "/glassfilmimages/Restaurant.GIF", imageAlt: "Decorative glass film in a restaurant" },
+      { title: "Restaurants", image: "/glassfilmimages/Restaurant.gif", imageAlt: "Decorative glass film in a restaurant" },
       { title: "Hospitals", image: "/glassfilmimages/Hospital.webp", imageAlt: "Privacy glass film in a hospital" },
       { title: "Commercial Spaces", image: "/glassfilmimages/Commercial.png", imageAlt: "Custom glass film in a commercial space" },
     ],

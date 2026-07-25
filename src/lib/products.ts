@@ -313,7 +313,7 @@ export const products: Product[] = [
     title: "Flooring",
     description: "Warm, durable flooring for any space",
     href: "/collections/flooring",
-    coverImage: "/Wooden-Floor.jpg",
+    coverImage: "/Wooden-Floor.webp",
     placeholderGradient: ["#D7B899", "#8B6A4E"],
     featured: true,
     subcategories: [

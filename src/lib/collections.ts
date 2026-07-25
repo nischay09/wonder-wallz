@@ -691,8 +691,8 @@ export const collections: Collection[] = [
     heroDescription:
       "Underfoot comfort meets lasting durability. Choose from stone-core SPC, real-wood engineered planks, or resilient PVC — all professionally installed with a full site survey.",
     href: "/collections/flooring",
-    heroImage: "/Wooden-Floor.jpg",
-    coverImage: "/Wooden-Floor.jpg",
+    heroImage: "/Wooden-Floor.webp",
+    coverImage: "/Wooden-Floor.webp",
     placeholderGradient: ["#D7B899", "#8B6A4E"],
     productCount: flooringProducts.length,
     workflow: "standard",

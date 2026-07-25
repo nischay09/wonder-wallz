@@ -24,7 +24,7 @@ export const upholsteryConfig: ProductLandingConfig = {
     headlineAccent: "second life.",
     description:
       "From sofas to headboards, our craftsmen re-cover and restyle your furniture with fabrics chosen to match your room, not just the piece.",
-    image: "/Upholstery.png",
+    image: "/Upholstery.webp",
     imageAlt: "Freshly upholstered sofa in a warmly lit living room",
     primaryCtaLabel: "Book Free Consultation",
     secondaryCtaLabel: "Visit a Showroom",
