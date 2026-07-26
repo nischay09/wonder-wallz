@@ -37,6 +37,7 @@ import { Suspense } from "react";
 import { SectionScrollHandler } from "@/components/SectionScrollHandler";
 import CompletedProjects from "@/components/CompletedProjects/CompletedProjects";
 import ShopByCategory from "@/components/ShopByCategory";
+import MoreToExplore from "@/components/MoreToExplore";
 
 
 
@@ -71,13 +72,16 @@ export const metadata: Metadata = {
     "vinyl wallpaper",
     "non-woven wallpaper",
   ],
-  metadataBase: new URL("https://wonderwallz.in"),
+  // metadataBase is now declared once on the root layout (app/layout.tsx)
+  // and applies to every route automatically — removed the duplicate
+  // declaration that used to live here to avoid two sources of truth for
+  // the domain.
   alternates: { canonical: "/" },
   openGraph: {
     title: "Wonder Wallz – Transform Your Space with Designer Wallpapers",
     description:
       "Premium custom wallpapers for every room. 1,500+ designs. Delivery all over West Bengal. Free WhatsApp consultation.",
-    url: "https://wonderwallz.in",
+    url: "https://thewonderwallz.com",
     siteName: "Wonder Wallz",
     // NOTE: url + siteName were already present here — kept as-is.
     images: [
@@ -111,10 +115,10 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "LocalBusiness",
-      "@id": "https://wonderwallz.in/#business",
+      "@id": "https://thewonderwallz.com/#business",
       name: "Wonder Wallz",
-      url: "https://wonderwallz.in",
-      logo: "https://wonderwallz.in/logo.png",
+      url: "https://thewonderwallz.com",
+      logo: "https://thewonderwallz.com/logo.png",
       description:
         "Wonder Wallz offers premium custom-sized designer wallpapers, wall murals, glass films, flooring, blinds, curtains, upholstery and canvas prints for residential and commercial spaces across India.",
       areaServed: "IN",
@@ -144,14 +148,14 @@ const jsonLd = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://wonderwallz.in/#website",
-      url: "https://wonderwallz.in",
+      "@id": "https://thewonderwallz.com/#website",
+      url: "https://thewonderwallz.com",
       name: "Wonder Wallz",
       potentialAction: {
         "@type": "SearchAction",
         target: {
           "@type": "EntryPoint",
-          urlTemplate: "https://wonderwallz.in/search?q={search_term_string}",
+          urlTemplate: "https://thewonderwallz.com/search?q={search_term_string}",
         },
         "query-input": "required name=search_term_string",
       },
@@ -209,6 +213,21 @@ export default function HomePage() {
            * a premium, editorial shopping experience.
            */}
           <ShopByCategory />
+
+          {/* ──────── MORE TO EXPLORE (compact showroom / WhatsApp note) ──── */}
+          {/*
+           * Small, low-key announcement letting visitors know the website
+           * only shows a curated selection of the full catalogue, and
+           * pointing them to the Merlin Homeland showroom or WhatsApp for
+           * everything else.
+           *
+           * Deliberately compact — roughly half the height of the
+           * "Discover More" promo on the Collections page — a single quiet
+           * card, not a full section treatment. Sits right after Shop by
+           * Category, before trust-building content begins.
+           */}
+          <MoreToExplore />
+
         {/* ──────── 2. WONDER WALLZ TRUST ─────────────────────────────── */}
        {/*
         * Premium trust-building section combining brand highlights,

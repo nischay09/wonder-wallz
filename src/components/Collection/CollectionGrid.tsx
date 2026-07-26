@@ -1,7 +1,9 @@
 "use client";
 
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { CollectionCard } from "./CollectionCard";
+import { QuickViewModal } from "./QuickViewModal";
 import type { CollectionProduct, WorkflowType } from "@/lib/collections";
 
 interface CollectionGridProps {
@@ -13,6 +15,20 @@ interface CollectionGridProps {
 const EASE_BRAND = [0.22, 1, 0.36, 1] as const;
 
 export function CollectionGrid({ products, workflow, collectionSlug }: CollectionGridProps) {
+  // Quick View used to be mounted once per CollectionCard (so a 24-product
+  // page mounted 24 modal instances simultaneously, even though only one
+  // can ever be open). It now lives once here at the grid level, driven by
+  // which product (if any) is currently selected.
+  const [selectedProduct, setSelectedProduct] = useState<CollectionProduct | null>(null);
+
+  const handleQuickView = useCallback((product: CollectionProduct) => {
+    setSelectedProduct(product);
+  }, []);
+
+  const handleCloseQuickView = useCallback(() => {
+    setSelectedProduct(null);
+  }, []);
+
   if (products.length === 0) {
     return (
       <motion.div
@@ -49,24 +65,37 @@ export function CollectionGrid({ products, workflow, collectionSlug }: Collectio
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: EASE_BRAND }}
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
-      role="list"
-      aria-label="Product grid"
-    >
-      {products.map((product, i) => (
-        <div key={product.id} role="listitem" className="h-full">
-          <CollectionCard
-            product={product}
-            workflow={workflow}
-            index={i}
-            collectionSlug={collectionSlug}
-          />
-        </div>
-      ))}
-    </motion.div>
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: EASE_BRAND }}
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8"
+        role="list"
+        aria-label="Product grid"
+      >
+        {products.map((product, i) => (
+          <div key={product.id} role="listitem" className="h-full">
+            <CollectionCard
+              product={product}
+              workflow={workflow}
+              index={i}
+              collectionSlug={collectionSlug}
+              onQuickView={handleQuickView}
+            />
+          </div>
+        ))}
+      </motion.div>
+
+      {/* Single shared Quick View instance for the whole grid — replaces the
+          previous one-modal-per-card approach. */}
+      <QuickViewModal
+        product={selectedProduct}
+        workflow={workflow}
+        isOpen={selectedProduct !== null}
+        onClose={handleCloseQuickView}
+        collectionSlug={collectionSlug}
+      />
+    </>
   );
 }

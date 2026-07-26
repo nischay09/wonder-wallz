@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     title: "Contact Wonder Wallz — Kolkata Showrooms",
     description:
       "Two showrooms in Kolkata — Bhowanipore (blinds, curtains, upholstery, flooring) and Chandni Chowk (custom wallpapers, wall murals, glass films). Call, visit, or start your project online.",
-    url: "https://wonderwallz.in/contact",
+    url: "https://thewonderwallz.com/contact",
     siteName: "Wonder Wallz",
     type: "website",
     locale: "en_IN",
@@ -70,21 +70,21 @@ const jsonLd = {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://wonderwallz.in",
+          item: "https://thewonderwallz.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Contact",
-          item: "https://wonderwallz.in/contact",
+          item: "https://thewonderwallz.com/contact",
         },
       ],
     },
     {
       "@type": "LocalBusiness",
-      "@id": "https://wonderwallz.in/#business",
+      "@id": "https://thewonderwallz.com/#business",
       name: "Wonder Wallz",
-      url: "https://wonderwallz.in",
+      url: "https://thewonderwallz.com",
       sameAs: ["https://www.instagram.com/wonderwallz_kolkata"],
       department: [
         {

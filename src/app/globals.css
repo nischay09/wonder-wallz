@@ -98,9 +98,17 @@
     --shadow-elevated:    0 4px 8px 0 rgba(31, 34, 56, 0.08), 0 16px 40px 0 rgba(31, 34, 56, 0.14);
     --shadow-focus-ring:  0 0 0 3px rgba(179, 139, 109, 0.30);
 
-    /* Typography — unchanged */
-    --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
-    --font-body:    "Inter", system-ui, sans-serif;
+    /* Typography
+       Previously hardcoded to "Plus Jakarta Sans" / "Inter" — fonts that
+       were never loaded anywhere (no next/font import for either), so
+       every element using font-display/font-body silently fell back to
+       system fonts. layout.tsx actually loads Playfair Display (heading
+       font, --font-playfair), DM Sans (body font, --font-dm-sans) and
+       Geist (--font-sans, used for Tailwind's default font-sans utility).
+       These tokens now reference those real variables, with the original
+       families kept only as the final fallback if a font ever fails to load. */
+    --font-display: var(--font-playfair), "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-body:    var(--font-dm-sans), "Inter", system-ui, sans-serif;
     --font-mono:    "JetBrains Mono", ui-monospace, monospace;
 
     /* Motion — unchanged easing curves */

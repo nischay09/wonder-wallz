@@ -4,8 +4,12 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { cn } from "@/lib/utils";
+import { MotionConfig } from "framer-motion";
+import { BASE_URL } from "@/lib/site";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+// display: "swap" added here too so all three loaded fonts behave
+// consistently (previously only Playfair/DM Sans had it).
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -27,7 +31,7 @@ const dmSans = DM_Sans({
 // /contact) resolves relative OG/canonical URLs against the correct domain
 // instead of silently falling back to Next's localhost default.
 export const metadata: Metadata = {
-  metadataBase: new URL("https://wonderwallz.in"),
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "Wonder Wallz — Statement Wallpapers for Bold Interiors",
     template: "%s | Wonder Wallz",
@@ -36,10 +40,15 @@ export const metadata: Metadata = {
     "Curated collections of designer wallpapers, murals, and wall art. Transform any room into a work of art.",
   keywords: ["wallpaper", "wall murals", "interior design", "home decor", "designer wallpaper"],
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/favicon/favicon.ico",
+    apple: "/favicon/apple-touch-icon.png",
   },
+  manifest: "/favicon/site.webmanifest",
   openGraph: {
     title: "Wonder Wallz",
     description: "Statement Wallpapers for Bold Interiors",
@@ -60,11 +69,33 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn(playfair.variable, dmSans.variable, "font-sans", geist.variable)}>
-      <body className="bg-parchment text-walnut antialiased">
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+    <html
+      lang="en"
+      className={cn(playfair.variable, dmSans.variable, "font-sans", geist.variable)}
+    >
+      {/*
+       * bg-background / text-foreground replace the previous
+       * bg-parchment / text-walnut classes, which were never defined in
+       * tailwind.config.ts and therefore did nothing — the design-system
+       * CSS variables in globals.css (--background / --foreground) now
+       * drive the base page color for the single fixed Wonder Wallz theme.
+       */}
+      <body className="bg-background text-foreground antialiased">
+        {/*
+         * MotionConfig reducedMotion="user" makes every `motion.*` component
+         * in the app (Hero, CollectionCard, CollectionCarousel,
+         * CollectionHero, CollectionFilters, etc.) automatically respect
+         * the OS-level `prefers-reduced-motion` setting — animations
+         * collapse to instant/near-instant transitions for users who have
+         * that preference enabled, with zero changes needed in any
+         * individual component. This is additive: nothing about the
+         * default (non-reduced-motion) experience changes.
+         */}
+        <MotionConfig reducedMotion="user">
+          <Navbar />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+        </MotionConfig>
       </body>
     </html>
   );

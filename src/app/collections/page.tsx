@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: "Shop All Collections | Wonder Wallz",
     description:
       "Premium interior products for every space — wallpapers, blinds, curtains, flooring, glass films and canvas prints.",
-    url: "https://wonderwallz.in/collections",
+    url: "https://thewonderwallz.com/collections",
     siteName: "Wonder Wallz",
     type: "website",
     locale: "en_IN",
@@ -78,32 +78,41 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://thewonderwallz.com" },
         {
           "@type": "ListItem",
           position: 2,
           name: "Collections",
-          item: "https://wonderwallz.in/collections",
+          item: "https://thewonderwallz.com/collections",
         },
       ],
     },
     {
       "@type": "CollectionPage",
-      "@id": "https://wonderwallz.in/collections#page",
+      "@id": "https://thewonderwallz.com/collections#page",
       name: "Wonder Wallz Collections",
-      url: "https://wonderwallz.in/collections",
-      isPartOf: { "@id": "https://wonderwallz.in/#website" },
+      url: "https://thewonderwallz.com/collections",
+      isPartOf: { "@id": "https://thewonderwallz.com/#website" },
       about: {
-        "@id": "https://wonderwallz.in/#business",
+        "@id": "https://thewonderwallz.com/#business",
       },
+      // Each entry links to its actual collection URL — a bare `name` with
+      // no `url` is technically valid Schema.org but gives crawlers nothing
+      // to follow, which defeats the point of listing them here at all.
+      // Slugs match src/lib/collections.ts exactly (single source of truth).
       hasPart: [
-        "Wallpapers",
-        "Blinds",
-        "Curtains",
-        "Flooring",
-        "Glass Films",
-        "Canvas Prints",
-      ].map((name) => ({ "@type": "Thing", name })),
+        { name: "Wallpapers", slug: "wallpapers" },
+        { name: "Blinds", slug: "blinds" },
+        { name: "Curtains", slug: "curtains" },
+        { name: "Flooring", slug: "flooring" },
+        { name: "Glass Films", slug: "glass-films" },
+        { name: "Canvas Prints", slug: "canvas-prints" },
+        { name: "Upholstery", slug: "upholstery" },
+      ].map(({ name, slug }) => ({
+        "@type": "Thing",
+        name,
+        url: `https://thewonderwallz.com/collections/${slug}`,
+      })),
     },
   ],
 };

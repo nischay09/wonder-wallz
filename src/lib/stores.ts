@@ -11,16 +11,16 @@ export interface Store {
 export const stores: Store[] = [
   {
     id: "s1",
-    name: "Wonder Wallz Showroom – Salt Lake",
-    address: "DA Block, Sector V, Salt Lake, Kolkata, West Bengal 700091",
-    hours: "Mon – Sat, 10:00 AM – 7:30 PM",
-    mapsQuery: "Wonder Wallz Showroom Salt Lake Sector V Kolkata",
+    name: "Wonder Wallz Showroom – Chandni Chowk",
+    address: "157C, Lenin Sarani Rd, near Jyoti Cinema, Esplanade, Chandni Chawk, Bowbazar, Kolkata, West Bengal 700013",
+    hours: "Mon – Sat, 11:00 AM – 7:30 PM",
+    mapsQuery: "Wonder Wallz Showroom Chandni Chowk Kolkata",
   },
   {
     id: "s2",
-    name: "Wonder Wallz Showroom – Park Street",
-    address: "Park Street, Kolkata, West Bengal 700016",
+    name: "Wonder Wallz Showroom – Merlin Homeland",
+    address: "3rd Floor, Shop no: 370A, 18B Ashutosh Mukherjee Road, Bhowanipore, Kolkata, West Bengal 700025",
     hours: "Mon – Sun, 11:00 AM – 8:00 PM",
-    mapsQuery: "Wonder Wallz Showroom Park Street Kolkata",
+    mapsQuery: "Wonder Wallz Showroom Merlin Homeland Kolkata",
   },
 ];

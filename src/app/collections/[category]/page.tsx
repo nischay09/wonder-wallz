@@ -99,7 +99,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${collection.title} | Wonder Wallz`,
       description: collection.heroDescription,
-      url: `https://wonderwallz.in${canonicalPath}`,
+      url: `https://thewonderwallz.com${canonicalPath}`,
       siteName: "Wonder Wallz",
       type: "website",
       locale: "en_IN",
@@ -130,17 +130,17 @@ export async function generateMetadata({
 const SERVICE_COLLECTIONS = new Set(Object.keys(LANDING_PAGES));
 
 function buildJsonLd(collection: Collection) {
-  const canonicalUrl = `https://wonderwallz.in/collections/${collection.slug}`;
+  const canonicalUrl = `https://thewonderwallz.com/collections/${collection.slug}`;
 
   const breadcrumb = {
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://thewonderwallz.com" },
       {
         "@type": "ListItem",
         position: 2,
         name: "Collections",
-        item: "https://wonderwallz.in/collections",
+        item: "https://thewonderwallz.com/collections",
       },
       {
         "@type": "ListItem",
@@ -161,7 +161,7 @@ function buildJsonLd(collection: Collection) {
       name: collection.title,
       description: collection.heroDescription,
       serviceType: collection.title,
-      provider: { "@id": "https://wonderwallz.in/#business" },
+      provider: { "@id": "https://thewonderwallz.com/#business" },
       areaServed: "IN",
       url: canonicalUrl,
     });

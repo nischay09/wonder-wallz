@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: "Create Your Own Wallpaper — Wonder Wallz Custom Design",
     description:
       "Upload your own image, a Pinterest reference, or AI-generated artwork and we'll turn it into premium custom wallpaper.",
-    url: "https://wonderwallz.in/custom-design",
+    url: "https://thewonderwallz.com/custom-design",
     siteName: "Wonder Wallz",
     locale: "en_IN",
     type: "website",
@@ -76,25 +76,25 @@ const jsonLd = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://wonderwallz.in" },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://thewonderwallz.com" },
         {
           "@type": "ListItem",
           position: 2,
           name: "Custom Design",
-          item: "https://wonderwallz.in/custom-design",
+          item: "https://thewonderwallz.com/custom-design",
         },
       ],
     },
     {
       "@type": "Service",
-      "@id": "https://wonderwallz.in/custom-design#service",
+      "@id": "https://thewonderwallz.com/custom-design#service",
       name: "Custom Wallpaper & Wall Mural Design",
       serviceType: "Custom wallpaper design and printing",
       description:
         "Turn your own artwork, photos or inspiration into premium custom wallpaper printed using HP Latex technology, sized to your exact wall dimensions.",
-      provider: { "@id": "https://wonderwallz.in/#business" },
+      provider: { "@id": "https://thewonderwallz.com/#business" },
       areaServed: "IN",
-      url: "https://wonderwallz.in/custom-design",
+      url: "https://thewonderwallz.com/custom-design",
     },
   ],
 };

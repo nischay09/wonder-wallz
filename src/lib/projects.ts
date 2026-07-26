@@ -12,6 +12,10 @@ export interface Project {
   roomType: RoomType;
   collection: string;
   productCategory: string;
+  /** Short label shown on the card overlay, e.g. "Residential Project". */
+  projectLabel: string;
+  /** Route to the product category this installation represents. */
+  href: string;
   /** Controls masonry rhythm — "tall" spans two rows on desktop. */
   size: "tall" | "regular";
 }
@@ -19,62 +23,57 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: "p1",
-    image:
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1000&q=80",
-    alt: "Living room finished with Ombré Horizon gradient wallpaper",
+    image: "/our-work/canvas.jpeg",
+    alt: "Framed portrait canvas print installed in a residential living room",
     roomType: "Living Room",
-    collection: "Ombré Horizon",
-    productCategory: "Designer Wallpaper",
+    collection: "Canvas Prints",
+    productCategory: "Canvas Prints",
+    projectLabel: "Residential Project",
+    href: "/collections/canvas-prints",
     size: "tall",
   },
   {
     id: "p2",
-    image:
-      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1000&q=80",
-    alt: "Bedroom featuring Midnight Botanica floral mural wallpaper",
-    roomType: "Bedroom",
-    collection: "Midnight Botanica",
-    productCategory: "Mural Wallpaper",
+    image: "/our-work/glassfilm.jpeg",
+    alt: "Decorative glass film installed on an office partition",
+    roomType: "Office",
+    collection: "Glass Films",
+    productCategory: "Glass Films",
+    projectLabel: "Office Installation",
+    href: "/collections/glass-films",
     size: "regular",
   },
   {
     id: "p3",
-    image:
-      "https://images.unsplash.com/photo-1503174971373-b1f69850bded?w=1000&q=80",
-    alt: "Kids room decorated with Starfall washable illustrated wallpaper",
-    roomType: "Kids Room",
-    collection: "Starfall",
-    productCategory: "Washable Wallpaper",
+    image: "/our-work/wallpaper.jpeg",
+    alt: "3D floral textured wall mural installed as a feature wall",
+    roomType: "Living Room",
+    collection: "Wall Murals",
+    productCategory: "Wall Murals",
+    projectLabel: "Feature Wall",
+    href: "/collections",
     size: "regular",
   },
   {
     id: "p4",
-    image:
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=1000&q=80",
-    alt: "Office space finished with Mineral Earth textured stone wallpaper",
-    roomType: "Office",
-    collection: "Mineral Earth",
-    productCategory: "Textured Finish",
+    image: "/our-work/wallpaper-2.jpeg",
+    alt: "Blue floral pattern wallpaper installed in a residential bedroom",
+    roomType: "Bedroom",
+    collection: "Custom Wallpapers",
+    productCategory: "Custom Wallpapers",
+    projectLabel: "Residential Project",
+    href: "/custom-design",
     size: "tall",
   },
   {
     id: "p5",
-    image:
-      "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=1000&q=80",
-    alt: "Hotel lobby finished with Grand Palms contract-grade wallcovering",
+    image: "/our-work/wallpaper-3.jpeg",
+    alt: "Beige textured custom wallpaper installed in a commercial space",
     roomType: "Commercial",
-    collection: "Grand Palms",
-    productCategory: "Contract Wallcovering",
-    size: "regular",
-  },
-  {
-    id: "p6",
-    image:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1000&q=80",
-    alt: "Living room with Royale Play textured wall finish",
-    roomType: "Living Room",
-    collection: "Royale Play",
-    productCategory: "Texture Finish",
+    collection: "Custom Wallpapers",
+    productCategory: "Custom Wallpapers",
+    projectLabel: "Commercial Installation",
+    href: "/custom-design",
     size: "regular",
   },
 ];

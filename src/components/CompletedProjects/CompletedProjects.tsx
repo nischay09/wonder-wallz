@@ -6,7 +6,7 @@ import FocusCards from "./FocusCards";
 import { projects } from "@/lib/projects";
 
 export default function CompletedProjects() {
-  const featuredProjects = projects.slice(0, 5);
+  const featuredProjects = projects.slice(0, 4);
 
   return (
     <section
@@ -61,8 +61,10 @@ export default function CompletedProjects() {
             className="text-base md:text-lg max-w-xl mx-auto leading-relaxed"
             style={{ color: "#7A6855" }}
           >
-            A glimpse into beautifully transformed homes and commercial
-            spaces using Wonder Wallz interior solutions.
+            Explore a selection of real Wonder Wallz installations across
+            homes, offices, and commercial spaces. While these projects
+            showcase just a few of our specialties, we offer a complete
+            range of premium interior solutions tailored to every space.
           </motion.p>
         </div>
 

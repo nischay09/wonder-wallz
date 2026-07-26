@@ -155,7 +155,7 @@ export const glassFilmsLandingConfig: GlassFilmLandingConfig = {
         eyebrow: "Curated For You",
         title: "Decorative Glass Films",
         description:
-          "Suitable for privacy, frosted and patterned films. Our team will share suitable options directly on WhatsApp and help you choose the right design.",
+          "Suitable for privacy, frosted and patterned films. We will share suitable options directly on WhatsApp and help you choose the right design.",
         bullets: [
           "Privacy Films",
           "Frosted Films",

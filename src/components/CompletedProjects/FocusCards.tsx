@@ -14,14 +14,14 @@ interface FocusCardProps {
 }
 
 function FocusCard({ project, index, hovered, setHovered, priority = false }: FocusCardProps) {
-  const { image, alt } = project;
+  const { image, alt, href, productCategory, projectLabel } = project;
   const isFocused = hovered === index;
   const isDimmed = hovered !== null && hovered !== index;
 
   return (
     <Link
-      href="/collections"
-      aria-label="Explore Collections"
+      href={href}
+      aria-label={`Explore ${productCategory}`}
       onMouseEnter={() => setHovered(index)}
       onMouseLeave={() => setHovered(null)}
       onFocus={() => setHovered(index)}
@@ -51,32 +51,60 @@ function FocusCard({ project, index, hovered, setHovered, priority = false }: Fo
         }}
       />
 
-      {/* Warm gradient wash, only on focus */}
+      {/* Bottom gradient — always present at low opacity so the overlay text
+          stays legible, deepens further on focus for contrast. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(28,20,13,0) 55%, rgba(28,20,13,0.45) 100%)",
-          opacity: isFocused ? 1 : 0,
+            "linear-gradient(180deg, rgba(28,20,13,0) 50%, rgba(28,20,13,0.72) 100%)",
+          opacity: isFocused ? 1 : 0.82,
           transition: "opacity 0.35s ease-out",
         }}
       />
 
-      {/* Subtle CTA, only on focus */}
+      {/* Persistent card overlay — category, project label, Explore CTA */}
       <div
-        className="absolute bottom-4 left-4 sm:bottom-5 sm:left-5 flex items-center gap-1.5"
+        className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8 sm:px-5 sm:pb-5"
         style={{
-          opacity: isFocused ? 1 : 0,
-          transform: isFocused ? "translateY(0)" : "translateY(6px)",
-          transition: "opacity 0.3s ease-out, transform 0.3s ease-out",
+          transform: isFocused ? "translateY(-2px)" : "translateY(0)",
+          transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
         <span
-          className="text-xs sm:text-sm font-medium tracking-wide"
-          style={{ color: "rgba(255,255,255,0.95)" }}
+          className="block text-xs font-medium tracking-[0.14em] uppercase mb-1"
+          style={{ color: "rgba(255,255,255,0.75)" }}
         >
-          Explore Collections ↗
+          {projectLabel}
+        </span>
+        <span
+          className="block text-sm sm:text-base font-semibold mb-2"
+          style={{
+            color: "rgba(255,255,255,0.98)",
+            fontFamily: "'Playfair Display', Georgia, serif",
+          }}
+        >
+          {productCategory}
+        </span>
+        <span
+          className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium tracking-wide"
+          style={{
+            color: "#F0C892",
+            opacity: isFocused ? 1 : 0.85,
+            transition: "opacity 0.3s ease-out",
+          }}
+        >
+          Explore
+          <span
+            style={{
+              display: "inline-block",
+              transform: isFocused ? "translateX(3px)" : "translateX(0)",
+              transition: "transform 0.3s ease-out",
+            }}
+          >
+            →
+          </span>
         </span>
       </div>
     </Link>
@@ -87,7 +115,7 @@ export default function FocusCards({ projects }: { projects: Project[] }) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 h-[420px] sm:h-[440px] md:h-[460px]">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 h-[440px] sm:h-[480px] md:h-[520px]">
       {projects.map((project, i) => (
         <FocusCard
           key={project.id}

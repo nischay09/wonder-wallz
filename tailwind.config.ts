@@ -1,8 +1,10 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // "./src/pages/**" removed — this is an App Router project (app/layout.tsx,
+  // app/page.tsx, etc.), so a Pages Router glob here was leftover scaffolding
+  // with nothing to match.
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/lib/**/*.{js,ts,jsx,tsx,mdx}",
@@ -71,10 +73,15 @@ const config: Config = {
         },
       },
 
-      // ─── Typography (unchanged) ────────────────────────────────────────
+      // ─── Typography ──────────────────────────────────────────────────────
+      // Added `sans`, mapped to --font-sans (Geist, loaded in layout.tsx).
+      // Previously undefined here, so layout.tsx's `font-sans` class on
+      // <html> fell back to Tailwind's built-in default sans stack instead
+      // of the Geist font that was actually being loaded.
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],
         body:    ["var(--font-body)", "system-ui", "sans-serif"],
+        sans:    ["var(--font-sans)", "system-ui", "sans-serif"],
         mono:    ["var(--font-mono)", "ui-monospace", "monospace"],
       },
 

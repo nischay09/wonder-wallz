@@ -65,7 +65,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Do you install outside West Bengal?",
     answer:
-      "Our installation team currently works only within West Bengal. Outside the state, we're happy to deliver any of our products across India for installation through your local team.",
+      "Our installation team currently works only within West Bengal. Outside the state, we're happy to deliver any of our products across India but you will have to arrange for local installation.",
   },
   {
     question: "How are customised wallpapers ordered?",
@@ -81,12 +81,12 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "When do I need to pay?",
     answer:
-      "For custom wallpapers, glass films and canvas prints, advance payment is required before production starts, as these are made exclusively for you. For non-custom products — blinds, curtains, readymade wallpapers and flooring — you can pay after installation is complete.",
+      "For custom wallpapers, glass films and canvas prints, advance payment is required before production starts, as these are made exclusively for you. For non-custom products — blinds, curtains, readymade wallpapers, flooring, etc — you can pay after measurement is done and you have approved the design.",
   },
   {
     question: "How long does installation take?",
     answer:
-      "Most non-custom installations are completed within about 48 hours of measurement. Custom pieces are scheduled for installation as soon as production is finished and ready.",
+      "Most non-custom installations are completed within about 3-5 days of measurement but are subject to availability. Custom pieces are scheduled for installation as soon as production is finished and ready which depends on the complexity of the design and size.",
   },
   {
     question: "Do you provide after-installation support?",
@@ -96,7 +96,7 @@ const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Can I upload my own design?",
     answer:
-      "Yes — bring us your own artwork, photograph or inspiration, and our design team will help translate it into a custom wallpaper, glass film or canvas print, printed in premium HP Latex quality for true-to-life colour and detail.",
+      "Yes — bring us your own artwork, photograph or inspiration, and our design team will help translate it into a custom wallpaper, glass film or canvas print, printed in premium HP Latex quality for true-to-life colour and detail. You can send us the design using our Custom Design page, or share it in-store or over WhatsApp.",
   },
 ];
 
@@ -115,7 +115,7 @@ const STORES: StoreInfo[] = [
     accent: "brass",
   },
   {
-    name: "Wonder Wallz — Merlin Homeland Mall (2nd Floor)",
+    name: "Wonder Wallz — Merlin Homeland Mall (3rd Floor)",
     tagline: "For blinds, curtains, flooring & more",
     items: [
       "Blinds",

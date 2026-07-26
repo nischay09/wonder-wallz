@@ -570,7 +570,7 @@ export function HomeCatalogueVisitModal({
           <div className="flex items-start gap-2.5 text-left">
             <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#2C1F14]" />
             <p className="text-xs leading-relaxed text-neutral-600 sm:max-w-[340px]">
-              We'll open WhatsApp with your details pre-filled. Our team will confirm your
+              We'll open WhatsApp with your details pre-filled. We will confirm your
               slot and payment link there.
             </p>
           </div>

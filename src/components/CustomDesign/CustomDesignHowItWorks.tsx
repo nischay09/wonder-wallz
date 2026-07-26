@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 const STEPS = [
   { number: 1, title: 'Upload Design', detail: 'Share your artwork, photos or inspiration images.' },
   { number: 2, title: 'Share Measurements', detail: 'Tell us the dimensions of your wall or space.' },
-  { number: 3, title: 'Design Review', detail: "Our team reviews and prepares your custom quotation." },
+  { number: 3, title: 'Design Review', detail: "We review and prepare your custom quotation." },
   { number: 4, title: 'Printing', detail: 'Your design is printed using premium HP Latex technology.' },
   { number: 5, title: 'Installation', detail: 'Professional installation, available across West Bengal.' },
 ];

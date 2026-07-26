@@ -222,7 +222,7 @@ export default function ProjectBuilder() {
                   <p className="font-semibold">Project Request Submitted</p>
                   <p>Thank you for choosing Wonder Wallz.</p>
                   <p>
-                    Our team will review your project and contact you shortly with a detailed
+                    We will review your project and contact you shortly with a detailed
                     quotation.
                   </p>
                   <p>
