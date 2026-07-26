@@ -51,47 +51,52 @@ function FocusCard({ project, index, hovered, setHovered, priority = false }: Fo
         }}
       />
 
-      {/* Bottom gradient — always present at low opacity so the overlay text
-          stays legible, deepens further on focus for contrast. */}
+      {/* Bottom gradient — always dark enough to guarantee text legibility
+          no matter how light/busy the underlying photo is; deepens on focus. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(28,20,13,0) 50%, rgba(28,20,13,0.72) 100%)",
-          opacity: isFocused ? 1 : 0.82,
+            "linear-gradient(180deg, rgba(8,6,4,0) 35%, rgba(8,6,4,0.45) 60%, rgba(8,6,4,0.88) 100%)",
+          opacity: isFocused ? 1 : 0.96,
           transition: "opacity 0.35s ease-out",
         }}
       />
 
       {/* Persistent card overlay — category, project label, Explore CTA */}
       <div
-        className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8 sm:px-5 sm:pb-5"
+        className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-12 sm:px-5 sm:pb-5 sm:pt-14"
         style={{
           transform: isFocused ? "translateY(-2px)" : "translateY(0)",
           transition: "transform 0.35s cubic-bezier(0.22,1,0.36,1)",
         }}
       >
         <span
-          className="block text-xs font-medium tracking-[0.14em] uppercase mb-1"
-          style={{ color: "rgba(255,255,255,0.75)" }}
+          className="block text-[10px] sm:text-xs font-semibold tracking-[0.14em] uppercase mb-1 leading-tight"
+          style={{
+            color: "rgba(255,255,255,0.92)",
+            textShadow: "0 1px 3px rgba(0,0,0,0.85), 0 1px 8px rgba(0,0,0,0.5)",
+          }}
         >
           {projectLabel}
         </span>
         <span
-          className="block text-sm sm:text-base font-semibold mb-2"
+          className="block text-sm sm:text-base font-semibold mb-2 leading-snug"
           style={{
-            color: "rgba(255,255,255,0.98)",
+            color: "#FFFFFF",
             fontFamily: "'Playfair Display', Georgia, serif",
+            textShadow: "0 1px 4px rgba(0,0,0,0.9), 0 2px 10px rgba(0,0,0,0.55)",
           }}
         >
           {productCategory}
         </span>
         <span
-          className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium tracking-wide"
+          className="inline-flex items-center gap-1 text-xs sm:text-sm font-semibold tracking-wide"
           style={{
-            color: "#F0C892",
-            opacity: isFocused ? 1 : 0.85,
+            color: "#F5D5A8",
+            opacity: isFocused ? 1 : 0.95,
+            textShadow: "0 1px 3px rgba(0,0,0,0.8)",
             transition: "opacity 0.3s ease-out",
           }}
         >
