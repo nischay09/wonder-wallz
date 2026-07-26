@@ -23,7 +23,7 @@ export interface Project {
 export const projects: Project[] = [
   {
     id: "p1",
-    image: "/our-work/canvas.jpeg",
+    image: "/our-work/Canvas.jpeg",
     alt: "Framed portrait canvas print installed in a residential living room",
     roomType: "Living Room",
     collection: "Canvas Prints",
