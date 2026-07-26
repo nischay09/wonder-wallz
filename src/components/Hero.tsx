@@ -220,9 +220,13 @@ export default function Hero() {
           {/* Social proof row */}
           <div className={styles.socialProof} aria-label="Customer trust indicators">
             <div className={styles.spStat}>
-              <div className={styles.spStars} aria-label="4.8 out of 5 stars">
+              <div
+                className={styles.spStars}
+                role="img"
+                aria-label="4.8 out of 5 stars"
+              >
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} viewBox="0 0 12 12">
+                  <svg key={i} viewBox="0 0 12 12" aria-hidden="true">
                     <path d="M6 1l1.3 2.7 3 .4-2.2 2.1.5 3L6 7.8l-2.6 1.4.5-3L1.7 4.1l3-.4z" />
                   </svg>
                 ))}

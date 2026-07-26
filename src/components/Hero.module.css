@@ -22,8 +22,8 @@
   --gold: #a9784f;
   --gold-light: #d4b483;
   --gold-pale: rgba(169, 120, 79, 0.12);
-  --wa-green: #25d366;
-  --wa-dark: #1da851;
+  --wa-green: #157a3d; /* deepened from #25d366 so white CTA text reaches ~5:1 (was ~2:1) */
+  --wa-dark: #0f6631; /* hover shade, darkened proportionally */
   --shadow-warm: rgba(28, 20, 16, 0.18);
 
   font-family: 'Inter', sans-serif;
@@ -109,7 +109,7 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: #8c6238; /* darkened from var(--gold) to meet 4.5:1 text contrast on ivory */
   margin-bottom: 1.5rem;
 }
 .eyebrowLine {
@@ -218,7 +218,7 @@
 }
 .spLabel {
   font-size: 10.5px;
-  color: var(--ink-faint);
+  color: var(--ink-muted); /* was --ink-faint (~2.7:1, fails); --ink-muted (~5.9:1) is already in the same palette */
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-top: 3px;

@@ -298,6 +298,8 @@ export default function TestimonialsMarquee() {
       ref={viewportRef}
       className="ww-marquee-viewport w-full overflow-hidden"
       style={{ touchAction: "pan-y" }}
+      role="region"
+      aria-label="Customer testimonials"
     >
       <style>{`
         @keyframes ww-marquee-scroll {
@@ -338,8 +340,6 @@ export default function TestimonialsMarquee() {
       <div
         ref={trackRef}
         className="ww-marquee-track flex w-max items-stretch gap-5 py-2 sm:gap-6"
-        role="list"
-        aria-label="Customer testimonials"
       >
         {renderSet("a")}
         {renderSet("b")}
