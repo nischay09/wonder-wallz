@@ -254,7 +254,7 @@ export default function ContactPageClient() {
               name="Wonder Wallz"
               locality="Merlin Homeland"
               addressLines={[
-                "3rd Floor, Shop no: 370A",
+                "3rd Floor, Shop no: 327A",
                 "18B, Ashutosh Mukherjee Road",
                 "Bhowanipore",
                 "Kolkata, West Bengal 700025",

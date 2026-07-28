@@ -235,7 +235,7 @@ const stores = [
   {
     name: "Wonder Wallz – Interior Products Showroom",
     detail: "Blinds, Curtains, Upholstery, Flooring & Readymade Wallpapers",
-    address: "Merlin Homeland, 3rd Floor, Shop no: 370A, 18B Ashutosh Mukherjee Road, Bhowanipore, Kolkata, West Bengal 700025",
+    address: "Merlin Homeland, 3rd Floor, Shop no: 327A, 18B Ashutosh Mukherjee Road, Bhowanipore, Kolkata, West Bengal 700025",
     mapHref: "https://maps.google.com/?q=Merlin+Homeland+18B+Ashutosh+Mukherjee+Road+Bhowanipore+Kolkata+West+Bengal+700025",
   },
 ];

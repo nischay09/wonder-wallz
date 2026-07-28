@@ -25,6 +25,7 @@ function toRequestEmailData(request: ProjectRequest): ProjectRequestEmailData {
   return {
     product: request.product,
     material: material?.name ?? 'Not selected',
+    canvasFinish: request.product === 'Canvas Print' ? request.canvasFinish : undefined,
     width: request.width,
     height: request.height,
     unit: request.unit,

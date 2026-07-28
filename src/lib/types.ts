@@ -5,6 +5,24 @@ import { getDefaultMaterial } from './materials';
 export type Unit = 'in' | 'ft' | 'cm';
 export type Product = 'Wallpaper' | 'Custom Glass Film' | 'Canvas Print';
 
+/** Canvas Print-only finish option. Irrelevant for all other products. */
+export type CanvasFinish =
+  | 'Frameless Canvas'
+  | 'Canvas with Frame (No Glass)'
+  | 'Canvas with Frame & Glass';
+
+export const CANVAS_FINISH_OPTIONS: CanvasFinish[] = [
+  'Frameless Canvas',
+  'Canvas with Frame (No Glass)',
+  'Canvas with Frame & Glass',
+];
+
+export const DEFAULT_CANVAS_FINISH: CanvasFinish = 'Frameless Canvas';
+
+/** Shown under the two framed options only. */
+export const CANVAS_FRAME_HELPER_TEXT =
+  'Frame designs and available styles will be shared with you via WhatsApp after your enquiry. Final frame selection will be confirmed before production.';
+
 export interface ProjectRequest {
   id: string;
   product: Product;
@@ -15,6 +33,12 @@ export interface ProjectRequest {
   height: string;
   unit: Unit;
   notes: string;
+  /**
+   * Canvas Print-only. Always populated (defaults to 'Frameless Canvas')
+   * so it's safe to read regardless of the current product, but it is
+   * only ever shown/validated/emailed when product === 'Canvas Print'.
+   */
+  canvasFinish: CanvasFinish;
 }
 
 export const PRODUCTS: Product[] = ['Wallpaper', 'Custom Glass Film', 'Canvas Print'];
@@ -50,6 +74,7 @@ export function makeRequest(overrides?: Partial<ProjectRequest>): ProjectRequest
     height: '',
     unit: 'in',
     notes: '',
+    canvasFinish: DEFAULT_CANVAS_FINISH,
     ...overrides,
   };
 }

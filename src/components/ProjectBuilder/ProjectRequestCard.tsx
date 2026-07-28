@@ -15,9 +15,12 @@ import {
   UNITS,
   NOTE_EXAMPLES,
   PRODUCT_ICONS,
+  CANVAS_FINISH_OPTIONS,
+  CANVAS_FRAME_HELPER_TEXT,
   type ProjectRequest,
   type Product,
   type Unit,
+  type CanvasFinish,
 } from '../../lib/types';
 import {
   getMaterialsForProduct,
@@ -148,6 +151,50 @@ function MaterialSelector({
   );
 }
 
+function CanvasFinishSelector({
+  value,
+  onChange,
+}: {
+  value: CanvasFinish;
+  onChange: (finish: CanvasFinish) => void;
+}) {
+  const showFrameHelper = value !== 'Frameless Canvas';
+
+  return (
+    <div>
+      <div
+        role="radiogroup"
+        aria-label="Canvas Finish"
+        aria-required="true"
+        className="flex flex-wrap gap-2"
+      >
+        {CANVAS_FINISH_OPTIONS.map((finish) => (
+          <button
+            key={finish}
+            type="button"
+            role="radio"
+            aria-checked={value === finish}
+            onClick={() => onChange(finish)}
+            className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
+              value === finish
+                ? 'border-[#C9A227] bg-[#FBF3DF] text-[#7A5C1E] shadow-sm'
+                : 'border-[#E7DEC8] bg-white text-[#6E6457] hover:border-[#D9C28A] hover:bg-[#FDFAF3]'
+            }`}
+          >
+            {finish}
+          </button>
+        ))}
+      </div>
+      {showFrameHelper && (
+        <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-[#8A8070]">
+          <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+          {CANVAS_FRAME_HELPER_TEXT}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function EstimatorStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
@@ -272,6 +319,17 @@ export default function ProjectRequestCard({
             onChange={(materialId) => onUpdate({ materialId })}
           />
         </div>
+
+        {/* Canvas Finish — Canvas Print only */}
+        {request.product === 'Canvas Print' && (
+          <div>
+            <FieldLabel>Canvas Finish</FieldLabel>
+            <CanvasFinishSelector
+              value={request.canvasFinish}
+              onChange={(canvasFinish) => onUpdate({ canvasFinish })}
+            />
+          </div>
+        )}
 
         {/* Image upload + preview */}
         <div>

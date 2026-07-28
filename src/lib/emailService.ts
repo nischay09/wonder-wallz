@@ -4,7 +4,7 @@
  * Reusable email-sending service for the Project Builder (and anything else
  * that needs to send a structured enquiry email).
  *
- * Provider: a first-party API route (/api/order), which itself uses
+ * Provider: a first-party API route (/api/project), which itself uses
  * Cloudinary (image hosting) + Resend (delivery) — but nothing outside this
  * file knows that. To migrate providers again later, only `sendEmail()`
  * needs to change; every caller uses `sendProjectEnquiry()` and the shared
@@ -45,6 +45,8 @@ export interface CustomerEmailData {
 export interface ProjectRequestEmailData {
   product: string;
   material: string;
+  /** Present only when product is "Canvas Print". */
+  canvasFinish?: string;
   width: string;
   height: string;
   unit: string;
@@ -75,7 +77,7 @@ export interface EmailSendResult {
 // ─── Internal: payload + files → FormData (isolated to this service layer) ───
 
 /**
- * Builds the multipart FormData sent to /api/order: the structured
+ * Builds the multipart FormData sent to /api/project: the structured
  * payload as a single JSON string field, plus each request's raw image
  * `File`s appended in order, paired with an `imageRequestIndex` entry so
  * the API route can regroup uploaded URLs back onto the correct request.
@@ -102,14 +104,21 @@ function buildFormData(
 // ─── Provider implementation ───────────────────────────────────────────────────
 
 /**
- * Sends the enquiry by POSTing multipart FormData to our own /api/order
- * route, which handles Cloudinary uploads + Resend delivery server-side.
- * Swap the body of this function to change providers again later — the
- * rest of the app only calls `sendProjectEnquiry`.
+ * Sends the enquiry by POSTing multipart FormData to the Project
+ * Builder's own /api/project route, which handles Cloudinary uploads +
+ * Resend delivery server-side.
+ *
+ * NOTE: this used to post to /api/order, but that path is now the
+ * ready-made cart order endpoint (JSON body, see orderEmailService.ts /
+ * orderEmailTemplate.ts). Posting FormData there would silently fail
+ * (or worse, be misparsed as JSON), so this was repointed at the
+ * restored, isolated /api/project route. Swap the body of this function
+ * to change providers again later — the rest of the app only calls
+ * `sendProjectEnquiry`.
  */
 async function sendEmail(formData: FormData): Promise<EmailSendResult> {
   try {
-    const response = await fetch("/api/order", {
+    const response = await fetch("/api/project", {
       method: "POST",
       body: formData,
     });

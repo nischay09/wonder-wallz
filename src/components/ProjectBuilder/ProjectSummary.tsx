@@ -50,7 +50,20 @@ export default function ProjectSummary({ requests }: ProjectSummaryProps) {
   const total = requests.length;
   const wallpapers = requests.filter((r) => r.product === 'Wallpaper').length;
   const glassFilms = requests.filter((r) => r.product === 'Custom Glass Film').length;
-  const canvasPrints = requests.filter((r) => r.product === 'Canvas Print').length;
+  const canvasRequests = requests.filter((r) => r.product === 'Canvas Print');
+  const canvasPrints = canvasRequests.length;
+
+  /**
+   * Summary note for the Canvas Prints stat. Shows the finish when every
+   * canvas request shares the same one; otherwise shows a count of
+   * distinct finishes so the note never misrepresents a mixed selection.
+   */
+  const canvasFinishNote = (() => {
+    if (canvasPrints === 0) return undefined;
+    const distinctFinishes = Array.from(new Set(canvasRequests.map((r) => r.canvasFinish)));
+    if (distinctFinishes.length === 1) return distinctFinishes[0];
+    return `${distinctFinishes.length} finishes selected`;
+  })();
 
   return (
     <motion.div
@@ -85,7 +98,11 @@ export default function ProjectSummary({ requests }: ProjectSummaryProps) {
         <SummaryStat
           label="Canvas Prints"
           value={canvasPrints === 0 ? '—' : canvasPrints}
-          note={canvasPrints > 0 ? getProductionTime('Canvas Print') : undefined}
+          note={
+            canvasPrints > 0
+              ? [getProductionTime('Canvas Print'), canvasFinishNote].filter(Boolean).join(' · ')
+              : undefined
+          }
           highlight
         />
       </div>

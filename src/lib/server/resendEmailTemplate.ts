@@ -23,6 +23,8 @@ export interface ResendCustomer {
 export interface ResendRequestLine {
   product: string;
   material: string;
+  /** Present only when product is "Canvas Print". */
+  canvasFinish?: string;
   width: string;
   height: string;
   unit: string;
@@ -60,6 +62,11 @@ function renderRequestBlock(req: ResendRequestLine, index: number): string {
   )}</h3>
       <table style="width:100%;font-size:13px;color:#4A4436;border-collapse:collapse;">
         <tr><td style="padding:2px 0;width:160px;color:#8A7F6A;">Material</td><td>${escapeHtml(req.material)}</td></tr>
+        ${
+          req.canvasFinish
+            ? `<tr><td style="padding:2px 0;color:#8A7F6A;">Canvas Finish</td><td>${escapeHtml(req.canvasFinish)}</td></tr>`
+            : ""
+        }
         <tr><td style="padding:2px 0;color:#8A7F6A;">Dimensions</td><td>${escapeHtml(req.width)} × ${escapeHtml(req.height)} ${escapeHtml(req.unit)}</td></tr>
         <tr><td style="padding:2px 0;color:#8A7F6A;">Coverage Area</td><td>${escapeHtml(req.coverageArea)}</td></tr>
         <tr><td style="padding:2px 0;color:#8A7F6A;">Estimated Total</td><td style="font-weight:600;color:#8A6D2E;">${escapeHtml(req.estimatedTotal)}</td></tr>
