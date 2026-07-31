@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * ProjectBuilder — Iteration 3
+ * ProjectBuilder — Iteration 4
  * Wonder Wallz premium project builder.
  * Full state management, image upload/preview, live project summary,
  * and email submission via the reusable emailService.
@@ -13,10 +13,14 @@
  *       ImageUploader       ← multi-image upload + preview + removal
  *     ProjectSummary        ← live breakdown by product type
  *
- * NOTE: only change from the previous iteration is the sendProjectEnquiry()
- * call below now also passes `requests`, so emailService.ts can convert the
- * raw File[] images into base64 attachments for the /api/order route.
- * No other logic in this component has changed.
+ * NOTE (this iteration): ProjectBuilder no longer reads the URL itself.
+ * useSearchParams() forces any page importing this component into a
+ * client-side-only render path (or requires wrapping in <Suspense>) which
+ * broke static rendering for /custom-design. The deep-link params are now
+ * read once on the server in app/custom-design/page.tsx and passed down as
+ * plain props (`initialProduct` / `initialCanvasFinish`), which are used to
+ * seed the very first request on mount. Everything else is unchanged from
+ * the previous iteration.
  */
 
 import { useEffect, useState } from "react";
@@ -30,16 +34,36 @@ import {
   cloneRequest,
   makeCustomerDetails,
   validateCustomerDetails,
+  CANVAS_FINISH_OPTIONS,
   type ProjectRequest,
   type CustomerDetails,
   type CustomerDetailsErrors,
+  type CanvasFinish,
 } from '../../lib/types';
 import { sendProjectEnquiry, getWhatsAppFallbackUrl } from '../../lib/emailService';
 import { buildProjectEnquiryPayload } from '../../lib/projectEnquiryMapper';
 
 type SubmissionStatus = 'idle' | 'sending' | 'success' | 'error';
 
-export default function ProjectBuilder() {
+export interface ProjectBuilderProps {
+  /**
+   * Deep-link product hint from the Canvas Collection page's Finish Samples
+   * (see CanvasLandingPage.tsx / buildProjectBuilderHref):
+   * /custom-design?product=canvas-prints&canvasFinish=<CanvasFinish>#start-project
+   *
+   * Only 'canvas-prints' is recognised here — Wallpaper, Glass Film, and
+   * Ready-made flows don't pass this param and are unaffected, and fall
+   * through to the plain makeRequest() default exactly as before.
+   */
+  initialProduct?: string | null;
+  /** Deep-link canvas finish hint, only used when initialProduct === 'canvas-prints'. */
+  initialCanvasFinish?: string | null;
+}
+
+export default function ProjectBuilder({
+  initialProduct = null,
+  initialCanvasFinish = null,
+}: ProjectBuilderProps) {
   // ── State ──────────────────────────────────────────────────────────────────
 
   const [requests, setRequests] = useState<ProjectRequest[]>([]);
@@ -49,7 +73,25 @@ export default function ProjectBuilder() {
   const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
+    if (initialProduct === 'canvas-prints') {
+      const isValidFinish = (
+        value: string | null
+      ): value is CanvasFinish =>
+        !!value && (CANVAS_FINISH_OPTIONS as string[]).includes(value);
+
+      setRequests([
+        makeRequest({
+          product: 'Canvas Print',
+          ...(isValidFinish(initialCanvasFinish)
+            ? { canvasFinish: initialCanvasFinish }
+            : {}),
+        }),
+      ]);
+      return;
+    }
+
     setRequests([makeRequest()]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Handlers ───────────────────────────────────────────────────────────────

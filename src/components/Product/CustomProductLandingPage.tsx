@@ -52,6 +52,14 @@ interface CustomProductLandingPageProps extends CustomProductLandingConfig {
    * given product needs different behaviour.
    */
   onStartCustomProject?: () => void;
+  /**
+   * Optional content rendered immediately after the Frame Options section
+   * (section 3, before Perfect For). Generic component stays product-
+   * agnostic — nothing renders here unless a per-product wrapper passes
+   * something in. Canvas Prints uses this for its Finish Samples section;
+   * Wallpapers/Glass Films can leave it unset.
+   */
+  afterFrameOptions?: React.ReactNode;
 }
 
 // ─── Shared button styles ──────────────────────────────────────────────────
@@ -78,6 +86,7 @@ export function CustomProductLandingPage({
   faq,
   finalCta,
   onStartCustomProject,
+  afterFrameOptions,
 }: CustomProductLandingPageProps) {
   const router = useRouter();
   const [isShowroomVisitOpen, setIsShowroomVisitOpen] = useState(false);
@@ -290,6 +299,8 @@ export function CustomProductLandingPage({
           </div>
         </div>
       </section>
+
+      {afterFrameOptions}
 
       {/* ── 4. Perfect For — Canvas-specific ──────────────────────────── */}
       <section className="container-site py-16 md:py-20">

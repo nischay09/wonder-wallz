@@ -7,6 +7,7 @@
  * dimensions, live estimate, and notes.
  */
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Copy, Trash2, Info } from 'lucide-react';
 import ImageUploader from './ImageUploader';
@@ -28,7 +29,6 @@ import {
   getDefaultMaterial,
   CANVAS_FRAME_NOTE,
   ESTIMATE_DISCLAIMER,
-  getMinBillableAreaNote,
 } from '../../lib/materials';
 import {
   toSquareFeet,
@@ -37,6 +37,7 @@ import {
   calculateEstimatedTotal,
   formatArea,
   formatCurrency,
+  PROJECT_BUILDER_MIN_BILLABLE_AREA_NOTE,
 } from '../../lib/estimator';
 
 // ─── Shared primitives ────────────────────────────────────────────────────────
@@ -158,7 +159,7 @@ function CanvasFinishSelector({
   value: CanvasFinish;
   onChange: (finish: CanvasFinish) => void;
 }) {
-  const showFrameHelper = value !== 'Frameless Canvas';
+  const showFrameHelper = value !== 'Print Only (No Frame)';
 
   return (
     <div>
@@ -186,10 +187,22 @@ function CanvasFinishSelector({
         ))}
       </div>
       {showFrameHelper && (
-        <p className="mt-2 flex items-start gap-1.5 text-xs leading-relaxed text-[#8A8070]">
-          <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
-          {CANVAS_FRAME_HELPER_TEXT}
-        </p>
+        <div className="mt-2 space-y-1.5">
+          <p className="flex items-start gap-1.5 text-xs leading-relaxed text-[#8A8070]">
+            <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+            {CANVAS_FRAME_HELPER_TEXT}
+          </p>
+          {/* Shown for every finish except Print Only (No Frame), same
+              condition as the helper text above. Links to the Canvas
+              Finish Samples section on the Canvas Collection page. */}
+          <Link
+            href="/collections/canvas-prints#canvas-finish-samples"
+            className="inline-flex items-center gap-1 pl-[18px] text-xs font-semibold text-[#8A6D2E] transition-colors hover:text-[#C9A227]"
+          >
+            View Frame Samples
+            <span aria-hidden>→</span>
+          </Link>
+        </div>
       )}
     </div>
   );
@@ -215,16 +228,17 @@ function EstimatorCard({ request }: { request: ProjectRequest }) {
 
   return (
     <div className="rounded-2xl border border-[#E7DEC8] bg-[#FAF7EF] px-5 py-4">
-      {/* Display only Coverage Area + Estimated Total — no rate, no formula. */}
-      <div className="grid grid-cols-2 gap-4">
-        <EstimatorStat label="Coverage Area" value={formatArea(coverageAreaSqFt)} />
+      {/* Actual Area, Billable Area (25 sq ft minimum when applicable), Estimated Total — no rate, no formula. */}
+      <div className="grid grid-cols-3 gap-4">
+        <EstimatorStat label="Actual Area" value={formatArea(coverageAreaSqFt)} />
+        <EstimatorStat label="Billable Area" value={formatArea(billableAreaSqFt)} />
         <EstimatorStat label="Estimated Total" value={formatCurrency(estimatedTotal)} />
       </div>
 
       {minAreaApplied && (
         <p className="mt-3 flex items-start gap-1.5 border-t border-[#EDE3CB] pt-3 text-[11px] leading-relaxed text-[#8A6D2E]">
           <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
-          {getMinBillableAreaNote(request.product)}
+          {PROJECT_BUILDER_MIN_BILLABLE_AREA_NOTE}
         </p>
       )}
 

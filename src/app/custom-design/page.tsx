@@ -14,7 +14,15 @@
  *  2. Benefits         → CustomDesignBenefits.tsx
  *  3. How It Works      → CustomDesignHowItWorks.tsx
  *  4. Trust section     → CustomDesignTrust.tsx
- *  5. Project Builder   → existing ProjectBuilder component (unmodified)
+ *  5. Project Builder   → existing ProjectBuilder component
+ *
+ * NOTE: deep-link params (?product=canvas-prints&canvasFinish=...) used to
+ * be read inside ProjectBuilder via useSearchParams(), which forces that
+ * subtree to opt out of static rendering (or requires a <Suspense> boundary)
+ * and broke static builds for this page. This is a Server Component, so the
+ * App Router already gives it a `searchParams` prop for free — we read the
+ * values here on the server and pass them down to ProjectBuilder as plain
+ * props instead. The page remains statically renderable.
  */
 
 import type { Metadata } from "next";
@@ -99,7 +107,24 @@ const jsonLd = {
   ],
 };
 
-export default function CustomDesignPage() {
+// Narrow whatever the router hands us down to a single string | undefined,
+// since searchParams values can be string | string[] | undefined.
+function firstParam(value: string | string[] | undefined): string | null {
+  if (Array.isArray(value)) return value[0] ?? null;
+  return value ?? null;
+}
+
+interface CustomDesignPageProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function CustomDesignPage({
+  searchParams,
+}: CustomDesignPageProps) {
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const initialProduct = firstParam(resolvedSearchParams.product);
+  const initialCanvasFinish = firstParam(resolvedSearchParams.canvasFinish);
+
   return (
     <main id="main-content">
       <script
@@ -120,11 +145,15 @@ export default function CustomDesignPage() {
 
       {/* ── 5. PROJECT BUILDER ──────────────────────────────────────────── */}
       {/*
-       * Existing, unmodified ProjectBuilder component. The hero's
-       * "Start Your Project" CTA scrolls to this anchor.
+       * Deep-link params (?product=canvas-prints&canvasFinish=...) are read
+       * above, on the server, and passed down as props — ProjectBuilder no
+       * longer calls useSearchParams() itself.
        */}
       <div id="start-project">
-        <ProjectBuilder />
+        <ProjectBuilder
+          initialProduct={initialProduct}
+          initialCanvasFinish={initialCanvasFinish}
+        />
       </div>
     </main>
   );

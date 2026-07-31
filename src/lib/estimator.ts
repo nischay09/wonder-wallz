@@ -5,7 +5,26 @@
 
 import type { Unit, Product } from './types';
 import type { Material } from './materials';
-import { getMinBillableArea } from './materials';
+
+// ─── Project Builder minimum billable area ────────────────────────────────
+//
+// Business rule: Custom Wallpapers, Canvas Prints, and Custom Glass Films
+// ordered through the Project Builder all share a single universal minimum
+// billable area of 25 sq ft, regardless of product type.
+//
+// This is intentionally separate from `materials.ts`'s `getMinBillableArea`,
+// which still governs the Ready-made Products / cart / catalogue workflow
+// (different, per-product minimums, e.g. 11 / 20 sq ft). Do not import or
+// reuse that function here — the two floors are independent by design, and
+// this file must not affect cart/catalogue pricing.
+export const PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT = 25;
+
+/**
+ * Plain-language note shown only when the Project Builder minimum has been
+ * applied (i.e. the entered coverage area is below 25 sq ft).
+ */
+export const PROJECT_BUILDER_MIN_BILLABLE_AREA_NOTE =
+  'Minimum billable area for all custom wallpapers, canvas prints and custom glass films is 25 sq ft.';
 
 /** Convert a width × height pair (in the given unit) into square feet. */
 export function toSquareFeet(width: number, height: number, unit: Unit): number {
@@ -31,7 +50,7 @@ export function toSquareFeet(width: number, height: number, unit: Unit): number 
  */
 export function calculateBillableArea(coverageAreaSqFt: number, product: Product): number {
   if (!coverageAreaSqFt || coverageAreaSqFt <= 0) return 0;
-  return Math.max(coverageAreaSqFt, getMinBillableArea(product));
+  return Math.max(coverageAreaSqFt, PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT);
 }
 
 /**
@@ -42,7 +61,7 @@ export function calculateBillableArea(coverageAreaSqFt: number, product: Product
  */
 export function isMinBillableAreaApplied(coverageAreaSqFt: number, product: Product): boolean {
   if (!coverageAreaSqFt || coverageAreaSqFt <= 0) return false;
-  return coverageAreaSqFt < getMinBillableArea(product);
+  return coverageAreaSqFt < PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT;
 }
 
 /**

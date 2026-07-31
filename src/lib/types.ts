@@ -7,11 +7,13 @@ export type Product = 'Wallpaper' | 'Custom Glass Film' | 'Canvas Print';
 
 /** Canvas Print-only finish option. Irrelevant for all other products. */
 export type CanvasFinish =
+  | 'Print Only (No Frame)'
   | 'Frameless Canvas'
   | 'Canvas with Frame (No Glass)'
   | 'Canvas with Frame & Glass';
 
 export const CANVAS_FINISH_OPTIONS: CanvasFinish[] = [
+  'Print Only (No Frame)',
   'Frameless Canvas',
   'Canvas with Frame (No Glass)',
   'Canvas with Frame & Glass',
@@ -65,10 +67,11 @@ export const PRODUCT_ICONS: Record<Product, string> = {
 /** Create a fresh request with sensible defaults. */
 export function makeRequest(overrides?: Partial<ProjectRequest>): ProjectRequest {
   const defaultProduct: Product = 'Wallpaper';
+  const product = overrides?.product ?? defaultProduct;
   return {
     id: crypto.randomUUID(),
-    product: defaultProduct,
-    materialId: getDefaultMaterial(defaultProduct)?.id ?? '',
+    product,
+    materialId: getDefaultMaterial(product)?.id ?? '',
     images: [],
     width: '',
     height: '',

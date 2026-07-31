@@ -10,9 +10,18 @@
  */
 
 import { motion } from 'framer-motion';
-import { Layers } from 'lucide-react';
+import { Layers, Info } from 'lucide-react';
 import type { ProjectRequest } from '../../lib/types';
-import { getProductionTime } from '../../lib/materials';
+import { getProductionTime, getMaterialById, getDefaultMaterial } from '../../lib/materials';
+import {
+  toSquareFeet,
+  calculateBillableArea,
+  isMinBillableAreaApplied,
+  calculateEstimatedTotal,
+  formatArea,
+  formatCurrency,
+  PROJECT_BUILDER_MIN_BILLABLE_AREA_NOTE,
+} from '../../lib/estimator';
 
 interface ProjectSummaryProps {
   requests: ProjectRequest[];
@@ -36,7 +45,7 @@ function SummaryStat({
       </span>
       <span
         className={`text-base font-bold leading-tight ${
-          highlight && Number(value) > 0 ? 'text-[#C9A227]' : 'text-[#2B2620]'
+          highlight && value !== '—' && value !== 0 ? 'text-[#C9A227]' : 'text-[#2B2620]'
         }`}
       >
         {value}
@@ -64,6 +73,34 @@ export default function ProjectSummary({ requests }: ProjectSummaryProps) {
     if (distinctFinishes.length === 1) return distinctFinishes[0];
     return `${distinctFinishes.length} finishes selected`;
   })();
+
+  /**
+   * Aggregate area/pricing across every request. Each request is floored at
+   * the Project Builder's universal 25 sq ft minimum billable area
+   * individually (each design is produced/billed as its own item), then the
+   * per-request figures are summed for the summary totals.
+   */
+  const { actualAreaSqFt, billableAreaSqFt, estimatedTotal, minAreaAppliedAnywhere } = requests.reduce(
+    (acc, r) => {
+      const coverage = toSquareFeet(parseFloat(r.width), parseFloat(r.height), r.unit);
+      if (!coverage || coverage <= 0) return acc;
+
+      const billable = calculateBillableArea(coverage, r.product);
+      const material = getMaterialById(r.product, r.materialId) ?? getDefaultMaterial(r.product);
+      const total = calculateEstimatedTotal(billable, material);
+      const minApplied = isMinBillableAreaApplied(coverage, r.product);
+
+      return {
+        actualAreaSqFt: acc.actualAreaSqFt + coverage,
+        billableAreaSqFt: acc.billableAreaSqFt + billable,
+        estimatedTotal: acc.estimatedTotal + total,
+        minAreaAppliedAnywhere: acc.minAreaAppliedAnywhere || minApplied,
+      };
+    },
+    { actualAreaSqFt: 0, billableAreaSqFt: 0, estimatedTotal: 0, minAreaAppliedAnywhere: false }
+  );
+
+  const hasAnyArea = actualAreaSqFt > 0;
 
   return (
     <motion.div
@@ -106,6 +143,29 @@ export default function ProjectSummary({ requests }: ProjectSummaryProps) {
           highlight
         />
       </div>
+
+      {/* Area & pricing totals across all design requests */}
+      {hasAnyArea && (
+        <>
+          <div className="grid grid-cols-2 divide-x divide-y divide-[#EDE3CB] border-t border-[#EDE3CB] md:grid-cols-3 md:divide-y-0">
+            <SummaryStat label="Actual Area" value={formatArea(actualAreaSqFt)} />
+            <SummaryStat label="Billable Area" value={formatArea(billableAreaSqFt)} highlight />
+            <SummaryStat
+              label="Estimated Total"
+              value={formatCurrency(estimatedTotal)}
+              highlight
+              note="Excludes GST, coupons & offers"
+            />
+          </div>
+
+          {minAreaAppliedAnywhere && (
+            <p className="flex items-start gap-1.5 border-t border-[#EDE3CB] px-6 py-3 text-[11px] leading-relaxed text-[#8A6D2E]">
+              <Info className="mt-0.5 h-3 w-3 flex-shrink-0" />
+              {PROJECT_BUILDER_MIN_BILLABLE_AREA_NOTE}
+            </p>
+          )}
+        </>
+      )}
     </motion.div>
   );
 }
