@@ -11,7 +11,17 @@ import { getProductBySlug } from "@/lib/products";
 // Reuse the exact same unit conversion + formatting utilities as the
 // Project Builder — do not re-implement unit math here.
 import { UNITS, type Unit } from "@/lib/types";
-import { toSquareFeet, formatCurrency as formatEstimatorCurrency } from "@/lib/estimator";
+// Single source of truth for the Project Builder's minimum billable area
+// (25 sq ft, universal across Wallpaper / Canvas Print / Glass Film). This
+// is deliberately NOT lib/materials.ts's getMinBillableArea, which governs
+// the separate Ready-made/cart/catalogue workflow with different, per-
+// product minimums — Quick View's "Add to Project" path feeds the same
+// Project Builder cart, so it must follow the Project Builder's rule.
+import {
+  toSquareFeet,
+  formatCurrency as formatEstimatorCurrency,
+  PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT,
+} from "@/lib/estimator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,7 +72,12 @@ function getPreviewAspectConfig(product: CollectionProduct): { ratio: string; ma
 //
 // Customers simply enter wall width and height — there is no media width or
 // roll length restriction shown or enforced for wallpapers.
-const MIN_BILLABLE_AREA_SQFT = 20;
+//
+// Minimum billable area is NOT hardcoded here — it's sourced from
+// PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT in lib/estimator.ts, the same
+// universal 25 sq ft floor the Custom Project Builder uses for Wallpaper,
+// Canvas Print, and Glass Film, so Quick View and the Builder can never
+// drift apart on this business rule again.
 
 // Internal rate table (₹ per sq ft) used only to derive the Estimated Total.
 // This is never rendered — customers only ever see the final total.
@@ -228,12 +243,18 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
     return toSquareFeet(widthNum, heightNum, unit);
   }, [dimensionsValid, widthNum, heightNum, unit]);
 
-  const minAreaApplied = coverageAreaSqFt != null && coverageAreaSqFt < MIN_BILLABLE_AREA_SQFT;
+  // Sourced from lib/estimator.ts — the same 25 sq ft Project Builder floor
+  // used for Wallpaper, Canvas Print, and Glass Film. Kept as a single
+  // reference (not a local literal) so the business rule only ever has to
+  // change in one place.
+  const minBillableAreaSqFt = PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT;
+
+  const minAreaApplied = coverageAreaSqFt != null && coverageAreaSqFt < minBillableAreaSqFt;
 
   const billableAreaSqFt = useMemo(() => {
     if (coverageAreaSqFt == null) return null;
-    return Math.max(coverageAreaSqFt, MIN_BILLABLE_AREA_SQFT);
-  }, [coverageAreaSqFt]);
+    return Math.max(coverageAreaSqFt, minBillableAreaSqFt);
+  }, [coverageAreaSqFt, minBillableAreaSqFt]);
 
   const estimatedTotal = useMemo(() => {
     if (!billableAreaSqFt) return null;
@@ -619,7 +640,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                       </svg>
                       <span>
                         This estimate has been calculated using the minimum billable area of{" "}
-                        {MIN_BILLABLE_AREA_SQFT} sq ft.
+                        {minBillableAreaSqFt} sq ft.
                       </span>
                     </div>
                   )}
@@ -1089,7 +1110,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         </svg>
                         <span>
                           This estimate has been calculated using the minimum billable area of{" "}
-                          {MIN_BILLABLE_AREA_SQFT} sq ft.
+                          {minBillableAreaSqFt} sq ft.
                         </span>
                       </div>
                     )}
