@@ -194,12 +194,13 @@ function CanvasFinishSamplesSection() {
           </p>
         </div>
 
-        {/* ── Desktop / tablet (sm and up): unchanged from before ──────────
-            Single FocusCards grid of all 4 cards, with the full
-            descriptions rendered as a separate caption grid underneath.
-            Hidden below the sm breakpoint, where the mobile-only layout
-            below takes over instead. */}
-        <div className="hidden sm:block">
+        {/* ── Desktop only (lg and up): unchanged from before — the
+            original four-column requirement. Single FocusCards grid of
+            all 4 cards, with the full descriptions rendered as a separate
+            caption grid underneath. Hidden below the lg breakpoint, where
+            the paired card+caption layout below takes over for both
+            tablet and mobile. */}
+        <div className="hidden lg:block">
           <div className="mt-10">
             <FocusCards projects={CANVAS_FINISH_SAMPLES} />
           </div>
@@ -207,7 +208,7 @@ function CanvasFinishSamplesSection() {
           {/* Descriptions — FocusCards' own card face has no description
               slot (see comment above), so these render as captions beneath
               the grid, aligned to the same columns as the cards above. */}
-          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+          <div className="mt-6 grid grid-cols-4 gap-4">
             {CANVAS_FINISH_SAMPLES.map((sample) => (
               <p
                 key={sample.id}
@@ -219,24 +220,33 @@ function CanvasFinishSamplesSection() {
           </div>
         </div>
 
-        {/* ── Mobile only (below sm): 2x2 grid, each card + its own short
-            caption rendered together as one unit. FocusCards itself isn't
-            modified — but it always renders its OWN internal
-            `grid-cols-2 ... lg:grid-cols-4` regardless of how many items
-            are passed in, so a single-item array was still only filling
-            one of two *internal* grid columns — that's what was actually
-            capping card width at ~50%, not our outer wrapper's columns.
-            `[&>div]:!grid-cols-1` targets that inner grid directly (it's
-            FocusCards' single top-level returned div) and forces it to
-            one column so the single card fills the full width of our
-            outer grid cell. hover animation, image sizing (object-cover),
-            links, and deep-link params all still pass through unchanged —
-            only the internal column count is overridden. */}
-        <div className="mt-10 grid grid-cols-2 gap-x-2 gap-y-8 sm:hidden">
+        {/* ── Mobile + tablet (below lg): 2-column grid where each card is
+            paired with its own caption as a single unit. This replaces the
+            split "one big image grid + separate caption grid below" layout
+            that was causing captions to visually misalign with their
+            cards on tablet (any text-wrap difference between the two
+            separate grids threw off the alignment). Pairing them
+            guarantees each caption always sits directly under its own
+            card, at any width below lg.
+            FocusCards now accepts an optional `gridClassName` prop
+            (defaulting to its original grid-cols-2/lg:grid-cols-4 classes,
+            so every OTHER usage of FocusCards across the site — Flooring,
+            Blinds, Curtains, Upholstery, and the desktop grid above — is
+            completely unaffected since they never pass this prop). Here we
+            override it to a single column per card, with a height that
+            steps up from mobile to tablet (h-[320px] → sm:h-[400px]) so
+            tablet cards aren't squashed into the same fixed height that
+            was previously shared with the 4-column desktop grid. hover
+            animation, image sizing (object-cover), links, and deep-link
+            params all still pass through unchanged. */}
+        <div className="mt-10 grid grid-cols-2 gap-x-2 gap-y-8 sm:gap-x-4 lg:hidden">
           {CANVAS_FINISH_SAMPLES.map((sample) => (
             <div key={sample.id} className="flex w-full flex-col items-center">
-              <div className="w-full [&>div]:!grid-cols-1">
-                <FocusCards projects={[sample]} />
+              <div className="w-full">
+                <FocusCards
+                  projects={[sample]}
+                  gridClassName="grid grid-cols-1 h-[320px] sm:h-[400px]"
+                />
               </div>
               <p className="mt-3 text-center text-sm leading-relaxed text-neutral-600">
                 {sample.mobileDescription}

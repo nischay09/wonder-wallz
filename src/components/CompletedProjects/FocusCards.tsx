@@ -116,11 +116,26 @@ function FocusCard({ project, index, hovered, setHovered, priority = false }: Fo
   );
 }
 
-export default function FocusCards({ projects }: { projects: Project[] }) {
+// `gridClassName` is optional and defaults to the exact original grid
+// classes below, so every existing call site that doesn't pass it
+// (Flooring, Blinds, Curtains, Upholstery, the desktop/tablet Canvas
+// grid, etc.) renders byte-for-byte identically to before. It exists
+// solely so the Canvas Finish Samples mobile layout can override the
+// column count for its single-item cards without forking this component.
+const DEFAULT_GRID_CLASSNAME =
+  "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 h-[440px] sm:h-[480px] md:h-[520px]";
+
+export default function FocusCards({
+  projects,
+  gridClassName = DEFAULT_GRID_CLASSNAME,
+}: {
+  projects: Project[];
+  gridClassName?: string;
+}) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 h-[440px] sm:h-[480px] md:h-[520px]">
+    <div className={gridClassName}>
       {projects.map((project, i) => (
         <FocusCard
           key={project.id}
