@@ -219,16 +219,17 @@ function CanvasFinishSamplesSection() {
           </div>
         </div>
 
-        {/* ── Mobile only (below sm): each card + its own short caption
-            rendered together as one unit, laid out in a 2x2 grid.
-            FocusCards itself isn't modified — each cell just renders it
-            with a single-item array, so hover animation, image sizing,
-            links, and deep-link params all pass through unchanged. The
-            caption sits directly under its own card instead of in a
-            separate block below the whole grid. */}
-        <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:hidden">
+        {/* ── Mobile only (below sm): one card per row, each spanning the
+            full available width, with its own short caption directly
+            beneath it. FocusCards itself isn't modified — each cell just
+            renders it with a single-item array, so hover animation, image
+            sizing (object-cover), links, and deep-link params all pass
+            through unchanged. Widening the column (grid-cols-1 instead of
+            2) widens the card itself, which increases the visible width of
+            the image without touching the crop/object-fit behaviour. */}
+        <div className="mt-10 grid grid-cols-1 gap-y-8 sm:hidden">
           {CANVAS_FINISH_SAMPLES.map((sample) => (
-            <div key={sample.id} className="flex flex-col items-center">
+            <div key={sample.id} className="flex w-full flex-col items-center">
               <div className="w-full">
                 <FocusCards projects={[sample]} />
               </div>
