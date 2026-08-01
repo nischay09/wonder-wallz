@@ -219,18 +219,23 @@ function CanvasFinishSamplesSection() {
           </div>
         </div>
 
-        {/* ── Mobile only (below sm): one card per row, each spanning the
-            full available width, with its own short caption directly
-            beneath it. FocusCards itself isn't modified — each cell just
-            renders it with a single-item array, so hover animation, image
-            sizing (object-cover), links, and deep-link params all pass
-            through unchanged. Widening the column (grid-cols-1 instead of
-            2) widens the card itself, which increases the visible width of
-            the image without touching the crop/object-fit behaviour. */}
-        <div className="mt-10 grid grid-cols-1 gap-y-8 sm:hidden">
+        {/* ── Mobile only (below sm): 2x2 grid, each card + its own short
+            caption rendered together as one unit. FocusCards itself isn't
+            modified — but it always renders its OWN internal
+            `grid-cols-2 ... lg:grid-cols-4` regardless of how many items
+            are passed in, so a single-item array was still only filling
+            one of two *internal* grid columns — that's what was actually
+            capping card width at ~50%, not our outer wrapper's columns.
+            `[&>div]:!grid-cols-1` targets that inner grid directly (it's
+            FocusCards' single top-level returned div) and forces it to
+            one column so the single card fills the full width of our
+            outer grid cell. hover animation, image sizing (object-cover),
+            links, and deep-link params all still pass through unchanged —
+            only the internal column count is overridden. */}
+        <div className="mt-10 grid grid-cols-2 gap-x-2 gap-y-8 sm:hidden">
           {CANVAS_FINISH_SAMPLES.map((sample) => (
             <div key={sample.id} className="flex w-full flex-col items-center">
-              <div className="w-full">
+              <div className="w-full [&>div]:!grid-cols-1">
                 <FocusCards projects={[sample]} />
               </div>
               <p className="mt-3 text-center text-sm leading-relaxed text-neutral-600">
