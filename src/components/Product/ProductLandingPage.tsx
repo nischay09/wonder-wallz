@@ -200,6 +200,36 @@ export function ProductLandingPage({
         @media (prefers-reduced-motion: reduce) {
           .plp-hero-fade-up, .plp-hero-image-in, .plp-hero-image-drift { animation: none; }
         }
+
+        /* Readability overlay — a radial wash centred on the text block
+           (right-aligned, vertically mid) layered with the original top/
+           bottom washes, so the darkest point always sits directly behind
+           the copy while the rest of the photograph stays visible. Desktop
+           keeps a light touch; mobile deepens and widens the radial since
+           the text column can span closer to the full image width there. */
+        .plp-hero-overlay {
+          background:
+            radial-gradient(120% 100% at 82% 45%, rgba(16,11,8,0.60) 0%, rgba(16,11,8,0.36) 34%, rgba(16,11,8,0.15) 58%, rgba(16,11,8,0) 74%),
+            linear-gradient(180deg, rgba(16,11,8,0.28) 0%, rgba(16,11,8,0) 26%),
+            linear-gradient(0deg, rgba(16,11,8,0.34) 0%, rgba(16,11,8,0) 40%);
+        }
+        @media (max-width: 767px) {
+          .plp-hero-overlay {
+            background:
+              radial-gradient(150% 95% at 62% 42%, rgba(16,11,8,0.74) 0%, rgba(16,11,8,0.56) 42%, rgba(16,11,8,0.30) 66%, rgba(16,11,8,0.06) 86%),
+              linear-gradient(180deg, rgba(16,11,8,0.36) 0%, rgba(16,11,8,0) 24%),
+              linear-gradient(0deg, rgba(16,11,8,0.42) 0%, rgba(16,11,8,0) 46%);
+          }
+        }
+
+        /* Elegant, minimal text shadow — a touch stronger on mobile, where
+           the overlay alone has less room to build contrast. No glow. */
+        .plp-hero-heading-shadow { text-shadow: 0 2px 16px rgba(16,11,8,0.35), 0 1px 3px rgba(16,11,8,0.45); }
+        .plp-hero-desc-shadow { text-shadow: 0 1px 10px rgba(16,11,8,0.3), 0 1px 2px rgba(16,11,8,0.4); }
+        @media (max-width: 767px) {
+          .plp-hero-heading-shadow { text-shadow: 0 2px 18px rgba(16,11,8,0.5), 0 1px 4px rgba(16,11,8,0.6); }
+          .plp-hero-desc-shadow { text-shadow: 0 1px 12px rgba(16,11,8,0.45), 0 1px 3px rgba(16,11,8,0.55); }
+        }
       `}</style>
 
       {/* ── 1. Hero ──────────────────────────────────────────────────────
@@ -218,18 +248,10 @@ export function ProductLandingPage({
           />
         </div>
 
-        {/* Light, right-weighted wash — legibility only, most of the
-            frame stays visible. A bottom-anchored wash is layered in
-            alongside it so the lower portion of the (right-aligned) text
-            block keeps contrast too, since the original two washes only
-            covered the left side and the very top of the image. */}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(270deg, rgba(16,11,8,0.52) 0%, rgba(16,11,8,0.22) 40%, rgba(16,11,8,0) 62%), linear-gradient(180deg, rgba(16,11,8,0.30) 0%, rgba(16,11,8,0) 30%), linear-gradient(0deg, rgba(16,11,8,0.38) 0%, rgba(16,11,8,0) 42%)",
-          }}
-        />
+        {/* Responsive readability wash — darkest directly behind the text
+            block, fading naturally across the rest of the photograph. See
+            .plp-hero-overlay above for the mobile/desktop variants. */}
+        <div className="plp-hero-overlay pointer-events-none absolute inset-0" />
 
         {/* Mobile top padding is safe-area-aware (navbar height + notch
             inset) instead of a fixed guess, so hero content always clears
@@ -244,8 +266,8 @@ export function ProductLandingPage({
             </div>
 
             <h1
-              className="plp-hero-fade-up mt-7 font-serif text-[2.75rem] font-medium leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[3.6rem] xl:text-[4rem]"
-              style={{ animationDelay: "130ms", textShadow: "0 2px 16px rgba(16,11,8,0.35)" }}
+              className="plp-hero-fade-up plp-hero-heading-shadow mt-7 font-serif text-[2.75rem] font-medium leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[3.6rem] xl:text-[4rem]"
+              style={{ animationDelay: "130ms" }}
             >
               {hero.headlineLead}{" "}
               <span className="italic" style={{ color: "#E4A868" }}>
@@ -254,8 +276,8 @@ export function ProductLandingPage({
             </h1>
 
             <p
-              className="plp-hero-fade-up ml-auto mt-6 max-w-md text-[15px] leading-relaxed text-white/85 sm:text-base"
-              style={{ animationDelay: "240ms", textShadow: "0 1px 10px rgba(16,11,8,0.3)" }}
+              className="plp-hero-fade-up plp-hero-desc-shadow ml-auto mt-6 max-w-md text-[15px] leading-relaxed text-white/85 sm:text-base"
+              style={{ animationDelay: "240ms" }}
             >
               {hero.description}
             </p>
