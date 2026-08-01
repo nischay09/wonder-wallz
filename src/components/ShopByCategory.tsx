@@ -178,11 +178,16 @@ export default function ShopByCategory() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-40px" }}
-          className="mt-8 grid grid-cols-2 gap-3.5 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-7"
+          className="mt-8 flex gap-3.5 overflow-x-auto pb-2 sm:gap-4 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
           role="list"
         >
           {products.map((product) => (
-            <motion.div key={product.id} variants={itemVariants} role="listitem">
+            <motion.div
+              key={product.id}
+              variants={itemVariants}
+              role="listitem"
+              className="w-[42vw] shrink-0 xs:w-[38vw] sm:w-[30vw] md:w-[22vw] lg:w-[18vw] xl:w-[calc((100%-6*1rem)/7)]"
+            >
               <CategoryTile product={product} />
             </motion.div>
           ))}

@@ -833,6 +833,53 @@ export const collections: Collection[] = [
       ["#EFE4D7", "#C9B39A"]
     ),
   },
+  // ── MATTRESSES & PILLOWS ───────────────────────────────────────────────────
+  {
+    id: "mattresses-pillows",
+    slug: "mattresses-pillows",
+    title: "Mattresses & Pillows",
+    description: "Restful sleep, tailored to you",
+    heroDescription:
+      "From memory foam to hybrid coil, our mattress and pillow range is built for real comfort. Try before you buy at our showroom, with sizing and firmness guidance from our team.",
+    href: "/collections/mattresses-pillows",
+    heroImage: "/Mattress_.webp",
+    coverImage: "/Mattress_.webp",
+    placeholderGradient: ["#E8DED0", "#B49A7C"],
+    productCount: 40,
+    workflow: "standard",
+    customerActions: ["whatsapp", "home-catalogue", "visit-store"],
+    // No online catalogue yet — consultation landing page, not a grid.
+    showCollectionCards: false,
+    highlights: [
+      "Memory foam, latex, and hybrid coil options",
+      "4 ranges: Luxe Collection, Celestial, Cloude Essential, Accessories",
+      "In-store trial before you buy",
+      "Firmness and sizing guidance from our team",
+      "Matching pillow and topper sets available",
+    ],
+    featured: true,
+    subcategories: [
+      sub("mattresses-pillows", "luxe-collection", "Luxe Collection"),
+      sub("mattresses-pillows", "celestial", "Celestial"),
+      sub("mattresses-pillows", "cloude-essential", "Cloude Essential"),
+      sub("mattresses-pillows", "accessories", "Accessories"),
+    ],
+    products: seedProducts(
+      "mattresses-pillows",
+      [
+        { name: "Luxe Cloud Mattress", description: "Plush memory foam with cooling gel layer", subcategory: "luxe-collection" },
+        { name: "Luxe Firm Support", description: "Orthopedic-grade support for back sleepers", subcategory: "luxe-collection" },
+        { name: "Celestial Hybrid", description: "Pocket coil and latex hybrid for balanced comfort", subcategory: "celestial" },
+        { name: "Celestial Pillow Duo", description: "Adjustable-loft pillows in a matched pair", subcategory: "celestial" },
+        { name: "Cloude Essential Foam", description: "Everyday comfort at an accessible price point", subcategory: "cloude-essential" },
+        { name: "Cloude Essential Topper", description: "Instant softness layer for any mattress", subcategory: "cloude-essential" },
+        { name: "Waterproof Mattress Protector", description: "Breathable, machine-washable protection", subcategory: "accessories" },
+        { name: "Memory Foam Pillow", description: "Contoured neck support in cooling fabric", subcategory: "accessories" },
+      ],
+      "/Mattress_.webp",
+      ["#E8DED0", "#B49A7C"]
+    ),
+  },
 ];
 
 // ─── Lookup helpers ───────────────────────────────────────────────────────────

@@ -9,6 +9,7 @@
  *   /collections/glass-films
  *   /collections/canvas-prints
  *   /collections/upholstery
+ *   /collections/mattresses-pillows
  *
  * Data is sourced entirely from src/lib/collections.ts.
  * To add a new collection, edit that file — no new pages needed.
@@ -49,6 +50,7 @@ import { GlassFilmLandingPage } from "@/components/GlassFilms/GlassFilmLandingPa
 import { BlindsLandingPage } from "@/components/Blinds/BlindsLandingPage";
 import { CurtainsLandingPage } from "@/components/Curtains/CurtainsLandingPage";
 import { UpholsteryLandingPage } from "@/components/Upholstery/UpholsteryLandingPage";
+import { MattressesLandingPage } from "@/components/Mattresses/MattressesLandingPage";
 import type { Collection } from "@/lib/collections";
 
 // ─── Consultation-product landing pages ──────────────────────────────────────
@@ -65,6 +67,7 @@ const LANDING_PAGES: Record<
   blinds: BlindsLandingPage,
   curtains: CurtainsLandingPage,
   upholstery: UpholsteryLandingPage,
+  "mattresses-pillows": MattressesLandingPage,
 };
 
 // ─── Static params ────────────────────────────────────────────────────────────

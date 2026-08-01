@@ -60,6 +60,7 @@ const CATEGORY_SLUGS = [
   "flooring",
   "glass-films",
   "canvas-prints",
+  "mattresses-pillows",
 ] as const;
 
 const categoryProducts = CATEGORY_SLUGS
@@ -160,11 +161,33 @@ export default function CollectionsPageContent() {
           className="mx-auto grid max-w-[1280px] grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-6"
           role="list"
         >
-          {categoryProducts.map((product) => (
-            <motion.div key={product.id} variants={itemVariants} className="h-full" role="listitem">
-              <ProductCard product={product} aspectClass="aspect-[4/5]" prominent />
-            </motion.div>
-          ))}
+          {categoryProducts.map((product, index) => {
+            const isLast = index === categoryProducts.length - 1;
+            // When the final card would be left alone on its row (i.e. the
+            // total count isn't evenly divisible by the column count), let
+            // it span the full row instead of leaving empty tiles beside it.
+            const isLoneOnSmRow = isLast && categoryProducts.length % 2 === 1;
+            const isLoneOnLgRow = isLast && categoryProducts.length % 3 === 1;
+
+            return (
+              <motion.div
+                key={product.id}
+                variants={itemVariants}
+                className={[
+                  "h-full",
+                  isLoneOnSmRow ? "sm:col-span-2" : "",
+                  isLoneOnLgRow ? "lg:col-span-3" : "",
+                ].join(" ")}
+                role="listitem"
+              >
+                <ProductCard
+                  product={product}
+                  aspectClass={isLoneOnLgRow ? "aspect-[21/9] lg:aspect-[21/6]" : "aspect-[4/5]"}
+                  prominent
+                />
+              </motion.div>
+            );
+          })}
         </motion.div>
       </section>
 

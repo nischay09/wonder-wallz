@@ -38,7 +38,8 @@ export type CatalogueCategory =
   | "curtains"
   | "upholstery"
   | "glass-films"
-  | "canvas-prints";
+  | "canvas-prints"
+  | "mattresses-pillows";
 
 const CATEGORY_OPTIONS: { value: CatalogueCategory; label: string }[] = [
   { value: "wallpapers", label: "Wallpapers" },
@@ -48,6 +49,7 @@ const CATEGORY_OPTIONS: { value: CatalogueCategory; label: string }[] = [
   { value: "upholstery", label: "Upholstery" },
   { value: "glass-films", label: "Glass Films" },
   { value: "canvas-prints", label: "Canvas Prints" },
+  { value: "mattresses-pillows", label: "Mattresses & Pillows" },
 ];
 
 const PROPERTY_TYPE_OPTIONS = [

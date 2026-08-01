@@ -97,7 +97,13 @@ function buildProjectBuilderHref(canvasFinish: CanvasFinish) {
 // (roomType: "Living Room", collection: "Canvas Prints"). `size` alternates
 // "tall"/"regular" to match FocusCards' masonry rhythm rather than using
 // "regular" for all four, which would render as a flat, uniform row.
-const CANVAS_FINISH_SAMPLES: (Project & { description: string })[] = [
+const CANVAS_FINISH_SAMPLES: (Project & {
+  description: string;
+  // Shorter caption shown only on mobile (below sm breakpoint) so each
+  // card + caption reads as a compact unit in the 2x2 mobile grid.
+  // Tablet/desktop continue to use `description` in full, unchanged.
+  mobileDescription: string;
+})[] = [
   {
     id: "canvas-finish-print-only",
     image: "/canvas/noframecanvas.webp",
@@ -110,6 +116,7 @@ const CANVAS_FINISH_SAMPLES: (Project & { description: string })[] = [
     size: "tall",
     description:
       "Premium canvas print supplied without framing, ready for your preferred display.",
+    mobileDescription: "Unframed premium canvas.",
   },
   {
     id: "canvas-finish-frameless",
@@ -123,6 +130,7 @@ const CANVAS_FINISH_SAMPLES: (Project & { description: string })[] = [
     size: "regular",
     description:
       "Gallery-wrapped canvas with clean edges for a modern, minimalist finish.",
+    mobileDescription: "Gallery-wrapped modern finish.",
   },
   {
     id: "canvas-finish-framed-no-glass",
@@ -136,6 +144,7 @@ const CANVAS_FINISH_SAMPLES: (Project & { description: string })[] = [
     size: "regular",
     description:
       "Premium framed canvas without glass for a contemporary gallery-style appearance.",
+    mobileDescription: "Premium frame without glass.",
   },
   {
     id: "canvas-finish-framed-with-glass",
@@ -149,6 +158,7 @@ const CANVAS_FINISH_SAMPLES: (Project & { description: string })[] = [
     size: "tall",
     description:
       "Premium framed canvas protected with glass for a timeless and elegant presentation.",
+    mobileDescription: "Premium frame with protective glass.",
   },
 ];
 
@@ -184,23 +194,48 @@ function CanvasFinishSamplesSection() {
           </p>
         </div>
 
-        <div className="mt-10">
-          <FocusCards projects={CANVAS_FINISH_SAMPLES} />
+        {/* ── Desktop / tablet (sm and up): unchanged from before ──────────
+            Single FocusCards grid of all 4 cards, with the full
+            descriptions rendered as a separate caption grid underneath.
+            Hidden below the sm breakpoint, where the mobile-only layout
+            below takes over instead. */}
+        <div className="hidden sm:block">
+          <div className="mt-10">
+            <FocusCards projects={CANVAS_FINISH_SAMPLES} />
+          </div>
+
+          {/* Descriptions — FocusCards' own card face has no description
+              slot (see comment above), so these render as captions beneath
+              the grid, aligned to the same columns as the cards above. */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+            {CANVAS_FINISH_SAMPLES.map((sample) => (
+              <p
+                key={sample.id}
+                className="text-center text-sm leading-relaxed text-neutral-600"
+              >
+                {sample.description}
+              </p>
+            ))}
+          </div>
         </div>
 
-        {/* Descriptions — FocusCards' own card face has no description
-            slot (see comment above), so these render as captions beneath
-            the grid, aligned to the same columns as the cards above.
-            Now 4 cards total (grid already uses lg:grid-cols-4, which
-            matches FocusCards' own column count for 4 items). */}
-        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+        {/* ── Mobile only (below sm): each card + its own short caption
+            rendered together as one unit, laid out in a 2x2 grid.
+            FocusCards itself isn't modified — each cell just renders it
+            with a single-item array, so hover animation, image sizing,
+            links, and deep-link params all pass through unchanged. The
+            caption sits directly under its own card instead of in a
+            separate block below the whole grid. */}
+        <div className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:hidden">
           {CANVAS_FINISH_SAMPLES.map((sample) => (
-            <p
-              key={sample.id}
-              className="text-center text-sm leading-relaxed text-neutral-600"
-            >
-              {sample.description}
-            </p>
+            <div key={sample.id} className="flex flex-col items-center">
+              <div className="w-full">
+                <FocusCards projects={[sample]} />
+              </div>
+              <p className="mt-3 text-center text-sm leading-relaxed text-neutral-600">
+                {sample.mobileDescription}
+              </p>
+            </div>
           ))}
         </div>
       </div>

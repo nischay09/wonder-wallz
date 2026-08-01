@@ -351,6 +351,32 @@ export const products: Product[] = [
     metaDescription:
       "Gallery-grade canvas prints made from your photos or artwork. Available in multiple sizes and frame options.",
   },
+  {
+    // --- existing fields ---
+    id: "mattresses-pillows",
+    slug: "mattresses-pillows",
+    title: "Mattresses & Pillows",
+    description: "Restful sleep systems for every body",
+    href: "/collections/mattresses-pillows",
+    coverImage: "/Mattress_.webp",
+    placeholderGradient: ["#E8DED0", "#B49A7C"],
+    featured: false,
+    subcategories: [
+      buildSubcategory("mattresses-pillows", "luxe-collection", "Luxe Collection"),
+      buildSubcategory("mattresses-pillows", "celestial", "Celestial"),
+      buildSubcategory("mattresses-pillows", "cloude-essential", "Cloude Essential"),
+      buildSubcategory("mattresses-pillows", "accessories", "Accessories"),
+    ],
+    // --- new fields ---
+    pricingMode: "quote",
+    currency: "INR",
+    active: true,
+    materials: ["Memory Foam", "Latex", "Pocket Spring", "Cotton"],
+    tags: ["mattress", "pillow", "sleep", "bedding"],
+    metaTitle: "Mattresses & Pillows | Wonder Wallz",
+    metaDescription:
+      "Sleep systems built for comfort and support — from the Luxe Collection to Cloude Essential, plus pillows and sleep accessories.",
+  },
 ];
 
 /** Look up a top-level product by its slug. */

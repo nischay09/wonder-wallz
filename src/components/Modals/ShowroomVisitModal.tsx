@@ -42,6 +42,7 @@ const CATEGORY_OPTIONS: { value: CatalogueCategory; label: string }[] = [
   { value: "upholstery", label: "Upholstery" },
   { value: "glass-films", label: "Glass Films" },
   { value: "canvas-prints", label: "Canvas Prints" },
+  { value: "mattresses-pillows", label: "Mattresses & Pillows" },
 ];
 
 const CATEGORY_LABELS: Record<CatalogueCategory, string> = CATEGORY_OPTIONS.reduce(
@@ -51,8 +52,8 @@ const CATEGORY_LABELS: Record<CatalogueCategory, string> = CATEGORY_OPTIONS.redu
 
 // Categories that only exist as custom-order work — these steer the
 // customer toward Chandni. Anything outside this set (wallpapers, flooring,
-// blinds, curtains, upholstery) is a catalogue category and steers toward
-// Merlin Homeland.
+// blinds, curtains, upholstery, mattresses-pillows) is a catalogue category
+// and steers toward Merlin Homeland.
 const CUSTOM_ONLY_CATEGORIES: CatalogueCategory[] = [
   "glass-films",
   "canvas-prints",
