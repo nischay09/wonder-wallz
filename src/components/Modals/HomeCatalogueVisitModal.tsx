@@ -20,6 +20,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { openWhatsApp } from "@/lib/whatsapp";
+import { ValidationRequiredModal } from "@/components/ui/ValidationRequiredModal";
+import { scrollToAndFocusFirstError } from "@/lib/validationScroll";
 
 /**
  * HomeCatalogueVisitModal
@@ -103,7 +105,33 @@ interface FormErrors {
   categories?: string;
   visitDate?: string;
   timeSlot?: string;
+  [key: string]: string | undefined;
 }
+
+/**
+ * Order (top-to-bottom) of the required fields, and how each maps to its
+ * DOM id, used only to drive "Review My Details" in ValidationRequiredModal.
+ * `categories` is a checkbox-card group rather than a single input, so it
+ * scrolls/focuses to a wrapper element around the whole group.
+ */
+const FIELD_ORDER: string[] = [
+  "fullName",
+  "mobileNumber",
+  "completeAddress",
+  "pinCode",
+  "categories",
+  "visitDate",
+  "timeSlot",
+];
+const FIELD_ELEMENT_IDS: Record<string, string> = {
+  fullName: "full-name",
+  mobileNumber: "mobile-number",
+  completeAddress: "complete-address",
+  pinCode: "pin-code",
+  categories: "categories-group",
+  visitDate: "visit-date",
+  timeSlot: "time-slot",
+};
 
 export interface HomeCatalogueVisitModalProps {
   /** Controls dialog visibility. Fully controlled — no internal open state. */
@@ -133,6 +161,9 @@ export function HomeCatalogueVisitModal({
   const [timeSlot, setTimeSlot] = useState("");
   const [additionalRequirements, setAdditionalRequirements] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  // Shown ONLY when required fields are missing — this modal has no
+  // API/network failure path (WhatsApp hand-off is a plain link open).
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   const toggleCategory = (category: CatalogueCategory) => {
     setSelectedCategories((prev) =>
@@ -249,6 +280,8 @@ export function HomeCatalogueVisitModal({
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
+      // Prevent submission, preserve all entered data.
+      setShowValidationModal(true);
       return;
     }
 
@@ -259,8 +292,14 @@ export function HomeCatalogueVisitModal({
     resetForm();
   };
 
+  /** "Review My Details" — scroll to and focus the first invalid field. */
+  const handleReviewDetails = () => {
+    scrollToAndFocusFirstError(errors, FIELD_ORDER, (field) => FIELD_ELEMENT_IDS[field]);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
           "max-w-[1160px] overflow-hidden bg-[#FBF8F3] p-0 sm:max-w-[1160px]",
@@ -416,7 +455,10 @@ export function HomeCatalogueVisitModal({
             <p className="mt-2 text-sm leading-relaxed text-neutral-500">
               Select every category you'd like us to bring — pick as many as you like.
             </p>
-            <div className="mt-7 grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3.5">
+            <div
+              id={FIELD_ELEMENT_IDS.categories}
+              className="mt-7 grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3.5"
+            >
               {CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategories.includes(option.value);
                 return (
@@ -588,5 +630,13 @@ export function HomeCatalogueVisitModal({
       </div>
       </DialogContent>
     </Dialog>
+
+      {/* Shown only when required fields are missing — never for API/network errors */}
+      <ValidationRequiredModal
+        open={showValidationModal}
+        onOpenChange={setShowValidationModal}
+        onReviewDetails={handleReviewDetails}
+      />
+    </>
   );
 }

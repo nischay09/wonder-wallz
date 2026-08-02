@@ -42,6 +42,21 @@ import {
 } from '../../lib/types';
 import { sendProjectEnquiry, getWhatsAppFallbackUrl } from '../../lib/emailService';
 import { buildProjectEnquiryPayload } from '../../lib/projectEnquiryMapper';
+import { ValidationRequiredModal } from '@/components/ui/ValidationRequiredModal';
+import { scrollToAndFocusFirstError } from '@/lib/validationScroll';
+
+/**
+ * Order (top-to-bottom) of the required CustomerDetails fields, and how
+ * each maps to its input's DOM id in CustomerDetailsForm. Used only to
+ * drive "Review My Details" in the ValidationRequiredModal — the actual
+ * validation logic still lives in validateCustomerDetails().
+ */
+const CUSTOMER_FIELD_ORDER: (keyof CustomerDetailsErrors)[] = ['name', 'phone', 'email'];
+const CUSTOMER_FIELD_ELEMENT_IDS: Record<string, string> = {
+  name: 'customer-name',
+  phone: 'customer-phone',
+  email: 'customer-email',
+};
 
 type SubmissionStatus = 'idle' | 'sending' | 'success' | 'error';
 
@@ -71,6 +86,9 @@ export default function ProjectBuilder({
   const [customerErrors, setCustomerErrors] = useState<CustomerDetailsErrors>({});
   const [status, setStatus] = useState<SubmissionStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  // ValidationRequiredModal is shown ONLY for missing required fields —
+  // never for the API/network failure path (that's `status === 'error'` above).
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   useEffect(() => {
     if (initialProduct === 'canvas-prints') {
@@ -139,7 +157,12 @@ export default function ProjectBuilder({
 
     const { valid, errors } = validateCustomerDetails(customer);
     setCustomerErrors(errors);
-    if (!valid) return;
+    if (!valid) {
+      // Prevent submission, preserve all entered data, and surface the
+      // ValidationRequiredModal instead of silently doing nothing.
+      setShowValidationModal(true);
+      return;
+    }
 
     setStatus('sending');
     setErrorMessage('');
@@ -156,6 +179,15 @@ export default function ProjectBuilder({
       setStatus('error');
       setErrorMessage(result.error ?? 'Something went wrong while sending your enquiry.');
     }
+  }
+
+  /** "Review My Details" — scroll to and focus the first invalid customer field. */
+  function handleReviewDetails() {
+    scrollToAndFocusFirstError(
+      customerErrors,
+      CUSTOMER_FIELD_ORDER,
+      (field) => CUSTOMER_FIELD_ELEMENT_IDS[field]
+    );
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -310,6 +342,13 @@ export default function ProjectBuilder({
           )}
         </div>
       </div>
+
+      {/* Shown only when required fields are missing — never for API/network errors */}
+      <ValidationRequiredModal
+        open={showValidationModal}
+        onOpenChange={setShowValidationModal}
+        onReviewDetails={handleReviewDetails}
+      />
     </section>
   );
 }

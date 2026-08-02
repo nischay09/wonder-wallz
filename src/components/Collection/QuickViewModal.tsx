@@ -22,6 +22,8 @@ import {
   formatCurrency as formatEstimatorCurrency,
   PROJECT_BUILDER_MIN_BILLABLE_AREA_SQFT,
 } from "@/lib/estimator";
+import { ValidationRequiredModal } from "@/components/ui/ValidationRequiredModal";
+import { scrollToAndFocusElementById } from "@/lib/validationScroll";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -151,6 +153,9 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
   const [addedFeedback, setAddedFeedback] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  // Shown ONLY when Width/Height are missing or invalid on "Add to
+  // Project" / WhatsApp enquiry — never for cart/API failures.
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -183,6 +188,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
       setAddedFeedback(false);
       setImageLoaded(false);
       setActiveImage(0);
+      setShowValidationModal(false);
     }
   }, [product?.id]);
 
@@ -304,7 +310,11 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
   }, [product, addItem, widthNum, heightNum, dimensionsValid, unit, selectedMaterial, quantity, onClose, onAddedToCart, collectionSlug]);
 
   const handlePrimaryCTA = () => {
-    if (!dimensionsValid) return;
+    if (!dimensionsValid) {
+      // Prevent submission, preserve all entered data.
+      setShowValidationModal(true);
+      return;
+    }
     if (isCustom) {
       // Custom → Add to Project (goes to Project Builder via the cart)
       handleAddToProject();
@@ -314,12 +324,28 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
     }
   };
 
+  /**
+   * "Review My Details" — scroll to and focus the first invalid field.
+   * Width/Height are rendered twice (once in the <1024px layout, once in
+   * the >=1024px split layout — see the two "MOBILE / TABLET" and
+   * "DESKTOP" sections below); only one is ever visible at a time via
+   * `lg:hidden` / `hidden lg:flex`, so pick the id matching whichever
+   * layout is actually on screen right now.
+   */
+  const handleReviewDetails = () => {
+    const isDesktopLayout = typeof window !== "undefined" && window.innerWidth >= 1024;
+    const suffix = isDesktopLayout ? "desktop" : "mobile";
+    const targetId = widthError ? `qv-width-${suffix}` : `qv-height-${suffix}`;
+    scrollToAndFocusElementById(targetId);
+  };
+
   if (!product) return null;
 
   const previewAspect = getPreviewAspectConfig(product);
 
   return (
-    <AnimatePresence>
+    <>
+      <AnimatePresence>
       {isOpen && (
         // Backdrop — fixed inset-0 with no padding so it fully covers the
         // viewport on every breakpoint.
@@ -533,6 +559,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         Width
                       </label>
                       <input
+                        id="qv-width-mobile"
                         type="number"
                         min={0}
                         value={width}
@@ -560,6 +587,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                         Height
                       </label>
                       <input
+                        id="qv-height-mobile"
                         type="number"
                         min={0}
                         value={height}
@@ -752,7 +780,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                   <button
                     type="button"
                     onClick={handlePrimaryCTA}
-                    disabled={addedFeedback || !dimensionsValid}
+                    disabled={addedFeedback}
                     className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                     style={{
                       background: addedFeedback
@@ -1003,6 +1031,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                           Width
                         </label>
                         <input
+                          id="qv-width-desktop"
                           type="number"
                           min={0}
                           value={width}
@@ -1030,6 +1059,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                           Height
                         </label>
                         <input
+                          id="qv-height-desktop"
                           type="number"
                           min={0}
                           value={height}
@@ -1228,7 +1258,7 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
                 <button
                   type="button"
                   onClick={handlePrimaryCTA}
-                  disabled={addedFeedback || !dimensionsValid}
+                  disabled={addedFeedback}
                   className="w-full py-4 rounded-2xl flex flex-col items-center justify-center gap-0.5 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                   style={{
                     background: addedFeedback
@@ -1278,5 +1308,14 @@ export function QuickViewModal({ product, workflow, isOpen, onClose, onAddedToCa
         </motion.div>
       )}
     </AnimatePresence>
+
+      {/* Shown only when Width/Height are missing or invalid — never for
+          cart/API failures. */}
+      <ValidationRequiredModal
+        open={showValidationModal}
+        onOpenChange={setShowValidationModal}
+        onReviewDetails={handleReviewDetails}
+      />
+    </>
   );
 }
