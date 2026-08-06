@@ -138,8 +138,16 @@ function useNavbarHeightVar(ref: React.RefObject<HTMLDivElement | null>) {
 }
 
 export function Navbar() {
-  const [scrolled,              setScrolled]              = useState(false);
-  const [hidden,                setHidden]                = useState(false);
+  // Lazily initialize from the *actual* scroll position instead of always
+  // starting at false. Without this, a page that mounts already scrolled
+  // (refresh mid-page, back/forward nav, in-page anchor) renders in the
+  // wrong visual state for a frame, then visibly snaps into place the
+  // instant the first scroll "change" event fires. That snap is the
+  // on-load jitter.
+  const [scrolled, setScrolled] = useState(
+    () => typeof window !== "undefined" && window.scrollY > 60
+  );
+  const [hidden,   setHidden]   = useState(false);
   const [mobileOpen,            setMobileOpen]            = useState(false);
   const [activeLink,            setActiveLink]            = useState<string | null>(null);
   const [collectionsOpen,       setCollectionsOpen]       = useState(false);
@@ -171,7 +179,10 @@ export function Navbar() {
   useNavbarHeightVar(navWrapperRef);
 
   const { scrollY } = useScroll();
-  const lastY = useRef(0);
+  // Seed lastY with the real starting scroll position too, so the very
+  // first delta calculation (used to decide hide/show-on-scroll) isn't
+  // computed against a false "started at 0" baseline.
+  const lastY = useRef(typeof window !== "undefined" ? window.scrollY : 0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 60);
@@ -208,42 +219,53 @@ export function Navbar() {
       >
         <motion.div
           className="flex justify-center px-2"
+          style={{ paddingTop: "0.625rem", paddingBottom: "0.5rem" }}
           animate={{
-            paddingLeft:  scrolled ? "0.75rem" : "0.5rem",
-            paddingRight: scrolled ? "0.75rem" : "0.5rem",
-            paddingTop:   scrolled ? "0.625rem" : "0.5rem",
-            paddingBottom:"0.5rem",
+            // y is the only thing animated here — a transform, so it's
+            // handled entirely by the compositor (no layout/paint cost).
             y: hidden ? "-130%" : "0%",
           }}
           transition={{ duration: 0.35, ease: "easeOut" }}
         >
           <motion.header
-            className="w-full"
+            className="w-full max-w-[1640px]"
+            style={{ transformOrigin: "top center" }}
             animate={{
-              maxWidth: scrolled ? "880px" : "1640px",
-              y:        scrolled ? 0 : 4,
-              filter: scrolled
-                ? "drop-shadow(0 8px 32px rgba(40,30,10,0.16))"
-                : "drop-shadow(0 4px 16px rgba(40,30,10,0.08))",
+              // Scaling the header down reads visually like the old
+              // maxWidth shrink, but scale/y are transform properties —
+              // no reflow. Animating maxWidth forced a layout recalculation
+              // on every frame of every scroll-state transition, which was
+              // the main source of the jank.
+              scale: scrolled ? 0.965 : 1,
+              y:     scrolled ? 0 : 4,
             }}
             transition={{ duration: 0.35, ease: "easeOut" }}
           >
             {/* ── Nav Shell ── */}
             <motion.nav
               className="grid grid-cols-[auto_1fr_auto] items-center px-3 py-2"
-              animate={{
+              style={{
+                border: "1px solid transparent",
                 borderRadius: "9999px",
+                // Blur stays constant instead of being re-computed by
+                // Framer every animation frame — backdrop-filter is one of
+                // the most expensive properties to animate (it repaints
+                // everything behind the element each tick). Only the
+                // background opacity and border color, both cheap paint
+                // properties, transition on scroll.
+                backdropFilter: "blur(24px)",
+                WebkitBackdropFilter: "blur(24px)",
+                transition: "background-color 0.35s ease-out, border-color 0.35s ease-out",
                 background: scrolled
                   ? "rgba(244,241,234,0.92)"
                   : "rgba(244,241,234,0.78)",
-                backdropFilter: "blur(24px)",
-                WebkitBackdropFilter: "blur(24px)",
                 borderColor: scrolled
                   ? "rgba(156,122,63,0.38)"
                   : "rgba(156,122,63,0.24)",
+                boxShadow: scrolled
+                  ? "0 8px 32px rgba(40,30,10,0.16)"
+                  : "0 4px 16px rgba(40,30,10,0.08)",
               }}
-              style={{ border: "1px solid transparent" }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
               aria-label="Main navigation"
             >
 
