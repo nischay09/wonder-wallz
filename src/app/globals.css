@@ -238,7 +238,15 @@
     transition: color 0.15s var(--ease-brand);
   }
 
-  a:hover {
+  /* :where() keeps this at (0,1,0) specificity — same as a Tailwind
+     utility class — instead of the default (0,1,1) for `a:hover`.
+     Without this, this rule was beating `hover:text-*` utility classes
+     on any Link/anchor-based button, forcing their hover text color to
+     --accent-hover regardless of what was set inline. That's exactly
+     what caused "Start Your Project" / "Design Your Space" buttons to
+     go invisible on hover: bg went to --accent-hover AND text got
+     force-overridden to the same --accent-hover, so text == background. */
+  :where(a):hover {
     color: var(--accent-hover);
   }
 
